@@ -1,0 +1,35 @@
+extends layout
+
+block content
+    style.
+        .error {
+            color: #c00;
+        }
+        form label {
+            padding-left: 15px;
+            padding-right: 5px;
+            margin: 0;
+            }
+        input[type="submit"] {
+            display: block;
+            margin-top: 25px;
+            margin-left: 15px;
+        }
+    h1 Идентификация
+    p Введите, пожалуйста, свои данные
+    if message && message.length > 0
+        p.error!= message.join('<br/>')
+    form(action='login' method='POST')
+        label(for='group') Номер группы
+        input(type='text' name='group' value=loginData.group autofocus)
+        p Студент 1
+            label(for='firstname1') Имя
+            input(type='text' name='firstname1' value=loginData.firstname1)
+            label(for='lastname1') Фамилия
+            input(type='text' name='lastname1' value=loginData.lastname1)
+        p Студент 2
+            label(for='firstname2') Имя
+            input(type='text' name='firstname2' value=loginData.firstname2)
+            label(for='lastname2') Фамилия
+            input(type='text' name='lastname2' value=loginData.lastname2)
+        input(type='submit' value='Войти')

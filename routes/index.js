@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var csc = require('./console-scene.js')
+var tsk = require('./tasks.js')
 
 /*
 var scene = new csc.Scene({
@@ -57,28 +58,35 @@ var scene = csc.Scene.fromObject({
     background: ['----====', '----====', '====----', '====----']
     })
 
+function clamp(x, xmin, xmax, xdefault) {
+    if (x === undefined)
+        return xdefault
+    x = +x
+    return x<xmin? xmin: x>xmax? xmax: x
+}
+
 /* GET home page. */
 router
-    .get('/', function(req, res, next) {
-        res.render('index', { title: 'Express' })
+    .use('/', function(req, res, next) {
+        if (!req.session.taskIndex)
+            req.session.taskIndex = 0   // TODO
+        next()
     })
-    .get('/task', function(req, res, next) {
-        res.render('task', { title: 'Task' })
+    .get('/', function(req, res, next) {
+        var n = clamp(req.query.n, 0, tsk.list.length()-1, req.session.taskIndex)
+        var task = tsk.list.task(n)
+        res.render('task', { n: n, task: task })
     })
     .get('/task-output', function(req, res, next) {
-        function clamp(x, xmin, xmax, xdefault) {
-            if (x === undefined)
-                return xdefault
-            x = +x
-            return x<xmin? xmin: x>xmax? xmax: x
-        }
+        var n = clamp(req.query.n, 0, tsk.list.length()-1, 0)
         var w = clamp(req.query.width, 1, 160, 80)
         var h = clamp(req.query.height, 1, 50, 24)
+        var task = tsk.list.task(n)
         res.send(JSON.stringify({
             width: w,
             height: h,
-            data: scene.paint(w, h)
+            data: task.scene().paint(w, h)
         }))
     })
 
-module.exports = router;
+module.exports = router

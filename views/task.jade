@@ -21,7 +21,7 @@ block content
             var charWidth = aux.width() / 79
             var charHeight = aux.height() / 23
             function loadOutput(dst, w, h) {
-                $.get('/task-output', {width: w, height: h})
+                $.get('/task-output', {width: w, height: h, n: #{n}})
                     .done(function(d) {
                         d = JSON.parse(d)
                         var w = d.width,   h = d.height
@@ -70,8 +70,14 @@ block content
             overflow: hidden;
             position: absolute;
         }
-    h1= title
-
+        p {
+            font-size: 16px;
+        }
+        h1 {
+            font-size: 20px;
+        }
+    h1 Вариант #{n+1}
+    p= task.text()
     #console-size
     .console.black.monospace.console-pad
         .console-data
