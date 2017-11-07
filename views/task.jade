@@ -1,0 +1,75 @@
+extends layout
+
+block content
+    link(rel='stylesheet', href='stylesheets/jquery-ui.min.css')
+    script(src='javascripts/jquery-3.2.1.min.js')
+    script(src='javascripts/jquery-ui.min.js')
+    script.
+        $(document).ready(function() {
+            function message(className, text) {
+                $('#log').append($('<p>').addClass(className || 'info').html(text))
+            }
+            var infoMessage = message.bind(this, 'info')
+            var errorMessage = message.bind(this, 'error')
+            function error(xhr) {
+                errorMessage(xhr.statusText || 'Error ' + xhr.status)
+            }
+            var aux = $('#aux').html(Array(78).fill('0').join('') + Array(23).fill('0<br/>').join(''))
+            var charWidth = aux.width() / 79
+            var charHeight = aux.height() / 23
+            function loadOutput(dst, w, h) {
+                $.get('/task-output', {width: w, height: h})
+                    .done(function(d) {
+                        d = JSON.parse(d)
+                        w = d.width
+                        h = d.height
+                        dst.find('.console-data').html(d.data.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'))
+                        $('#console-size').text(w + ' x ' + h)
+                    })
+                    .fail(error)
+            }
+            var console = $('.console')
+            console.width(aux.width())
+                .height(aux.height())
+                .resizable({
+                resize: function(e, ui) {
+                    ui.size.width = Math.round(ui.size.width/charWidth)*charWidth
+                    ui.size.height = Math.round(ui.size.height/charHeight)*charHeight
+                },
+                stop: function(e, ui) {
+                    var w = Math.round(ui.size.width/charWidth)
+                    var h = Math.round(ui.size.height/charHeight)
+                    loadOutput($(this), w, h)
+                }
+            })
+            loadOutput(console, aux.width()/charWidth, aux.height()/charHeight)
+        })
+    style.
+        .info {
+            color: #0c0;
+        }
+        .error {
+            color: #c00;
+        }
+        .black {
+            color: #fff;
+            background-color: #000;
+        }
+        .monospace {
+            font-family: courier;
+            font-size: 16px;
+        }
+        .zero-size {
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            position: absolute;
+        }
+    h1= title
+
+    #console-size
+    .console.black.monospace
+        .console-data
+    #log
+    .zero-size
+        span#aux.monospace
