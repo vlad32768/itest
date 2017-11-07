@@ -14,6 +14,9 @@ block content
             function error(xhr) {
                 errorMessage(xhr.statusText || 'Error ' + xhr.status)
             }
+            function cssToPixel(element, cssProp) {
+                return +(element.css(cssProp).replace(/[^0-9]*$/, ''))
+            }
             var aux = $('#aux').html(Array(78).fill('0').join('') + Array(23).fill('0<br/>').join(''))
             var charWidth = aux.width() / 79
             var charHeight = aux.height() / 23
@@ -21,8 +24,7 @@ block content
                 $.get('/task-output', {width: w, height: h})
                     .done(function(d) {
                         d = JSON.parse(d)
-                        w = d.width
-                        h = d.height
+                        var w = d.width,   h = d.height
                         dst.find('.console-data').html(d.data.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'))
                         $('#console-size').text(w + ' x ' + h)
                     })
@@ -59,6 +61,9 @@ block content
             font-family: courier;
             font-size: 16px;
         }
+        .console-pad {
+            padding: 0.3em;
+        }
         .zero-size {
             width: 0;
             height: 0;
@@ -68,7 +73,7 @@ block content
     h1= title
 
     #console-size
-    .console.black.monospace
+    .console.black.monospace.console-pad
         .console-data
     #log
     .zero-size
