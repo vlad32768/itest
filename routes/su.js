@@ -137,69 +137,6 @@ su.post('/deny-identification', function(req, res) {
     studentsData.denyIdentification = v
     res.sendStatus(200)
 })
-su.get('/test', function(req, res) {
-    var studentId = req.query.student
-    if (!studentId)
-        return res.status(400).send('Query parameter \'student\' is missing')
-    var st = studentsData.byid(studentId)
-    if (!st)
-        return res.status(404).send('Student is not found')
-    if (!st.test)
-        return res.status(404).send('No test is associated with the student')
-    res.render('test', {
-        req: req,
-        student: st,
-        allFinished: true,
-        timeTillAllFinish: 0,
-        timeTillAllFinishFmt: '-',
-        summary: st.test.summary(),
-        backref: '/su',
-        suview: true
-    })
-})
-su.get('/task', function(req, res) {
-    var studentId = req.query.student
-    if (!studentId)
-        return res.status(400).send('Query parameter \'student\' is missing')
-    var st = studentsData.byid(studentId)
-    if (!st)
-        return res.status(404).send('Student is not found')
-    if (!st.task)
-        return res.status(404).send('No test is associated with the student')
-    res.render('task', {
-        student: st,
-        prop: 'task',
-        title: 'Задача',
-        backref: '/su',
-        suview: true
-    })
-})
-su.get('/task2', function(req, res) {
-    var studentId = req.query.student
-    if (!studentId)
-        return res.status(400).send('Query parameter \'student\' is missing')
-    var st = studentsData.byid(studentId)
-    if (!st)
-        return res.status(404).send('Student is not found')
-    if (!st.task)
-        return res.status(404).send('No test is associated with the student')
-    res.render('task', {
-        student: st,
-        prop: 'task2',
-        title: 'Задача 2',
-        backref: '/su',
-        suview: true
-    })
-})
-su.get('/trash', function(req, res) {
-   var studentId = req.query.student
-   if (!studentId)
-       return res.status(400).send('Query parameter \'student\' is missing')
-   if (!studentsData.canTrash(studentId))
-       return res.status(403).send('Student cannot be moved to trash')
-   studentsData.trash(studentId)
-   res.redirect('/su')
-})
 */
 
 module.exports = router

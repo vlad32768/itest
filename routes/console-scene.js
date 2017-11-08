@@ -116,7 +116,7 @@ Wave.fromObject = function(o) {
 }
 
 Wave.prototype.contains = function(x, y) {
-    var v = this.data.bias + this.data.amp*Math.sin(x*this.data.length*2*Math.PI + this.data.phase)
+    var v = this.data.bias + this.data.amp*Math.sin(x/this.data.length*2*Math.PI + this.data.phase)
     return y < v
 }
 
