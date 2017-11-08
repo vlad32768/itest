@@ -1,0 +1,9 @@
+extends layout
+
+block content
+        h1 Авторизация экзаменатора
+        p Введите пароль
+        if message && message.length > 0
+            p(style="color: #c00;")!= message.join('<br/>')
+        form(action='auth' method='POST')
+            input(type='password' name='pass' autofocus)

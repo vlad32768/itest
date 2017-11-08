@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var csc = require('./console-scene.js')
 var tsk = require('./tasks.js')
+var sd = require('./student-data.js')
+var _ = require('lodash')
 
 /*
 var scene = new csc.Scene({
@@ -68,8 +70,14 @@ function clamp(x, xmin, xmax, xdefault) {
 /* GET home page. */
 router
     .use('/', function(req, res, next) {
-        if (!req.session.taskIndex)
-            req.session.taskIndex = 0   // TODO
+        if (!req.session.supervisor   &&   !req.session.hasOwnProperty('taskIndex')) {
+            var ti = sd.data.taskIndices
+            if (!ti   ||   ti.length === 0)
+                ti = sd.data.taskIndices = _.range(tsk.list.length())
+            var i = Math.floor(Math.random() * ti.length)
+            var team = sd.data.team(req.session.teamId)
+            team.taskIndex = req.session.taskIndex = ti.splice(i, 1)[0]
+        }
         next()
     })
     .get('/', function(req, res, next) {
@@ -87,6 +95,11 @@ router
             height: h,
             data: task.scene().paint(w, h)
         }))
+    })
+    .post('/upload-result', function(req, res, next) {
+        var team = sd.data.team(req.session.teamId)
+        team.result = req.body.result
+        res.sendStatus(200)
     })
 
 module.exports = router

@@ -1,63 +1,14 @@
 var express = require('express');
-var router = express.Router();
-
+var sd = require('./student-data.js')
 var _ = require('lodash')
 
-function Team(options) {
-    _.merge(this, _.pick(options || {}, ['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2']))
-}
-
-Team.prototype.keys = function() {
-    var self = this
-    function verbKey(firstName, lastName) {
-        return (firstName + '#' + lastName).toLowerCase()
-    }
-    function key(firstName, lastName) {
-        return [verbKey(firstName, lastName), verbKey(lastName, firstName)]
-    }
-    var keys = key(self.firstname1, self.lastname1)
-    if (self.firstname2 && self.lastname2)
-        keys = keys.concat(key(self.firstname2, self.lastname2))
-    return keys
-}
-
-Team.prototype.id = function() {
-    return _(this).pick(['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2']).values().join('#')
-}
-
-function Data() {
-    this.list = {}
-    this.unsaved = false
-}
-
-var data = new Data()
-
-Data.prototype.ids = function() {
-    return _.keys(this.list)
-}
-Data.prototype.byid = function(id) {
-    return this.list[id]
-}
-Data.prototype.canAddTeam = function(team) {
-    var self = this
-    return _.every(team.keys(), function(key) {
-        return !self.list.hasOwnProperty(key)
-    })
-}
-Data.prototype.addTeam = function(team) {
-    var self = this
-    _.each(team.keys(), function(key) {
-        self.list[key] = team
-    })
-    this.unsaved = true
-}
-
+var router = express.Router();
 router
     .get('/login', function(req, res, next) {
         res.render('login', {message: req.flash('loginMessage'), loginData: req.session.loginData || {}})
     })
     .post('/login', function(req, res, next) {
-//        if (data.denyIdentification)
+//        if (sd.data.denyIdentification)
 //            return res.status(403).send('Идентификация в данный момент запрещена')
         var b = req.session.loginData = req.body
         b = _.pick(b, ['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2'])
@@ -74,14 +25,14 @@ router
             req.flash('loginMessage', 'Для второго студента следует задать либо имя и фамилию, либо ничего')
             ok = false
         }
-        var team = new Team(b)
-        if (!data.canAddTeam(team)) {
+        var team = new sd.Team(b)
+        if (!sd.data.canAddTeam(team)) {
             req.flash('loginMessage', 'Как минимум один студент из этой команды уже зарегистрирован')
             ok = false
         }
         if (!ok)
             return res.redirect( '/login' )
-        data.addTeam(team)
+        sd.data.addTeam(team)
         req.session.team = team
         req.session.teamId = team.id()
         res.redirect('/')
@@ -91,9 +42,8 @@ router
         res.redirect('/')
     })
     .use('/', function(req, res, next) {
-        if (!req.session.teamId)
+        if (!req.session.teamId && !req.session.supervisor)
             return res.redirect('/login')
-        req.studentData = data
         next()
     })
 

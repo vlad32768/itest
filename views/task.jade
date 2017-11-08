@@ -14,6 +14,9 @@ block content
             function error(xhr) {
                 errorMessage(xhr.statusText || 'Error ' + xhr.status)
             }
+            function clearMessages() {
+                $('#log').html('')
+            }
             function cssToPixel(element, cssProp) {
                 return +(element.css(cssProp).replace(/[^0-9]*$/, ''))
             }
@@ -31,11 +34,11 @@ block content
                     .fail(error)
             }
             var console = $('.console')
-            console.width(aux.width())
+            console.width(aux.width()+1)
                 .height(aux.height())
                 .resizable({
                 resize: function(e, ui) {
-                    ui.size.width = Math.round(ui.size.width/charWidth)*charWidth
+                    ui.size.width = Math.round(ui.size.width/charWidth)*charWidth + 1
                     ui.size.height = Math.round(ui.size.height/charHeight)*charHeight
                 },
                 stop: function(e, ui) {
@@ -45,6 +48,16 @@ block content
                 }
             })
             loadOutput(console, aux.width()/charWidth, aux.height()/charHeight)
+
+            $('#upload-result').click(function() {
+                clearMessages()
+                var text = $('#student-result').val()
+                if (!text)
+                    return errorMessage('Слишком мало букв!')
+                $.post('/upload-result', { result: text })
+                    .done(infoMessage.bind(this, 'Текст отправлен на сервер'))
+                    .fail(error)
+            })
         })
     style.
         .info {
@@ -81,6 +94,10 @@ block content
     #console-size
     .console.black.monospace.console-pad
         .console-data
-    #log
     .zero-size
         span#aux.monospace
+    h1 Сюда можно скопипастить работающую программу
+    textarea#student-result
+    br
+    input#upload-result(type='button' value='У меня получилось!')
+    #log

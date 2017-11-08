@@ -10,6 +10,7 @@ var flash = require('express-flash')
 var login = require('./routes/login');
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var su = require('./routes/su');
 
 var app = express();
 
@@ -30,6 +31,7 @@ app.use(session({
     saveUninitialized: false
 }))
 app.use(flash())
+app.use('/su', su)
 app.use('/', login)
 app.use('/', routes);
 app.use('/users', users);
