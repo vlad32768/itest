@@ -2,26 +2,16 @@ extends layout
 
 block content
     link(rel='stylesheet', href='stylesheets/jquery-ui.min.css')
+    link(rel='stylesheet' href='/stylesheets/messages.css')
     style.
         .teamId {
             display: none;
         }
     script(src='javascripts/jquery-3.2.1.min.js')
     script(src='javascripts/jquery-ui.min.js')
+    script(src='/javascripts/messages.js')
     script.
         $(document).ready(function() {
-            function message(className, text) {
-                $('#log').append($('<p>').addClass(className || 'info').html(text))
-            }
-            var infoMessage = message.bind(this, 'info')
-            var errorMessage = message.bind(this, 'error')
-            function error(xhr) {
-                errorMessage(xhr.statusText || 'Error ' + xhr.status)
-            }
-            function clearMessages() {
-                $('#log').html('')
-            }
-
             function teamId(element) {
                 return $(element).closest('tr').find('.teamId').text()
             }
@@ -56,13 +46,59 @@ block content
                 }
             })
 
+            $('#confirm-clear').dialog({
+                autoOpen: false,
+                resizable: false,
+                height: "auto",
+                width: 400,
+                modal: true,
+                buttons: {
+                    "Всё равно очистить": function() {
+                        $.get('/su/clear', {force: true})
+                            .done(reload)
+                            .fail(msg.ajaxError)
+                        $(this).dialog('close')
+                    },
+                    "Отмена": function() {
+                        $(this).dialog('close')
+                    }
+                }
+            })
+
             // Process the 'save' button
             $('#save').click(function(e) {
                 e.preventDefault()
                 $.post('/su/save', { nameEnding: $('#nameEnding').val() })
                     .done(reload)
-                    .fail(error)
+                    .fail(msg.ajaxError)
             })
+
+            // Process control links and file loading
+            $('#loadfiles a').click(function(e) {
+                e.preventDefault()
+                $.get(this.href).done(reload).fail(msg.ajaxError)
+            })
+
+            // Process clear data link
+            $('#clear-data').click(function(e) {
+                e.preventDefault()
+                $.get(this.href)
+                    .done(reload)
+                    .fail(function(xhr) {
+                        if (xhr.status === 403)
+                            $('#confirm-clear').dialog('open')
+                        else
+                            msg.ajaxError(xhr)
+                    })
+            })
+
+            // Process the Deny login checkbox
+            $('#denyLogin').click(function() {
+                var checked = $(this).prop('checked')
+                $.post('/su/deny-login', {value: checked})
+                    .fail(msg.ajaxError)
+            })
+
         })
     #hdr
         h1 Страница экзаменатора
@@ -71,7 +107,7 @@ block content
         .nested
             u(style='list-style-type: none;')
                 li: a(href='/su/exit') Выход
-                li: a.control(href='/su/clear') Очистить данные
+                li: a#clear-data(href='/su/clear') Очистить данные
         .nested
             h3 Сохранение данных<br>
             .nested
@@ -91,10 +127,10 @@ block content
             h3 Разное
             .nested#misc
                 span
-                    if studentData.denyIdentification
-                        input#denyIdentification(type='checkbox' checked)
+                    if studentData.denyLogin
+                        input#denyLogin(type='checkbox' checked)
                     else
-                        input#denyIdentification(type='checkbox')
+                        input#denyLogin(type='checkbox')
                     | Запретить идентификацию вновь прибывших
     #students
         h2 Состояние
@@ -117,7 +153,7 @@ block content
                     td= team.lastname1
                     td= team.firstname2
                     td= team.lastname2
-                    td: a(href='/?n='+team.taskIndex target='_blank')= team.taskIndex+1
+                    td: a(href='/su/task?n='+team.taskIndex target='_blank')= team.taskIndex+1
                     td
                         if team.result
                             a.team-result(href='/su/team-result' target='_blank') есть
@@ -126,4 +162,5 @@ block content
                     td: input.mark(type='text' value=team.mark||'')
                     td: input.remove(type='button' value='удалить')
     #confirm-remove(title="Действитьельно удалить?")
-    #log
+    #confirm-clear(title="Очистить данные?")
+        p Текущее состояние не сохранено!

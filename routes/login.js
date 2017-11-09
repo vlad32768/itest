@@ -8,8 +8,9 @@ router
         res.render('login', {message: req.flash('loginMessage'), loginData: req.session.loginData || {}})
     })
     .post('/login', function(req, res, next) {
-//        if (sd.data.denyIdentification)
-//            return res.status(403).send('Идентификация в данный момент запрещена')
+        debugger
+        if (sd.data.denyLogin)
+            return res.status(403).send('Идентификация в данный момент запрещена')
         var b = req.session.loginData = req.body
         b = _.pick(b, ['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2'])
         var ok = true
@@ -33,16 +34,17 @@ router
         if (!ok)
             return res.redirect( '/login' )
         sd.data.addTeam(team)
-        req.session.team = team
         req.session.teamId = team.id()
         res.redirect('/')
     })
     .get('/logout', function(req, res, next) {
-        req.session.team = req.session.teamId = undefined
+        delete req.session.teamId
         res.redirect('/')
     })
     .use('/', function(req, res, next) {
-        if (!req.session.teamId && !req.session.supervisor)
+        if (req.session.teamId && !sd.data.team(req.session.teamId))
+            delete req.session.teamId
+        if (!req.session.teamId)
             return res.redirect('/login')
         next()
     })

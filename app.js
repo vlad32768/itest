@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session')
 var flash = require('express-flash')
 
+var taskOutput = require('./routes/task-output');
 var login = require('./routes/login');
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -31,6 +32,7 @@ app.use(session({
     saveUninitialized: false
 }))
 app.use(flash())
+app.use('/', taskOutput)
 app.use('/su', su)
 app.use('/', login)
 app.use('/', routes);

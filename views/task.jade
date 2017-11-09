@@ -1,22 +1,13 @@
 extends layout
 
 block content
-    link(rel='stylesheet', href='stylesheets/jquery-ui.min.css')
-    script(src='javascripts/jquery-3.2.1.min.js')
-    script(src='javascripts/jquery-ui.min.js')
+    link(rel='stylesheet', href='/stylesheets/jquery-ui.min.css')
+    link(rel='stylesheet' href='/stylesheets/messages.css')
+    script(src='/javascripts/jquery-3.2.1.min.js')
+    script(src='/javascripts/jquery-ui.min.js')
+    script(src='/javascripts/messages.js')
     script.
         $(document).ready(function() {
-            function message(className, text) {
-                $('#log').append($('<p>').addClass(className || 'info').html(text))
-            }
-            var infoMessage = message.bind(this, 'info')
-            var errorMessage = message.bind(this, 'error')
-            function error(xhr) {
-                errorMessage(xhr.statusText || 'Error ' + xhr.status)
-            }
-            function clearMessages() {
-                $('#log').html('')
-            }
             function cssToPixel(element, cssProp) {
                 return +(element.css(cssProp).replace(/[^0-9]*$/, ''))
             }
@@ -31,7 +22,7 @@ block content
                         dst.find('.console-data').html(d.data.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'))
                         $('#console-size').text(w + ' x ' + h)
                     })
-                    .fail(error)
+                    .fail(msg.ajaxError)
             }
             var console = $('.console')
             console.width(aux.width()+1)
@@ -50,22 +41,15 @@ block content
             loadOutput(console, aux.width()/charWidth, aux.height()/charHeight)
 
             $('#upload-result').click(function() {
-                clearMessages()
                 var text = $('#student-result').val()
                 if (!text)
-                    return errorMessage('Слишком мало букв!')
+                    return msg.error('Слишком мало букв!')
                 $.post('/upload-result', { result: text })
-                    .done(infoMessage.bind(this, 'Текст отправлен на сервер'))
-                    .fail(error)
+                    .done(msg.info.bind(this, 'Текст отправлен на сервер'))
+                    .fail(msg.ajaxError)
             })
         })
     style.
-        .info {
-            color: #0c0;
-        }
-        .error {
-            color: #c00;
-        }
         .black {
             color: #fff;
             background-color: #000;
@@ -96,8 +80,8 @@ block content
         .console-data
     .zero-size
         span#aux.monospace
-    h1 Сюда можно скопипастить работающую программу
-    textarea#student-result
-    br
-    input#upload-result(type='button' value='У меня получилось!')
-    #log
+    if allowUpload
+        h1 Сюда можно скопипастить работающую программу
+        textarea#student-result
+        br
+        input#upload-result(type='button' value='У меня получилось!')

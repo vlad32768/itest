@@ -14,7 +14,8 @@ var
     path = require('path'),
     _ = require('lodash'),
     crypto = require('crypto'),
-    sd = require('./student-data.js')
+    sd = require('./student-data.js'),
+    tsk = require('./tasks.js')
 
 var dataDir = path.join(__dirname, '..', 'data')
 
@@ -63,6 +64,11 @@ router
                 nameEnding: nameEnding
             })
         })
+    })
+    .get('/task', function(req, res, next) {
+        var n = +req.query.n
+        var task = tsk.list.task(n)
+        res.render('task', { n: n, task: task, allowUpload: false })
     })
     .get('/team-result', function(req, res, next) {
         var team = sd.data.team(req.query.id)
@@ -121,22 +127,19 @@ router
         })
     })
     .get('/clear', function(req, res) {
-       if (sd.data.unsaved)
+       if (sd.data.unsaved && !req.query.force)
            return res.status(403).send('Cannot clear data: save current state first')
-       sd.data.list = {}
+       sd.data = new sd.Data
        res.redirect('/su')
     })
-
-
-/*
-su.post('/deny-identification', function(req, res) {
-    var b = req.body
-    if (b.value === undefined)
-        return res.status(400).send('Query \'value\' is required')
-    var v = typeof b.value === 'string'? b.value === 'true': b.value == true
-    studentsData.denyIdentification = v
-    res.sendStatus(200)
-})
-*/
+    .post('/deny-login', function(req, res) {
+        debugger
+        var b = req.body
+        if (b.value === undefined)
+            return res.status(400).send('Query \'value\' is required')
+        var v = typeof b.value === 'string'? b.value === 'true': b.value == true
+        sd.data.denyLogin = v
+        res.sendStatus(200)
+    })
 
 module.exports = router
