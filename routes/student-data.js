@@ -46,6 +46,7 @@ Data.fromJson = function(d) {
         result.addTeam(team)
     }
     result.taskIndices = d.taskIndices
+    result.unsaved = false
     return result
 }
 
