@@ -1,5 +1,5 @@
 function Geom() {}
-
+var pgen = require('./pgen.js')
 
 
 function Rectangle(data) {
@@ -256,11 +256,7 @@ Geom.gen = {
     w: Wave.fromObject
 }
 
-Geom.fromObject = function(o) {
-    if (!((o instanceof Array) && o.length === 2))
-        throw new Error('Geom.fromObject(): exepcted array of 2 elements')
-    return Geom.gen[o[0]](o[1])
-}
+Geom.fromObject = pgen.bind(this, Geom.gen)
 
 
 function SolidFill(color) {

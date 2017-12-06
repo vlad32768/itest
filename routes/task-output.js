@@ -13,10 +13,11 @@ router
         var w = util.clamp(req.query.width, 1, 160, 80)
         var h = util.clamp(req.query.height, 1, 50, 24)
         var task = tsk.list.task(n)
+        var stdin = req.query.stdin || task.stdin()
         res.send(JSON.stringify({
             width: w,
             height: h,
-            data: task.scene().paint(w, h)
+            data: task.scene().paint(w, h, stdin)
         }))
     })
 
