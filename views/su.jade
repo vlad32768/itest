@@ -7,8 +7,8 @@ block content
         .teamId {
             display: none;
         }
-    script(src='javascripts/jquery-3.2.1.min.js')
-    script(src='javascripts/jquery-ui.min.js')
+    script(src='/javascripts/jquery-3.2.1.min.js')
+    script(src='/javascripts/jquery-ui.min.js')
     script(src='/javascripts/messages.js')
     script.
         $(document).ready(function() {
@@ -108,6 +108,7 @@ block content
             u(style='list-style-type: none;')
                 li: a(href='/su/exit') Выход
                 li: a#clear-data(href='/su/clear') Очистить данные
+                li: a(href='/su/mask-tasks', target='_blank') Доступные задания
         .nested
             h3 Сохранение данных<br>
             .nested
@@ -153,7 +154,7 @@ block content
                     td= team.lastname1
                     td= team.firstname2
                     td= team.lastname2
-                    td: a(href='/su/task?n='+team.taskIndex target='_blank')= team.taskIndex+1
+                    td: a(href='/su/task?n='+team.taskIndex+'&taskSet='+team.taskSet target='_blank')= team.taskIndex+1
                     td
                         if team.result
                             a.team-result(href='/su/team-result' target='_blank') есть

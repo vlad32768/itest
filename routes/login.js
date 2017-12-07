@@ -8,7 +8,6 @@ router
         res.render('login', {message: req.flash('loginMessage'), loginData: req.session.loginData || {}})
     })
     .post('/login', function(req, res, next) {
-        debugger
         if (sd.data.denyLogin)
             return res.status(403).send('Идентификация в данный момент запрещена')
         var b = req.session.loginData = req.body

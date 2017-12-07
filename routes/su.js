@@ -15,7 +15,8 @@ var
     _ = require('lodash'),
     crypto = require('crypto'),
     sd = require('./student-data.js'),
-    tsk = require('./tasks.js')
+    allTasks = require('./all-tasks.js'),
+    util = require('./util.js')
 
 var dataDir = path.join(__dirname, '..', 'data')
 
@@ -66,8 +67,10 @@ router
         })
     })
     .get('/task', function(req, res, next) {
-        var n = +req.query.n
-        var task = tsk.list.task(n)
+        var taskSet = req.query.taskSet || 'test-1'
+        var list = allTasks.lists[taskSet]
+        var n = util.clamp(req.query.n, 0, list.length()-1, 0)
+        var task = list.task(n)
         res.render('task', { n: n, task: task, allowUpload: false })
     })
     .get('/team-result', function(req, res, next) {
@@ -133,12 +136,20 @@ router
        res.redirect('/su')
     })
     .post('/deny-login', function(req, res) {
-        debugger
         var b = req.body
         if (b.value === undefined)
             return res.status(400).send('Query \'value\' is required')
         var v = typeof b.value === 'string'? b.value === 'true': b.value == true
         sd.data.denyLogin = v
+        res.sendStatus(200)
+    })
+    .get('/mask-tasks', function(req, res) {
+        res.render('mask-tasks', { allTasks: allTasks, sd: sd })
+    })
+    .get('/mask-task-set', function(req, res) {
+        var taskSet = req.query.taskSet
+        var enable = req.query.enable === 'true'   ||   req.query.enable === '1'
+        sd.data.enableTaskSet(taskSet, enable)
         res.sendStatus(200)
     })
 

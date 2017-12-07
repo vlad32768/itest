@@ -1,4 +1,5 @@
 var _ = require('lodash')
+var allTasks = require('./all-tasks.js')
 
 function Team(options) {
     _.merge(this, _.pick(options || {}, ['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2']))
@@ -31,9 +32,29 @@ Team.prototype.summary = function() {
     return result
 }
 
+function taskIds(taskSet) {
+    var result = []
+    var list = allTasks.lists[taskSet]
+    for (var i=0, n=list.length(); i<n; ++i)
+        result.push({taskIndex: i, taskSet: taskSet})
+    return result
+}
+
+function allTaskIds() {
+    var result = []
+    _.each(allTasks.lists, function(list, id) {
+        for (var i=0, n=list.length(); i<n; ++i)
+            result.push({taskIndex: i, taskSet: id})
+    })
+    return result
+}
+
 function Data() {
     this.list = {}
     this.unsaved = false
+    this.availableTasks = allTaskIds()
+    this.chosenTasks = []
+    this.disabledTasks = []
 }
 
 Data.fromJson = function(d) {
@@ -65,10 +86,22 @@ Data.prototype.canAddTeam = function(team) {
     })
 }
 Data.prototype.addTeam = function(team) {
+    // Add team keys
     var self = this
     _.each(team.keys(), function(key) {
         self.list[key] = team
     })
+    // Generate task for the team
+    if (this.availableTasks.length === 0) {
+        this.availableTasks = allTaskIds()
+        this.chosenTasks = []
+    }
+    var i = Math.floor(Math.random() * this.availableTasks.length)
+    var taskId = this.availableTasks.splice(i, 1)[0]
+    _.merge(team, taskId)
+    this.chosenTasks.push(taskId)
+
+    // Mark as unsaved
     this.unsaved = true
 }
 Data.prototype.removeTeam = function(team) {
@@ -85,6 +118,58 @@ Data.prototype.teams = function() {
         return a.id().localeCompare(b.id())
     })
     return _.sortedUniqBy(teams, function(team) { return team.id() })
+}
+
+function compareTaskSets(a, b) {
+    return a.taskSet === b.taskSet
+}
+
+function compareTaskIds(a, b) {
+    return a.taskIndex === b.taskIndex   &&   a.taskSet === b.taskSet
+}
+
+function filterTaskSet(taskSet, taskId) {
+    return taskSet === taskId.taskSet
+}
+
+Data.prototype.taskSetStatus = function(taskSet)
+{
+    var i = _.findIndex(this.disabledTasks, filterTaskSet.bind(this, taskSet))
+    return i === -1? 'enabled': 'disabled'
+}
+
+Data.prototype.enableTaskSet = function(taskSet, enable) {
+    var filter = filterTaskSet.bind(this, taskSet)
+    _.remove(this.disabledTasks, filter)
+    _.remove(this.availableTasks, filter)
+    var ids = taskIds(taskSet)
+    if (enable) {
+        _.merge(this.availableTasks, ids)
+        this.chosenTasks.forEach(function(taskId) {
+            _.remove(this.availableTasks, compareTaskIds.bind(this, taskId))
+        })
+    }
+    else {
+        _.merge(this.disabledTasks, ids)
+    }
+}
+
+Data.prototype.taskStatus = function(taskId)
+{
+    var filter = compareTaskIds.bind(this, taskId)
+    var i = _.findIndex(this.chosenTasks, filter)
+    if (i !== -1)
+        return 'chosen'
+    i = _.findIndex(this.availableTasks, filter)
+    if (i !== -1)
+        return 'available'
+    i = _.findIndex(this.disabledTasks, filter)
+    if (i !== -1)
+        return 'disabled'
+    return 'unknown'
+}
+Data.prototype.enableTask = function(taskId, enable) {
+    // TODO
 }
 
 module.exports = {

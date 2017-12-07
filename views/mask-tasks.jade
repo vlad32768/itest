@@ -1,0 +1,25 @@
+extends layout
+
+block content
+    link(rel='stylesheet', href='stylesheets/jquery-ui.min.css')
+    link(rel='stylesheet' href='/stylesheets/messages.css')
+    script(src='/javascripts/jquery-3.2.1.min.js')
+    script(src='/javascripts/jquery-ui.min.js')
+    script(src='/javascripts/messages.js')
+    script.
+        $(document).ready(function() {
+            $('.taskSet').click(function() {
+                $.get('/su/mask-task-set', { taskSet: $(this).next().text(), enable: this.checked } )
+                    .fail(msg.ajaxError)
+            })
+        })
+    #hdr
+        h1 Доступные задания
+    #tasks
+        each taskSet in allTasks.ids
+            p
+                if sd.data.taskSetStatus(taskSet)==='enabled'
+                    input.taskSet(type='checkbox' checked)
+                else
+                    input.taskSet(type='checkbox')
+                span= taskSet
