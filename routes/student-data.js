@@ -32,27 +32,10 @@ Team.prototype.summary = function() {
     return result
 }
 
-function taskIds(taskSet) {
-    var result = []
-    var list = allTasks.lists[taskSet]
-    for (var i=0, n=list.length(); i<n; ++i)
-        result.push({taskIndex: i, taskSet: taskSet})
-    return result
-}
-
-function allTaskIds() {
-    var result = []
-    _.each(allTasks.lists, function(list, id) {
-        for (var i=0, n=list.length(); i<n; ++i)
-            result.push({taskIndex: i, taskSet: id})
-    })
-    return result
-}
-
 function Data() {
     this.list = {}
     this.unsaved = false
-    this.availableTasks = allTaskIds()
+    this.availableTasks = allTasks.util.allTaskIds()
     this.chosenTasks = []
     this.disabledTasks = []
 }
@@ -120,32 +103,20 @@ Data.prototype.teams = function() {
     return _.sortedUniqBy(teams, function(team) { return team.id() })
 }
 
-function compareTaskSets(a, b) {
-    return a.taskSet === b.taskSet
-}
-
-function compareTaskIds(a, b) {
-    return a.taskIndex === b.taskIndex   &&   a.taskSet === b.taskSet
-}
-
-function filterTaskSet(taskSet, taskId) {
-    return taskSet === taskId.taskSet
-}
-
 Data.prototype.taskSetStatus = function(taskSet)
 {
-    var i = _.findIndex(this.disabledTasks, filterTaskSet.bind(this, taskSet))
+    var i = _.findIndex(this.disabledTasks, allTasks.util.filterTaskSet(taskSet))
     return i === -1? 'enabled': 'disabled'
 }
 
 Data.prototype.enableTaskSet = function(taskSet, enable) {
-    var filter = filterTaskSet.bind(this, taskSet)
+    var filter = allTasks.util.filterTaskSet(taskSet)
     _.remove(this.disabledTasks, filter)
     _.remove(this.availableTasks, filter)
-    var ids = taskIds(taskSet)
+    var ids = allTasks.util.taskIds(taskSet)
     if (enable) {
         this.chosenTasks.forEach(function(taskId) {
-            _.remove(ids, compareTaskIds.bind(this, taskId))
+            _.remove(ids, allTasks.util.filterTaskId(taskId))
         })
         this.availableTasks = this.availableTasks.concat(ids)
     }
@@ -156,7 +127,7 @@ Data.prototype.enableTaskSet = function(taskSet, enable) {
 
 Data.prototype.taskStatus = function(taskId)
 {
-    var filter = compareTaskIds.bind(this, taskId)
+    var filter = allTasks.util.filterTaskId(taskId)
     var i = _.findIndex(this.chosenTasks, filter)
     if (i !== -1)
         return 'chosen'
@@ -168,6 +139,7 @@ Data.prototype.taskStatus = function(taskId)
         return 'disabled'
     return 'unknown'
 }
+
 Data.prototype.enableTask = function(taskId, enable) {
     // TODO
 }

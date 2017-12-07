@@ -154,7 +154,7 @@ block content
                     td= team.lastname1
                     td= team.firstname2
                     td= team.lastname2
-                    td: a(href='/su/task?n='+team.taskIndex+'&taskSet='+team.taskSet target='_blank')= team.taskIndex+1
+                    td: a(href='/su/task?n='+team.taskIndex+'&taskSet='+team.taskSet target='_blank')= team.taskSet + ': ' + (team.taskIndex+1)
                     td
                         if team.result
                             a.team-result(href='/su/team-result' target='_blank') есть

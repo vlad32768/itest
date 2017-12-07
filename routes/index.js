@@ -16,7 +16,7 @@ router
         var list = allTasks.lists[taskSet]
         var n = util.clamp(req.query.n, 0, list.length()-1, team.taskIndex)
         var task = list.task(n)
-        res.render('task', { n: n, task: task, allowUpload: true })
+        res.render('task', { n: n, taskSet: taskSet, task: task, allowUpload: true })
     })
     .post('/upload-result', function(req, res, next) {
         var team = sd.data.team(req.session.teamId)
