@@ -144,13 +144,13 @@ Data.prototype.enableTaskSet = function(taskSet, enable) {
     _.remove(this.availableTasks, filter)
     var ids = taskIds(taskSet)
     if (enable) {
-        _.merge(this.availableTasks, ids)
         this.chosenTasks.forEach(function(taskId) {
-            _.remove(this.availableTasks, compareTaskIds.bind(this, taskId))
+            _.remove(ids, compareTaskIds.bind(this, taskId))
         })
+        this.availableTasks = this.availableTasks.concat(ids)
     }
     else {
-        _.merge(this.disabledTasks, ids)
+        this.disabledTasks = this.disabledTasks.concat(ids)
     }
 }
 
