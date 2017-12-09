@@ -18,7 +18,7 @@ block content
             var currentHeight
             function loadOutput(dst) {
                 var stdin = $('#stdin')
-                var param = {width: currentWidth, height: currentHeight, taskSet: '#{taskSet}', n: #{n}}
+                var param = {width: currentWidth, height: currentHeight, taskId: '#{taskId}'}
                 if (stdin.length > 0)
                     param.stdin = stdin.val()
                 $.get('/task-output', param)
@@ -92,7 +92,7 @@ block content
         #stdin-block {
             margin-bottom: 10px;
         }
-    h1 Вариант #{n+1}
+    h1 Вариант #{taskId}
     p= task.text()
     if task.stdin() !== undefined
         #stdin-block

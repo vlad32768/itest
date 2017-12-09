@@ -12,11 +12,9 @@ var allTasks = require('./all-tasks.js')
 router
     .get('/', function(req, res, next) {
         var team = sd.data.team(req.session.teamId)
-        var taskSet = req.query.taskSet || team.taskSet
-        var list = allTasks.lists[taskSet]
-        var n = util.clamp(req.query.n, 0, list.length()-1, team.taskIndex)
-        var task = list.task(n)
-        res.render('task', { n: n, taskSet: taskSet, task: task, allowUpload: true })
+        var taskId = req.query.task || team.taskId
+        var task = allTasks.tasks()[taskId]
+        res.render('task', { taskId: taskId, task: task, allowUpload: true })
     })
     .post('/upload-result', function(req, res, next) {
         var team = sd.data.team(req.session.teamId)

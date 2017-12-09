@@ -67,11 +67,9 @@ router
         })
     })
     .get('/task', function(req, res, next) {
-        var taskSet = req.query.taskSet || 'test-1'
-        var list = allTasks.lists[taskSet]
-        var n = util.clamp(req.query.n, 0, list.length()-1, 0)
-        var task = list.task(n)
-        res.render('task', { n: n, task: task, allowUpload: false })
+        var taskId = req.query.task || 'test-1'
+        var task = allTasks.tasks()[taskId]
+        res.render('task', { taskId: taskId, task: task, allowUpload: false })
     })
     .get('/team-result', function(req, res, next) {
         var team = sd.data.team(req.query.id)

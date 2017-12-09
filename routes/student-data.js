@@ -35,9 +35,10 @@ Team.prototype.summary = function() {
 function Data() {
     this.list = {}
     this.unsaved = false
-    this.availableTasks = allTasks.util.allTaskIds()
-    this.chosenTasks = []
-    this.disabledTasks = []
+    this.taskStatus = _.reduce(allTasks.allTaskIds(), function(o, taskId) {
+        o[taskId] = { chosen: false, blocked: false, solved: false, abandoned: false }
+        return o
+    }, {})
 }
 
 Data.fromJson = function(d) {
@@ -47,9 +48,10 @@ Data.fromJson = function(d) {
             continue
         var team = new Team
         _.merge(team, d.list[key])
+        // TODO: Fix task id
         result.addTeam(team)
     }
-    result.taskIndices = d.taskIndices
+    _.assign(result.taskStatus, d.taskStatus)
     result.unsaved = false
     return result
 }
@@ -75,17 +77,28 @@ Data.prototype.addTeam = function(team) {
         self.list[key] = team
     })
     // Generate task for the team
-    if (this.availableTasks.length === 0) {
-        this.availableTasks = allTaskIds()
-        this.chosenTasks = []
-    }
-    var i = Math.floor(Math.random() * this.availableTasks.length)
-    var taskId = this.availableTasks.splice(i, 1)[0]
-    _.merge(team, taskId)
-    this.chosenTasks.push(taskId)
+    var stats = _.reduce(self.taskStatus, function(o, st) {
+        if (!st.blocked) {
+            var index = st.chosen? ( st.solved? 2: st.abandoned? 1: 3 ): 0
+            ++o[index]
+            return o
+        }
+    }, [0, 0, 0, 0])
+    var filters = [
+        function(st) { return !st.blocked && !st.chosen },
+        function(st) { return !st.blocked && st.chosen && st.abandoned },
+        function(st) { return !st.blocked && st.chosen && st.solved },
+        function(st) { return !st.blocked && st.chosen && !st.abandoned && !st.solved }
+    ]
+    var filterIndex = _.findIndex(stats, function(x) { return x > 0})
+    if (filterIndex === -1)
+        throw new Error('Failed to add team: no more tasks are available.')
+    var taskIndex = Math.floor(Math.random() * stats[filterIndex])
+    team.taskId = _(self.taskStatus).keys().filter(filters[filterIndex]).nth(taskIndex)
+    self.taskStatus[team.taskId].chosen = true
 
     // Mark as unsaved
-    this.unsaved = true
+    self.unsaved = true
 }
 Data.prototype.removeTeam = function(team) {
     var self = this
@@ -105,43 +118,38 @@ Data.prototype.teams = function() {
 
 Data.prototype.taskSetStatus = function(taskSet)
 {
-    var i = _.findIndex(this.disabledTasks, allTasks.util.filterTaskSet(taskSet))
-    return i === -1? 'enabled': 'disabled'
+    var taskSetFilter = allTasks.taskSetFilter(taskSet)
+    var n = _.reduce(this.taskStatus, function(s, st, key) {
+        if (!st.blocked && taskSetFilter(key))
+            ++s;
+        return s;
+    }, 0)
+    return n === 0? 'disabled': 'enabled'
 }
 
 Data.prototype.enableTaskSet = function(taskSet, enable) {
-    var filter = allTasks.util.filterTaskSet(taskSet)
-    _.remove(this.disabledTasks, filter)
-    _.remove(this.availableTasks, filter)
-    var ids = allTasks.util.taskIds(taskSet)
-    if (enable) {
-        this.chosenTasks.forEach(function(taskId) {
-            _.remove(ids, allTasks.util.filterTaskId(taskId))
-        })
-        this.availableTasks = this.availableTasks.concat(ids)
-    }
-    else {
-        this.disabledTasks = this.disabledTasks.concat(ids)
-    }
+    var taskSetFilter = allTasks.taskSetFilter(taskSet)
+    _.each(this.taskStatus, function(st, key) {
+        if (taskSetFilter(key))
+            st.blocked = !enable
+    })
 }
 
 Data.prototype.taskStatus = function(taskId)
 {
-    var filter = allTasks.util.filterTaskId(taskId)
-    var i = _.findIndex(this.chosenTasks, filter)
-    if (i !== -1)
-        return 'chosen'
-    i = _.findIndex(this.availableTasks, filter)
-    if (i !== -1)
-        return 'available'
-    i = _.findIndex(this.disabledTasks, filter)
-    if (i !== -1)
-        return 'disabled'
-    return 'unknown'
+    return this.taskStatus[taskId]
+}
+
+Data.prototype.taskStatusFormatted = function(taskId)
+{
+    return _.reduce(this.taskStatus[taskId], function(o, v, k) {
+        if (v)
+            o.push(k)
+    }, []).join(', ')
 }
 
 Data.prototype.enableTask = function(taskId, enable) {
-    // TODO
+    this.taskStatus[taskId].blocked = !enable
 }
 
 module.exports = {
