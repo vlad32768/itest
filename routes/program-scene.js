@@ -1,15 +1,9 @@
-var programs = {
-    'p1': function(stdin) {
-        return '12\n34\n567\n\n' + stdin
-    }
-}
-
 function Program(data) {
     this.data = {}
     if (data) {
-        var program = programs[data.name]
-        if (typeof program !== 'function')
-            throw new Error('Program: unknown program name \'' + name + '\'')
+        var program
+        if (data instanceof Function)
+            program = data
         this.data.program = program
     }
 }
@@ -19,7 +13,16 @@ Program.fromObject = function(o) {
 }
 
 Program.prototype.paint = function(w, h, stdin) {
-    return this.data.program(stdin)
+    var program = this.data.program
+    function runProgram() {
+        try {
+            return program(stdin)
+        }
+        catch(err) {
+            return err.message
+        }
+    }
+    return program instanceof Function? runProgram(): 'N/A'
 }
 
 module.exports = { Program: Program }

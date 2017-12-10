@@ -16,6 +16,7 @@ Task.fromObject = function(o) {
         text: o.text,
         scene: pgen(sceneClasses, o.scene),
         stdin: o.stdin,
+        stdinHint: o.stdinHint
     })
 }
 Task.prototype.text = function() {
@@ -26,6 +27,9 @@ Task.prototype.scene = function() {
 }
 Task.prototype.stdin = function() {
     return this.data.stdin
+}
+Task.prototype.stdinHint = function() {
+    return this.data.stdinHint
 }
 
 function Tasks(data) {

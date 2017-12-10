@@ -3,8 +3,11 @@ extends layout
 block content
     link(rel='stylesheet', href='/stylesheets/jquery-ui.min.css')
     link(rel='stylesheet' href='/stylesheets/messages.css')
+    link(rel='stylesheet' href='/katex.min.css')
     script(src='/javascripts/jquery-3.2.1.min.js')
     script(src='/javascripts/jquery-ui.min.js')
+    script(src='/katex.min.js')
+    script(src='/contrib/auto-render.min.js')
     script(src='/javascripts/messages.js')
     script.
         $(document).ready(function() {
@@ -84,6 +87,17 @@ block content
                     })
                     .fail(msg.ajaxError)
             })
+
+            $('.render-tex').each(function() {
+                renderMathInElement( this, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "\\[", right: "\\]", display: true},
+                        {left: "$", right: "$", display: false},
+                        {left: "\\(", right: "\\)", display: false}
+                    ]
+                })
+            })
         })
     style.
         .black {
@@ -124,10 +138,12 @@ block content
         p= team.summary()
         if team.taskSolved
             p.win Задача решена, можно идти домой!
-    p= task.text()
+    p.render-tex!= task.text()
     if task.stdin() !== undefined
         #stdin-block
             p Стандартный ввод:
+            if task.stdinHint()
+                p.render-tex!= task.stdinHint()
             textarea#stdin= task.stdin()
             br
             input#apply-stdin(type='button' value='Применить')
