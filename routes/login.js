@@ -8,10 +8,12 @@ router
         res.render('login', {message: req.flash('loginMessage'), loginData: req.session.loginData || {}})
     })
     .post('/login', function(req, res, next) {
-        if (sd.data.denyLogin)
-            return res.status(403).send('Идентификация в данный момент запрещена')
         var b = req.session.loginData = req.body
         b = _.pick(b, ['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2'])
+        if (sd.data.denyLogin) {
+            req.flash('loginMessage', 'Идентификация в данный момент запрещена')
+            return res.redirect( '/login' )
+        }
         var ok = true
         if (!(b.group && b.firstname1 && b.lastname1)) {
             req.flash('loginMessage', 'Поля "Номер группы", "Имя" и "Фамилия" (для студента 1) должны быть заполнены')
@@ -32,11 +34,22 @@ router
         }
         if (!ok)
             return res.redirect( '/login' )
-        sd.data.addTeam(team)
+        try {
+            sd.data.addTeam(team)
+        }
+        catch(err) {
+            req.flash('loginMessage', err.message)
+            return res.redirect( '/login' )
+        }
         req.session.teamId = team.id()
         res.redirect('/')
     })
     .get('/logout', function(req, res, next) {
+        if (req.session.teamId) {
+            var team = sd.data.team(req.session.teamId)
+            if (team && !team.taskSolved)
+                sd.data.setTaskAbandoned(req.session.teamId, true)
+        }
         delete req.session.teamId
         res.redirect('/')
     })

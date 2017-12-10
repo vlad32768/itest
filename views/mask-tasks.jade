@@ -8,19 +8,45 @@ block content
     script(src='/javascripts/messages.js')
     script.
         $(document).ready(function() {
+            var reload = location.reload.bind(location)
             $('.taskSet').click(function() {
                 $.get('/su/mask-task-set', { taskSet: $(this).next().text(), enable: this.checked } )
                     .fail(msg.ajaxError)
+                    .done(reload)
+            })
+            $('.task').click(function() {
+                $.get('/su/mask-task', { task: $(this).next().text(), enable: this.checked } )
+                    .fail(msg.ajaxError)
+                    .done(reload)
             })
         })
+    style.
+        .taskContainer {
+            padding-left: 2em;
+        }
+        .info {
+            display: none;
+        }
     #hdr
         h1 Доступные задания
+        p новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress}
     #tasks
-        each taskSet in allTasks.ids
-            p
-                if sd.data.taskSetStatus(taskSet)==='enabled'
-                    input.taskSet(type='checkbox' checked)
-                else
-                    input.taskSet(type='checkbox')
-                span= taskSet
-                span "TODO: status"
+        each taskSet, taskSetId in taskSets
+            div
+                div.taskSetContainer
+                    if sd.data.taskSetStatus(taskSetId)==='enabled'
+                        input.taskSet(type='checkbox' checked)
+                    else
+                        input.taskSet(type='checkbox')
+                    span= taskSetId
+                    span "TODO: description"
+                div.taskContainer
+                    each taskId in taskSet
+                        div
+                            if sd.data.taskStatus(taskId).blocked
+                                input.task(type='checkbox')
+                            else
+                                input.task(type='checkbox' checked)
+                            span.info= taskId
+                            - var taskStatusFormatted = sd.data.taskStatusFormatted(taskId)
+                            a(href='/su/task?task='+taskId target='_blank')= taskId.replace(taskSetId+':', '') + (taskStatusFormatted? ': ' + taskStatusFormatted: '')

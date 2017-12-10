@@ -12,11 +12,13 @@ block content
     script(src='/javascripts/messages.js')
     script.
         $(document).ready(function() {
+            var reload = location.reload.bind(location)
             function teamId(element) {
                 return $(element).closest('tr').find('.teamId').text()
             }
             $('.mark').change(function() {
                 $.post('/su/set-mark', {id: teamId(this), mark: $(this).val()})
+                    .fail(msg.ajaxError)
             })
             $('.team-result').each(function() {
                 this.href = encodeURI(this.href+'?id='+teamId(this))
@@ -26,8 +28,16 @@ block content
                 currentTeamId = teamId(this)
                 $('#confirm-remove').dialog('open')
             })
-
-            var reload = location.reload.bind(location)
+            $('.taskSolved').click(function() {
+                $.post('/su/set-team-status', {id: teamId(this), taskSolved: $(this).prop('checked')})
+                    .done(reload)
+                    .fail(msg.ajaxError)
+            })
+            $('.taskAbandoned').click(function() {
+                $.post('/su/set-team-status', {id: teamId(this), taskAbandoned: $(this).prop('checked')})
+                    .done(reload)
+                    .fail(msg.ajaxError)
+            })
             $('#confirm-remove').dialog({
                 autoOpen: false,
                 resizable: false,
@@ -109,6 +119,7 @@ block content
                 li: a(href='/su/exit') Выход
                 li: a#clear-data(href='/su/clear') Очистить данные
                 li: a(href='/su/mask-tasks', target='_blank') Доступные задания
+                    | (новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress})
         .nested
             h3 Сохранение данных<br>
             .nested
@@ -144,6 +155,8 @@ block content
                 th Фамилия 2
                 th Вариант
                 th Результат
+                th :)
+                th :(
                 th Оценка
                 th ...
             each team, index in studentData.teams()
@@ -160,6 +173,14 @@ block content
                             a.team-result(href='/su/team-result' target='_blank') есть
                         else
                             | нет
+                    if team.taskSolved
+                        td: input.taskSolved(type='checkbox' checked)
+                    else
+                        td: input.taskSolved(type='checkbox')
+                    if team.taskAbandoned
+                        td: input.taskAbandoned(type='checkbox' checked)
+                    else
+                        td: input.taskAbandoned(type='checkbox')
                     td: input.mark(type='text' value=team.mark||'')
                     td: input.remove(type='button' value='удалить')
     #confirm-remove(title="Действитьельно удалить?")

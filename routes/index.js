@@ -14,12 +14,19 @@ router
         var team = sd.data.team(req.session.teamId)
         var taskId = req.query.task || team.taskId
         var task = allTasks.tasks()[taskId]
-        res.render('task', { taskId: taskId, task: task, allowUpload: true })
+        res.render('task', { taskId: taskId, task: task, allowUpload: true, team: team })
     })
     .post('/upload-result', function(req, res, next) {
         var team = sd.data.team(req.session.teamId)
         team.result = req.body.result
         res.sendStatus(200)
+    })
+    .get('/logout-warning-message', function(req, res) {
+        var team = sd.data.team(req.session.teamId)
+        if (team.taskSolved)
+            res.send('Задача решена, можно уходить')
+        else
+            res.send('Вам придётся прийти в другой раз, не сегодня')
     })
 
 module.exports = router

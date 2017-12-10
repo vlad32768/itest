@@ -61,6 +61,29 @@ block content
                     .done(msg.info.bind(this, 'Текст отправлен на сервер'))
                     .fail(msg.ajaxError)
             })
+            $('#confirm-logout').dialog({
+                autoOpen: false,
+                resizable: false,
+                height: "auto",
+                width: 400,
+                modal: true,
+                buttons: {
+                    "Да, выйти": function() {
+                        location.pathname='/logout'
+                    },
+                    "Отмена": function() {
+                        $(this).dialog('close')
+                    }
+                }
+            })
+            $('#logout').click(function() {
+                $.get('/logout-warning-message')
+                    .done(function(d) {
+                        $('#logout-warning-message').text(d)
+                        $('#confirm-logout').dialog('open')
+                    })
+                    .fail(msg.ajaxError)
+            })
         })
     style.
         .black {
@@ -92,7 +115,15 @@ block content
         #stdin-block {
             margin-bottom: 10px;
         }
+        .win {
+            font-size: 200%;
+            color: #0a0;
+        }
     h1 Вариант #{taskId}
+    if team
+        p= team.summary()
+        if team.taskSolved
+            p.win Задача решена, можно идти домой!
     p= task.text()
     if task.stdin() !== undefined
         #stdin-block
@@ -110,3 +141,7 @@ block content
         textarea#student-result
         br
         input#upload-result(type='button' value='У меня получилось!')
+        br
+        input#logout(type='button' value='Выйти')
+        #confirm-logout(title="Выйти из системы?")
+            p#logout-warning-message

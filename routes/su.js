@@ -24,6 +24,10 @@ fs.mkdir(dataDir, function(){})
 
 var router = express.Router()
 
+function toBool(x) {
+    return typeof x === 'string'?   x === 'true' || x === '1':   x == true
+}
+
 var nameEnding = ''
 router
     .get('/auth', function(req, res) {
@@ -62,7 +66,8 @@ router
             res.render('su', {
                 studentData: sd.data,
                 files: files,
-                nameEnding: nameEnding
+                nameEnding: nameEnding,
+                taskStats: sd.data.taskStatsObj()
             })
         })
     })
@@ -80,10 +85,10 @@ router
         if (team) {
             team.mark = req.body.mark
             sd.data.unsaved = true
-            res.send(200)
+            res.sendStatus(200)
         }
         else
-            res.send(404)
+            res.sendStatus(404)
     })
     .post('/remove-team', function(req, res, next) {
         var team = sd.data.team(req.body.id)
@@ -94,6 +99,15 @@ router
         }
         else
             res.sendStatus(404)
+    })
+    .post('/set-team-status', function(req, res) {
+        if (req.body.taskSolved !== undefined) {
+            sd.data.setTaskSolved(req.body.id, toBool(req.body.taskSolved))
+        }
+        if (req.body.taskAbandoned !== undefined) {
+            sd.data.setTaskAbandoned(req.body.id, toBool(req.body.taskAbandoned))
+        }
+        res.sendStatus(200)
     })
     .post('/save', function(req, res) {
         nameEnding = req.body.nameEnding
@@ -137,17 +151,24 @@ router
         var b = req.body
         if (b.value === undefined)
             return res.status(400).send('Query \'value\' is required')
-        var v = typeof b.value === 'string'? b.value === 'true': b.value == true
+        var v = toBool(b.value)
         sd.data.denyLogin = v
         res.sendStatus(200)
     })
     .get('/mask-tasks', function(req, res) {
-        res.render('mask-tasks', { allTasks: allTasks, sd: sd })
+        var taskSets = allTasks.taskSets()
+        res.render('mask-tasks', { allTasks: allTasks, taskSets: taskSets, sd: sd, taskStats: sd.data.taskStatsObj() })
     })
     .get('/mask-task-set', function(req, res) {
         var taskSet = req.query.taskSet
-        var enable = req.query.enable === 'true'   ||   req.query.enable === '1'
+        var enable = toBool(req.query.enable)
         sd.data.enableTaskSet(taskSet, enable)
+        res.sendStatus(200)
+    })
+    .get('/mask-task', function(req, res) {
+        var taskId = req.query.task
+        var enable = toBool(req.query.enable)
+        sd.data.enableTask(taskId, enable)
         res.sendStatus(200)
     })
 

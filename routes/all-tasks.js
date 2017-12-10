@@ -36,10 +36,22 @@ function taskIds(taskSet) {
     return _.filter(allTaskIds(), taskSetFilter(taskSet))
 }
 
+function taskSets() {
+    return _(allTaskIds()).reduce(function(o, taskId) {
+        var taskSetId = taskId.match(/^([^:]+):/)[1]
+        var d = o[taskSetId]
+        if (d === undefined)
+            d = o[taskSetId] = []
+        d.push(taskId)
+        return o
+    }, {})
+}
+
 module.exports = {
     tasks: function() { return tasks },
     taskIds: taskIds,
     allTaskIds: allTaskIds,
     taskSetFilter: taskSetFilter,
-    taskIdFilter: taskIdFilter
+    taskIdFilter: taskIdFilter,
+    taskSets: taskSets
 }

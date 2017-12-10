@@ -33,26 +33,35 @@ Team.prototype.summary = function() {
 }
 
 function Data() {
+    this.version = 1
     this.list = {}
     this.unsaved = false
-    this.taskStatus = _.reduce(allTasks.allTaskIds(), function(o, taskId) {
-        o[taskId] = { chosen: false, blocked: false, solved: false, abandoned: false }
+    this.denyLogin = true
+    this.statusData = _.reduce(allTasks.allTaskIds(), function(o, taskId) {
+        o[taskId] = { chosen: 0, blocked: false, solved: 0, abandoned: 0 }
         return o
     }, {})
 }
 
 Data.fromJson = function(d) {
+    var version = d.version || 0
     var result = new Data
     for (var key in d.list) {
         if (result.list.hasOwnProperty(key))
             continue
         var team = new Team
         _.merge(team, d.list[key])
-        // TODO: Fix task id
-        result.addTeam(team)
+        switch (version) {
+        case 0:
+            team.taskId = 'test-1:' + (team.taskIndex+1)
+            result.statusData[team.taskId].chosen = true
+            break
+        }
+        result.addTeam(team, version)
     }
-    _.assign(result.taskStatus, d.taskStatus)
+    _.assign(result.statusData, d.statusData)
     result.unsaved = false
+    result.denyLogin = true
     return result
 }
 
@@ -70,41 +79,57 @@ Data.prototype.canAddTeam = function(team) {
         return !self.list.hasOwnProperty(key)
     })
 }
+Data.prototype.taskStats = function() {
+    return _.reduce(this.statusData, function(o, st) {
+        if (!st.blocked)
+            ++o[st.chosen? ( st.solved? 2: st.abandoned? 1: 3 ): 0]
+        return o
+    }, [0, 0, 0, 0])
+}
+Data.prototype.taskStatsObj = function() {
+    var stats = this.taskStats()
+    return {
+        unchosen: stats[0],
+        abandoned: stats[1],
+        solved: stats[2],
+        inprogress: stats[3]
+    }
+}
+
 Data.prototype.addTeam = function(team) {
+    if (!team.taskId) {
+        // Generate task for the team
+        var stats = this.taskStats()
+        var filters = [
+            function(st) { return !st.blocked && !st.chosen },
+            function(st) { return !st.blocked && st.chosen && st.abandoned },
+            function(st) { return !st.blocked && st.chosen && st.solved },
+            function(st) { return !st.blocked && st.chosen && !st.abandoned && !st.solved }
+        ]
+        var filterIndex = _.findIndex(stats, function(x) { return x > 0})
+        if (filterIndex === -1)
+            throw new Error('Для Вас не хватило задания :\'(<br/>Приходите в другой раз!')
+        var taskIndex = Math.floor(Math.random() * stats[filterIndex])
+        team.taskId = _(this.statusData).pickBy(filters[filterIndex]).keys().nth(taskIndex)
+        this.statusData[team.taskId].chosen++
+    }
+
+
     // Add team keys
     var self = this
     _.each(team.keys(), function(key) {
         self.list[key] = team
     })
-    // Generate task for the team
-    var stats = _.reduce(self.taskStatus, function(o, st) {
-        if (!st.blocked) {
-            var index = st.chosen? ( st.solved? 2: st.abandoned? 1: 3 ): 0
-            ++o[index]
-            return o
-        }
-    }, [0, 0, 0, 0])
-    var filters = [
-        function(st) { return !st.blocked && !st.chosen },
-        function(st) { return !st.blocked && st.chosen && st.abandoned },
-        function(st) { return !st.blocked && st.chosen && st.solved },
-        function(st) { return !st.blocked && st.chosen && !st.abandoned && !st.solved }
-    ]
-    var filterIndex = _.findIndex(stats, function(x) { return x > 0})
-    if (filterIndex === -1)
-        throw new Error('Failed to add team: no more tasks are available.')
-    var taskIndex = Math.floor(Math.random() * stats[filterIndex])
-    team.taskId = _(self.taskStatus).keys().filter(filters[filterIndex]).nth(taskIndex)
-    self.taskStatus[team.taskId].chosen = true
 
     // Mark as unsaved
-    self.unsaved = true
+    this.unsaved = true
 }
 Data.prototype.removeTeam = function(team) {
     var self = this
     _.each(team.keys(), function(key) {
         delete self.list[key]
     })
+    self.statusData[team.taskId].chosen--
     this.unsaved = true
 }
 Data.prototype.teams = function() {
@@ -119,7 +144,7 @@ Data.prototype.teams = function() {
 Data.prototype.taskSetStatus = function(taskSet)
 {
     var taskSetFilter = allTasks.taskSetFilter(taskSet)
-    var n = _.reduce(this.taskStatus, function(s, st, key) {
+    var n = _.reduce(this.statusData, function(s, st, key) {
         if (!st.blocked && taskSetFilter(key))
             ++s;
         return s;
@@ -129,27 +154,48 @@ Data.prototype.taskSetStatus = function(taskSet)
 
 Data.prototype.enableTaskSet = function(taskSet, enable) {
     var taskSetFilter = allTasks.taskSetFilter(taskSet)
-    _.each(this.taskStatus, function(st, key) {
+    _.each(this.statusData, function(st, key) {
         if (taskSetFilter(key))
             st.blocked = !enable
     })
+    this.unsaved = true
 }
 
 Data.prototype.taskStatus = function(taskId)
 {
-    return this.taskStatus[taskId]
+    return this.statusData[taskId]
 }
 
 Data.prototype.taskStatusFormatted = function(taskId)
 {
-    return _.reduce(this.taskStatus[taskId], function(o, v, k) {
-        if (v)
-            o.push(k)
+    return _.reduce(this.statusData[taskId], function(o, v, k) {
+        if (v && k !== 'blocked') {
+            if (typeof v === 'boolean')
+                o.push(k)
+            else
+                o.push(k + ': ' + v)
+        }
+        return o
     }, []).join(', ')
 }
 
 Data.prototype.enableTask = function(taskId, enable) {
-    this.taskStatus[taskId].blocked = !enable
+    this.statusData[taskId].blocked = !enable
+    this.unsaved = true
+}
+
+Data.prototype.setTaskSolved = function(teamId, taskSolved) {
+    var team = this.team(teamId)
+    team.taskSolved = taskSolved
+    this.statusData[team.taskId].solved += (taskSolved? 1: -1)
+    this.unsaved = true
+}
+
+Data.prototype.setTaskAbandoned = function(teamId, taskAbandoned) {
+    var team = this.team(teamId)
+    team.taskAbandoned = taskAbandoned
+    this.statusData[team.taskId].abandoned += (taskAbandoned? 1: -1)
+    this.unsaved = true
 }
 
 module.exports = {
