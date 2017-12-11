@@ -53,7 +53,7 @@ Data.fromJson = function(d) {
         _.merge(team, d.list[key])
         switch (version) {
         case 0:
-            team.taskId = 'test-1:' + (team.taskIndex+1)
+            team.taskId = 'test-01-so:' + (team.taskIndex+1)
             result.statusData[team.taskId].chosen = true
             break
         }

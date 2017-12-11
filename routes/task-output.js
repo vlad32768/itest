@@ -9,7 +9,7 @@ var allTasks = require('./all-tasks.js')
 /* GET home page. */
 router
     .get('/task-output', function(req, res, next) {
-        var taskSet = req.query.taskId || 'test-1:0'
+        var taskSet = req.query.taskId || 'test-01-so:1'
         var task = allTasks.tasks()[taskSet]
         var w = util.clamp(req.query.width, 1, 160, 80)
         var h = util.clamp(req.query.height, 1, 50, 24)
