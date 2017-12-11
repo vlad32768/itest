@@ -36,25 +36,42 @@ module.exports = tasks.Tasks.fromObject([
             var printer = lp()
             var ok = true
             var _2n = 2*args.n
-            for (var i=1; i+1<_2n; i+=2)
+            for (var i=1; i+2<_2n; i+=2)
                 if (args.a[i] !== args.a[i+1]) {
                     ok = false
                     break
                 }
             if (ok)
                 printer
-                    .println('Matrix product is defined')
-                    .println('matrix has size', args.a[0], 'rows by', args.a[_2n-1], 'columns')
+                    .println('Матричное произведение определено')
+                    .println('Оно имеет размер ', args.a[0], 'x', args.a[_2n-1], ' (строк x столбцов)')
             else
-                printer.println('Matrix product is undefined')
+                printer.println('Матричное произведение не определено')
             return printer.finish()
         }],
-        stdin: '3 5 2 2 4 4 6',
+        stdin: '3 5 2 2 4 5 6',
         stdinHint: 'Введите через пробел $n$, число строк в $A_1$, число столбцов в $A_1, \\ldots,$ число строк в $A_n$, число столбцов в $A_n$'
     }, {
         text: 'Дан массив, содержащий $2n$ натуральных чисел. Там находятся размеры прямоугольных матриц $A_1, \\ldots A_n$ (например, первый элемент массива &mdash; число строк в $A_1$, второй &mdash; число столбцов в $A_1$, третий &mdash; число строк в $A_2$, четвёртый &mdash; число столбцов в $A_2$, и т. д.). Программа должна выяснить, определено ли матричное произведение $A_1^T A_2^T \\ldots A_n^T$, и если да, то сколько строк и столбцов в матрице, которая будет результатом этого произведения.',
-        scene: ['program', {name: 'p1'}],
-        stdin: 'asd'
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, whole a[2*n]')
+            var printer = lp()
+            var ok = true
+            var _2n = 2*args.n
+            for (var i=0; i+3<_2n; i+=2)
+                if (args.a[i] !== args.a[i+3]) {
+                    ok = false
+                    break
+                }
+            if (ok)
+                printer
+                    .println('Матричное произведение определено')
+                    .println('Оно имеет размер ', args.a[1], 'x', args.a[_2n-2], ' (строк x столбцов)')
+            else
+                printer.println('Матричное произведение не определено')
+            return printer.finish()
+        }],
+        stdin: '3 2 5 4 2 6 5'
     }
 ])
 
