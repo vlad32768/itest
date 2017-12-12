@@ -99,6 +99,16 @@ block content
                 })
             })
         })
+    if task.options().noscroll
+        style.
+            .console-data-scroller {
+                overflow: hidden;
+            }
+    else
+        style.
+            .console-data-scroller {
+                overflow: auto;
+            }
     style.
         .black {
             color: #fff;
@@ -110,6 +120,10 @@ block content
         }
         .console-pad {
             padding: 0.3em;
+        }
+        .console-data-scroller {
+            width: 100%;
+            height: 100%;
         }
         .zero-size {
             width: 0;
@@ -133,11 +147,18 @@ block content
             font-size: 200%;
             color: #0a0;
         }
-    h1 Вариант #{taskId}
+        textarea {
+            width: 100%;
+        }
+        .team-summary {
+            font-weight: bold;
+            color: #644;
+        }
     if team
-        p= team.summary()
+        p.team-summary= team.summary()
         if team.taskSolved
             p.win Задача решена, можно идти домой!
+    h1 Вариант #{taskId}
     p.render-tex!= task.text()
     if task.stdin() !== undefined
         #stdin-block
@@ -149,7 +170,8 @@ block content
             input#apply-stdin(type='button' value='Применить')
     #console-size
     .console.black.monospace.console-pad
-        .console-data
+        .console-data-scroller
+            .console-data
     .zero-size
         span#aux.monospace
     if allowUpload

@@ -5,11 +5,14 @@ var _ = require('lodash')
 var tasksDir = path.join(__dirname, '..', 'tasks')
 
 var tasks = {}
+var taskSetDescriptions = {}
 
 ;(function() {
     fs.readdirSync(path.join(tasksDir)).forEach(function(id) {
-        var dirTasks = require(path.join(tasksDir, id)).data
+        var taskSet = require(path.join(tasksDir, id))
+        var dirTasks = taskSet.data.items
         id = id.replace(/\.js$/, '')
+        taskSetDescriptions[id] = taskSet.data.description
         for (var i=0, n=dirTasks.length; i<n; ++i)
             tasks[id + ':' + (i+1)] = dirTasks[i]
     })
@@ -47,11 +50,16 @@ function taskSets() {
     }, {})
 }
 
+function taskSetDescription(taskSet) {
+    return taskSetDescriptions[taskSet]
+}
+
 module.exports = {
     tasks: function() { return tasks },
     taskIds: taskIds,
     allTaskIds: allTaskIds,
     taskSetFilter: taskSetFilter,
     taskIdFilter: taskIdFilter,
-    taskSets: taskSets
+    taskSets: taskSets,
+    taskSetDescription: taskSetDescription
 }

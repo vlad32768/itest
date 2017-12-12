@@ -39,7 +39,7 @@ block content
                     else
                         input.taskSet(type='checkbox')
                     span= taskSetId
-                    span "TODO: description"
+                    span= ': ' + allTasks.taskSetDescription(taskSetId)
                 div.taskContainer
                     each taskId in taskSet
                         div

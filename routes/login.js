@@ -29,8 +29,17 @@ router
         }
         var team = new sd.Team(b)
         if (!sd.data.canAddTeam(team)) {
-            req.flash('loginMessage', 'Как минимум один студент из этой команды уже зарегистрирован')
-            ok = false
+            team = sd.data.team(team.id())  // Pick existing team
+            if (team && team.allowExtraLogin)
+                team.allowExtraLogin = false
+            else if (team) {
+                req.flash('loginMessage', 'Эта команда уже зарегистрирована. Попросите у преподавателя разрешение на повторный вход, объясните причину.')
+                ok = false
+            }
+            else {
+                req.flash('loginMessage', 'Как минимум один студент из этой команды уже зарегистрирован. Повторный вход для всей команды возможен с разрешения преподавателя.')
+                ok = false
+            }
         }
         if (!ok)
             return res.redirect( '/login' )

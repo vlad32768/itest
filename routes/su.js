@@ -107,6 +107,9 @@ router
         if (req.body.taskAbandoned !== undefined) {
             sd.data.setTaskAbandoned(req.body.id, toBool(req.body.taskAbandoned))
         }
+        if (req.body.allowExtraLogin !== undefined) {
+            sd.data.team(req.body.id).allowExtraLogin = toBool(req.body.allowExtraLogin)
+        }
         res.sendStatus(200)
     })
     .post('/save', function(req, res) {

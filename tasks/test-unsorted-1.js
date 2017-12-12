@@ -2,8 +2,9 @@ var tasks = require('../routes/tasks.js')
 var ppi = require('../routes/parse-program-input.js')
 var lp = require('../routes/line-printer.js')
 
-module.exports = tasks.Tasks.fromObject([
-    {
+module.exports = tasks.Tasks.fromObject({
+    description: 'Unsorted tasks 1',
+    items: [{
         text: 'Даны два массива, $A$ и $B$, размеров $n$ и $m$ соответственно, содержащие вещественные числа $a_i$ и $b_j$ соответственно. Напечатать всевозможные упорядоченные пары ($a_i$, $b_j$).',
         scene: ['program', function(stdin) {
             var args = ppi(stdin, 'uint n, real a[n], uint m, real b[m]')
@@ -73,5 +74,5 @@ module.exports = tasks.Tasks.fromObject([
         }],
         stdin: '3 2 5 4 2 6 5'
     }
-])
+]})
 

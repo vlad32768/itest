@@ -25,8 +25,9 @@ function image(name) {
     return '<img src="' + images[name] + '"/>'
 }
 
-module.exports = tasks.Tasks.fromObject([
-    {
+module.exports = tasks.Tasks.fromObject({
+    description: 'Контрольная работа 2 СО 2017 осень',
+    items: [{
         text: [
             'Задано натуральное число $n$. Напечатать биномиальные коэффициенты $a_0,\\ldots,a_n$ в разложении $(1+x)^n=a_0 + a_1 x + \\ldots + a_n x^n$.',
             'Воспользлваться формулой $a_k = \\frac{n!}{k!(n-k)!}$, а лучше треугольником Паскаля:',
@@ -185,7 +186,7 @@ module.exports = tasks.Tasks.fromObject([
             return args.xy.slice(ilongest, ilongest+2).join(' ')
         }],
         stdin: '5   -2 0  -1 1   0 2   1 3   2 4',
-        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n, b_1, \\ldots, b_n$'
+        stdinHint: 'Введите через пробел $n, x_1, y_1 \\ldots, x_n, y_n$'
     }, {
         text: [
             'Заданы 8 вещественных чисел. Это декартовы координаты четырёх точек, ${\\bf p}_1$, ${\\bf p}_2$, ${\\bf q}_1$, ${\\bf q}_2$, лежащих на плоскости.',
@@ -197,18 +198,21 @@ module.exports = tasks.Tasks.fromObject([
             'координаты ${\\bf a}$ и ${\\bf b}$ соответственно).<br/>',
             image('intersect')].join('\n'),
         scene: ['program', function(stdin) {
-            var args = ppi(stdin, 'whole n, real xy[2*n]')
-            function sqlength(i) {
-                return sqr(args.xy[i]) + sqr(args.xy[i+1])
+            var args = ppi(stdin, 'real p1[2], real p2[2], real q1[2], real q2[2]')
+            function sub(a, b) {
+                return [a[0]-b[0], a[1]-b[1]]
             }
-            var ilongest = 0
-            for (var i=2, _2n=2*args.n; i<_2n; i+=2)
-                if (sqlength(i) > sqlength(ilongest))
-                    ilongest = i
-            return args.xy.slice(ilongest, ilongest+2).join(' ')
+            function cross(a, b) {
+                return a[0]*b[1] - a[1]*b[0]
+            }
+            var dp = sub(args.p2, args.p1)
+            var dq = sub(args.q2, args.q1)
+            return cross(sub(args.q1, args.p1), dp) * cross(sub(args.q2, args.p1), dp) <= 0 &&
+                   cross(sub(args.p1, args.q1), dq) * cross(sub(args.p2, args.q1), dq) <= 0 ?
+                        'Отрезки пересекаются' : 'Отрезки не пересекаются'
         }],
-        stdin: '5   -2 0  -1 1   0 2   1 3   2 4',
-        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n, b_1, \\ldots, b_n$'
+        stdin: '-1 0 1 0 0 -1 0 1',
+        stdinHint: 'Введите через пробел $p_{1,x}, p_{1,y}, p_{2,x}, p_{2,y}, q_{1,x}, q_{1,y}, q_{2,x}, q_{2,y}$'
     }, {
         text: [
             'Автодорога состоит из $n$ дуг окружности радиусов $R_1,\\ldots,R_n$. Расставьте знаки ограничения скорости на каждой дуге,',
@@ -243,7 +247,7 @@ module.exports = tasks.Tasks.fromObject([
             'на 4 одинаковые квадратные части. В каждой половине каждой перегородки имеется проём шириной в одну плитку. В одном углу зала,',
             'на плитке с координатами $(1,1)$, стоит робот; в другом углу с координатами $(2n,2n)$ стоит другой робот. Как им поменяться местами',
             'и при этом не встретиться друг с другом и с перегородками? Напечатайте траектории их движения. Каждый робот может делать шаги в любую',
-            'из четырёх сторон на одну плитку. Проёмы в горизонтальной перегородке заданы координатами $x_1, x_2$,',
+            'из четырёх сторон на одну плитку. Роботы шагают одновременно! Проёмы в горизонтальной перегородке заданы координатами $x_1, x_2$,',
             'в вертикальной &mdash; координатами $y_1, y_2$.<br/>',
             image('robots')].join('\n'),
         scene: ['program', function(stdin) {
@@ -327,14 +331,33 @@ module.exports = tasks.Tasks.fromObject([
         }],
         stdin: '4 2 7 1 6',
         stdinHint: 'Введите через пробел $n, x_1, x_2, y_1, y_2$'
+    }, {
+        text: [
+            'Заданы две последовательности целых чисел, $a_1, \\ldots a_n$ и $b_1, \\ldots b_m$,',
+            'Определить, встречается ли вторая последовательность в первой, т. е. существует ли такое',
+            '$k > 0$, что $a_k=b_1, a_{k+1}=b_2, \\ldots, a_{k+m-1}=b_m$. Если ответ положительный,',
+            'напечатать $k$ (если таких $k$ несколько, напечатать наименьшее из них).'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int a[n], whole m, int b[m]')
+            var kmax = args.n - args.m
+            for (var k=0; k<=kmax; ++k) {
+                var same = true
+                for (var i=0; i<args.m && same; ++i)
+                    if (args.a[k+i] !== args.b[i])
+                        same = false
+                if (same)
+                    return 'Встречается: k = ' + (k+1)
+            }
+            return 'Не встречается'
+        }],
+        stdin: '9   1 2 3 4 3 2 3 4 7     3   2 3 4',
+        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n, m, b_1, \\ldots, b_m$'
     }
-])
+]})
 /*
 
 Входной поток состоит из слов, разделённых пробелами. Напечатайте палиндромы (слова, читающиеся одинаково слева направо и справа налево, например, \\textit{шалаш}), встречающиеся среди этих слов и состоящие не менее, чем из трёх букв; не печатайте одни и те же слова по нескольку раз. Указание: строками (\\verb=std::string=, \\verb=QString=) можно пользоваться как массивами; в частности, размер можно узнать при помощи метода \\verb=size()=. Уже напечатанные слова можно хранить в \\verb=std::set<std::string>= или \\verb=QSet<QString>=.
 
-
-TODO: robots
 
 
 Заданы две строки с текстом, $p$ и $q$. Определить, встречается ли текст строки $q$ в строке $p$. Если да, то напечатать смещение, начиная с которого в $p$ начинается текст из $q$ (если $q$ встречается в $p$ несколько раз, то напечатать самое маленькое из всех возможных смещений). Строки можно читать из стандартного ввода при помощи функции \\verb=getline()=.
