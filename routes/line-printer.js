@@ -10,7 +10,7 @@ function Printer()
 
 Printer.prototype.append = function(text) {
     if (this.pendingLine && text)
-        this.pendingLine = this.pendingLine + text
+        this.pendingLine = this.pendingLine + ' ' + text
     else if (text)
         this.pendingLine = text
     return this

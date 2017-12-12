@@ -50,10 +50,10 @@ function InputReader(stdin) {
 }
 
 InputReader.prototype.errorPositionIndicator = function(itokBias) {
-    if (this.itok === 0)
-        return ''
     itokBias = itokBias || 0
     var itok = this.itok + itokBias
+    if (itok === 0)
+        return '^'
     var bias = itok === 1? 1: 2
     return ['', this.tokens.join(' '), new Array(this.tokens.slice(0, itok-1).join(' ').length+bias).join('-')+'^'].join('\n')
 }
