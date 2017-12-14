@@ -7,6 +7,16 @@ block content
         .teamId {
             display: none;
         }
+        #control input[type="radio"] {
+            margin-left: 1em;
+        }
+        input[type="checkbox"] {
+            margin-right: 0.5em;
+        }
+        input[type="text"] {
+            margin-left: 0.5em;
+        }
+
     script(src='/javascripts/jquery-3.2.1.min.js')
     script(src='/javascripts/jquery-ui.min.js')
     script(src='/javascripts/messages.js')
@@ -119,16 +129,45 @@ block content
     #control
         h2 Управление
         .nested
-            u(style='list-style-type: none;')
+            ul(style='list-style-type: none;')
                 li: a(href='/su/exit') Выход
                 li: a#clear-data(href='/su/clear') Очистить данные
-                li: a(href='/su/mask-tasks', target='_blank') Доступные задания
-                    | (новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress})
+
+            .nested
+                h3 Структура работы<br>
+                .nested
+                    ul(style='list-style-type: none;')
+                        li
+                            input#startWithTest(type='checkbox' checked=studentData.startWithTest)
+                            label(for='denyLogin')
+                                | Начать с&nbsp;
+                                a(href='/su/mask-test-questions', target='_blank') теста
+                        li: a(href='/su/mask-tasks', target='_blank') Доступные задачи
+                            | (новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress})
+                        li Максимальное число студентов в команде:
+                            input#teamSize1(type='radio' name='teamSize' value='1')
+                            label(for='teamSize1') 1
+                            input#teamSize2(type='radio' name='teamSize' value='2')
+                            label(for='teamSize2') 2
+                        li Максимальное число задач на команду:
+                            input#maxTasksPerTeam1(type='radio' name='maxTasksPerTeam' value='1')
+                            label(for='maxTasksPerTeam1') 1
+                            input#maxTasksPerTeam2(type='radio' name='maxTasksPerTeam' value='2')
+                            label(for='maxTasksPerTeam2') 2
+                            input#maxTasksPerTeam3(type='radio' name='maxTasksPerTeam' value='3')
+                            label(for='maxTasksPerTeam3') 3
+                        li
+                            input#allowAllTasksArOnce(type='checkbox' checked=studentData.allowAllTasksArOnce)
+                            label(for='allowAllTasksArOnce') Разрешить брать несколько задач одновременно
+                        li
+                            input#denyLogin(type='checkbox' checked=studentData.denyLogin)
+                            label(for='denyLogin') Запретить идентификацию вновь прибывших
+
         .nested
             h3 Сохранение данных<br>
             .nested
                 form
-                    span.label окончание имени
+                    label(for='nameEnding') окончание имени
                     input#nameEnding(type='text' name='nameEnding' value=nameEnding)
                     br
                     input#save(type='submit' value='Сохранить')
@@ -140,14 +179,6 @@ block content
                     each file in files
                         tr
                             td: a(href='/su/load?file='+file)= file
-            h3 Разное
-            .nested#misc
-                span
-                    if studentData.denyLogin
-                        input#denyLogin(type='checkbox' checked)
-                    else
-                        input#denyLogin(type='checkbox')
-                    | Запретить идентификацию вновь прибывших
     #students
         h2 Состояние
         table
