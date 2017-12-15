@@ -37,6 +37,9 @@ function Data() {
     this.list = {}
     this.unsaved = false
     this.denyLogin = true
+    this.maxTeamSize = 2
+    this.maxTasksPerTeam = 1
+    this.allowAllTasksArOnce = false
     this.statusData = _.reduce(allTasks.allTaskIds(), function(o, taskId) {
         o[taskId] = { chosen: 0, blocked: false, solved: 0, abandoned: 0 }
         return o

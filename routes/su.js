@@ -28,6 +28,14 @@ function toBool(x) {
     return typeof x === 'string'?   x === 'true' || x === '1':   x == true
 }
 
+function postScalarValue(req, res, cb) {
+    var b = req.body
+    if (b.value === undefined)
+        return res.status(400).send('Query \'value\' is required')
+    if (cb(b.value) !== false)
+        res.sendStatus(200)
+}
+
 var nameEnding = ''
 router
     .get('/auth', function(req, res) {
@@ -151,12 +159,36 @@ router
        res.redirect('/su')
     })
     .post('/deny-login', function(req, res) {
-        var b = req.body
-        if (b.value === undefined)
-            return res.status(400).send('Query \'value\' is required')
-        var v = toBool(b.value)
-        sd.data.denyLogin = v
-        res.sendStatus(200)
+        postScalarValue(req, res, function(value) {
+            sd.data.denyLogin = toBool(value)
+        })
+    })
+    .post('/set-max-team-size', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            var v = +value
+            if (v < 1 || v > 2) {
+                res.status(400).send('Enter size from 1 to 2')
+                return false
+            }
+            else
+                sd.data.maxTeamSize = v
+        })
+    })
+    .post('/set-tasks-per-team', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            var v = +value
+            if (v < 1 || v > 3) {
+                res.status(400).send('Enter size from 1 to 3')
+                return false
+            }
+            else
+                sd.data.maxTasksPerTeam = v
+        })
+    })
+    .post('/tasks-allow-all-tasts-at-once', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            sd.data.allowAllTasksArOnce = toBool(value)
+        })
     })
     .get('/mask-tasks', function(req, res) {
         var taskSets = allTasks.taskSets()

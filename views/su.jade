@@ -123,6 +123,15 @@ block content
                     .fail(msg.ajaxError)
             })
 
+            $('[name="maxTeamSize"]').click(function() {
+                $.post('/su/set-max-team-size', {value: $(this).val()}).fail(msg.ajaxError)
+            })
+            $('[name="maxTasksPerTeam"]').click(function() {
+                $.post('/su/set-tasks-per-team', {value: $(this).val()}).fail(msg.ajaxError)
+            })
+            $('#allowAllTasksArOnce').click(function() {
+                $.post('/su/tasks-allow-all-tasts-at-once', {value: $(this).val()}).fail(msg.ajaxError)
+            })
         })
     #hdr
         h1 Страница экзаменатора
@@ -145,16 +154,16 @@ block content
                         li: a(href='/su/mask-tasks', target='_blank') Доступные задачи
                             | (новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress})
                         li Максимальное число студентов в команде:
-                            input#teamSize1(type='radio' name='teamSize' value='1')
-                            label(for='teamSize1') 1
-                            input#teamSize2(type='radio' name='teamSize' value='2')
-                            label(for='teamSize2') 2
+                            input#teamSize1(type='radio' name='maxTeamSize' value='1' checked=studentData.maxTeamSize===1)
+                            label(for='maxTeamSize1') 1
+                            input#maxTeamSize2(type='radio' name='maxTeamSize' value='2' checked=studentData.maxTeamSize===2)
+                            label(for='maxTeamSize2') 2
                         li Максимальное число задач на команду:
-                            input#maxTasksPerTeam1(type='radio' name='maxTasksPerTeam' value='1')
+                            input#maxTasksPerTeam1(type='radio' name='maxTasksPerTeam' value='1' checked=studentData.maxTasksPerTeam===1)
                             label(for='maxTasksPerTeam1') 1
-                            input#maxTasksPerTeam2(type='radio' name='maxTasksPerTeam' value='2')
+                            input#maxTasksPerTeam2(type='radio' name='maxTasksPerTeam' value='2' checked=studentData.maxTasksPerTeam===2)
                             label(for='maxTasksPerTeam2') 2
-                            input#maxTasksPerTeam3(type='radio' name='maxTasksPerTeam' value='3')
+                            input#maxTasksPerTeam3(type='radio' name='maxTasksPerTeam' value='3' checked=studentData.maxTasksPerTeam===3)
                             label(for='maxTasksPerTeam3') 3
                         li
                             input#allowAllTasksArOnce(type='checkbox' checked=studentData.allowAllTasksArOnce)

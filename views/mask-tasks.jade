@@ -34,19 +34,13 @@ block content
         each taskSet, taskSetId in taskSets
             div
                 div.taskSetContainer
-                    if sd.data.taskSetStatus(taskSetId)==='enabled'
-                        input.taskSet(type='checkbox' checked)
-                    else
-                        input.taskSet(type='checkbox')
+                    input.taskSet(type='checkbox' checked=sd.data.taskSetStatus(taskSetId)==='enabled')
                     span= taskSetId
                     span= ': ' + allTasks.taskSetDescription(taskSetId)
                 div.taskContainer
                     each taskId in taskSet
                         div
-                            if sd.data.taskStatus(taskId).blocked
-                                input.task(type='checkbox')
-                            else
-                                input.task(type='checkbox' checked)
+                            input.task(type='checkbox' checked=!sd.data.taskStatus(taskId).blocked)
                             span.info= taskId
                             - var taskStatusFormatted = sd.data.taskStatusFormatted(taskId)
                             a(href='/su/task?task='+taskId target='_blank')= taskId.replace(taskSetId+':', '') + (taskStatusFormatted? ': ' + taskStatusFormatted: '')
