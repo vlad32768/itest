@@ -44,7 +44,7 @@ module.exports = tasks.Tasks.fromObject({
             if (n > 100)
                 throw new Error('Слишком большое n')
             var bc = [1]
-            for (var i=1; i<n; ++i) {
+            for (var i=1; i<=n; ++i) {
                 var bc2 = [1]
                 for (var j=1; j<i; ++j)
                     bc2.push(bc[j-1] + bc[j])

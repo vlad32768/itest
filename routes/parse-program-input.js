@@ -83,7 +83,7 @@ InputReader.prototype.eof = function() {
     return this.itok === this.tokens.length
 }
 
-function parsePrigramInput(stdin, format) {
+function parseProgramInput(stdin, format) {
     var inTokens = stdin.split(/\s+/)
     var fmTokens = format.split(/\s*,\s*/)
     var result = {}
@@ -198,6 +198,6 @@ function parsePrigramInput(stdin, format) {
         throw new Error('Слишком много входных данных' + reader.errorPositionIndicator(1))
     return result
 }
-parsePrigramInput.newReader = function(stdin) { return new InputReader(stdin) }
+parseProgramInput.newReader = function(stdin) { return new InputReader(stdin) }
 
-module.exports = parsePrigramInput
+module.exports = parseProgramInput
