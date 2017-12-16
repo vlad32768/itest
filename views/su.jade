@@ -118,19 +118,21 @@ block content
 
             // Process the Deny login checkbox
             $('#denyLogin').click(function() {
-                var checked = $(this).prop('checked')
-                $.post('/su/deny-login', {value: checked})
+                $.post('/su/deny-login', { value: $(this).prop('checked') })
                     .fail(msg.ajaxError)
             })
 
+            $('#startWithTest').click(function() {
+                $.post('/su/tasks-start-with-test', { value: $(this).prop('checked') }).fail(msg.ajaxError)
+            })
             $('[name="maxTeamSize"]').click(function() {
                 $.post('/su/set-max-team-size', {value: $(this).val()}).fail(msg.ajaxError)
             })
             $('[name="maxTasksPerTeam"]').click(function() {
                 $.post('/su/set-tasks-per-team', {value: $(this).val()}).fail(msg.ajaxError)
             })
-            $('#allowAllTasksArOnce').click(function() {
-                $.post('/su/tasks-allow-all-tasts-at-once', {value: $(this).val()}).fail(msg.ajaxError)
+            $('#allowAllTasksAtOnce').click(function() {
+                $.post('/su/tasks-allow-all-tasks-at-once', { value: $(this).prop('checked') }).fail(msg.ajaxError)
             })
         })
     #hdr
@@ -166,8 +168,8 @@ block content
                             input#maxTasksPerTeam3(type='radio' name='maxTasksPerTeam' value='3' checked=studentData.maxTasksPerTeam===3)
                             label(for='maxTasksPerTeam3') 3
                         li
-                            input#allowAllTasksArOnce(type='checkbox' checked=studentData.allowAllTasksArOnce)
-                            label(for='allowAllTasksArOnce') Разрешить брать несколько задач одновременно
+                            input#allowAllTasksAtOnce(type='checkbox' checked=studentData.allowAllTasksAtOnce)
+                            label(for='allowAllTasksAtOnce') Разрешить брать несколько задач одновременно
                         li
                             input#denyLogin(type='checkbox' checked=studentData.denyLogin)
                             label(for='denyLogin') Запретить идентификацию вновь прибывших

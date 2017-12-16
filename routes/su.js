@@ -185,9 +185,16 @@ router
                 sd.data.maxTasksPerTeam = v
         })
     })
-    .post('/tasks-allow-all-tasts-at-once', function(req, res) {
+    .post('/tasks-allow-all-tasks-at-once', function(req, res) {
         postScalarValue(req, res, function(value) {
-            sd.data.allowAllTasksArOnce = toBool(value)
+            sd.data.allowAllTasksAtOnce = toBool(value)
+        })
+    })
+    .post('/tasks-start-with-test', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            sd.data.startWithTest = toBool(value)
+            res.status(400).send('Feature is not implemented (TODO)')
+            return false
         })
     })
     .get('/mask-tasks', function(req, res) {

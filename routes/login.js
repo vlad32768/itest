@@ -5,7 +5,7 @@ var _ = require('lodash')
 var router = express.Router();
 router
     .get('/login', function(req, res, next) {
-        res.render('login', {message: req.flash('loginMessage'), loginData: req.session.loginData || {}})
+        res.render('login', {studentData: sd.data, message: req.flash('loginMessage'), loginData: req.session.loginData || {}})
     })
     .post('/login', function(req, res, next) {
         var b = req.session.loginData = req.body
