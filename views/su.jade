@@ -204,28 +204,20 @@ block content
                 th ->
             each team, index in studentData.teams()
                 tr
-                    td= team.summary()
+                    td(style='rowspan: #{team.tasks.length};')= team.summary()
                         span.teamId= team.id()
-                    td: a(href='/su/task?task='+team.taskId target='_blank')= team.taskId
-                    td
-                        if team.result
-                            a.team-result(href='/su/team-result' target='_blank') есть
-                        else
-                            | нет
-                    if team.taskSolved
-                        td: input.taskSolved(type='checkbox' checked)
-                    else
-                        td: input.taskSolved(type='checkbox')
-                    if team.taskAbandoned
-                        td: input.taskAbandoned(type='checkbox' checked)
-                    else
-                        td: input.taskAbandoned(type='checkbox')
-                    td: input.mark(type='text' value=team.mark||'')
-                    td: input.remove(type='button' value='удалить')
-                    if team.allowExtraLogin
-                        td: input.relogin(type='checkbox' checked)
-                    else
-                        td: input.relogin(type='checkbox')
+                    each teamTask, teamTaskIndex in team.tasks
+                        td: a(href='/su/task?task=#{teamTask.id}' target='_blank')= teamTask.id
+                        td
+                            if teamTask.result
+                                a.team-result(href='/su/team-result?id=#{team.id()}&taskIndex=#{teamTaskIndex}' target='_blank') есть
+                            else
+                                | нет
+                        td: input.taskSolved(type='checkbox' checked=teamTask.solved)
+                        td: input.taskAbandoned(type='checkbox' checked=teamTask.abandoned)
+                    td(style='rowspan: #{team.tasks.length};'): input.mark(type='text' value=team.mark||'')
+                    td(style='rowspan: #{team.tasks.length};'): input.remove(type='button' value='удалить')
+                    td(style='rowspan: #{team.tasks.length};'): input.relogin(type='checkbox' checked=team.allowExtraLogin)
     #confirm-remove(title="Действитьельно удалить?")
     #confirm-clear(title="Очистить данные?")
         p Текущее состояние не сохранено!

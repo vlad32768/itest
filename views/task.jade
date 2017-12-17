@@ -72,7 +72,7 @@ block content
                 modal: true,
                 buttons: {
                     "Да, выйти": function() {
-                        location.pathname='/logout'
+                        location.href = '/logout'
                     },
                     "Отмена": function() {
                         $(this).dialog('close')
@@ -154,10 +154,26 @@ block content
             font-weight: bold;
             color: #644;
         }
+        .task-links {
+            padding-left: 0;
+        }
+        .task-links li {
+            display: inline;
+            margin-right: 1em;
+        }
     if team
         p.team-summary= team.summary()
-        if team.taskSolved
-            p.win Задача решена, можно идти домой!
+        if team.tasks[teamTaskIndex].taskSolved
+            p.win Задача решена!
+        if maxTasks > 1
+            ul.task-links
+                - var otherTaskIndex = 0
+                while otherTaskIndex < maxTasks
+                    if otherTaskIndex == teamTaskIndex
+                        li Задача #{otherTaskIndex+1}
+                    else
+                        li: a(href="?taskIndex=#{otherTaskIndex}") Задача #{otherTaskIndex+1}
+                    - ++otherTaskIndex
     h1 Вариант #{taskId}
     p.render-tex!= task.text()
     if task.stdin() !== undefined

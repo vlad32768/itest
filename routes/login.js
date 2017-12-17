@@ -79,8 +79,12 @@ router
     .get('/logout', function(req, res, next) {
         if (req.session.teamId) {
             var team = sd.data.team(req.session.teamId)
-            if (team && !team.taskSolved)
-                sd.data.setTaskAbandoned(req.session.teamId, true)
+            if (team) {
+                team.tasks.forEach(function(teamTask, index) {
+                    if (!teamTask.solved)
+                        sd.data.setTaskAbandoned(req.session.teamId, index, true)
+                })
+            }
         }
         delete req.session.teamId
         res.redirect('/')

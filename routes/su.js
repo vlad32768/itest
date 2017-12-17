@@ -86,7 +86,9 @@ router
     })
     .get('/team-result', function(req, res, next) {
         var team = sd.data.team(req.query.id)
-        res.type('text/plain').send('// ' + team.summary() + '\n' + team.result)
+        var taskIndex = req.query.taskIndex || 0
+        var teamTask = team.tasks[taskIndex]
+        res.type('text/plain').send('// ' + team.summary() + '\n' + teamTask.result)
     })
     .post('/set-mark', function(req, res, next) {
         var team = sd.data.team(req.body.id)
@@ -109,11 +111,12 @@ router
             res.sendStatus(404)
     })
     .post('/set-team-status', function(req, res) {
+        var taskIndex = req.query.taskIndex || 0
         if (req.body.taskSolved !== undefined) {
-            sd.data.setTaskSolved(req.body.id, toBool(req.body.taskSolved))
+            sd.data.setTaskSolved(req.body.id, taskIndex, toBool(req.body.taskSolved))
         }
         if (req.body.taskAbandoned !== undefined) {
-            sd.data.setTaskAbandoned(req.body.id, toBool(req.body.taskAbandoned))
+            sd.data.setTaskAbandoned(req.body.id, taskIndex, toBool(req.body.taskAbandoned))
         }
         if (req.body.allowExtraLogin !== undefined) {
             sd.data.team(req.body.id).allowExtraLogin = toBool(req.body.allowExtraLogin)
