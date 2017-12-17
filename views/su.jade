@@ -194,11 +194,7 @@ block content
         h2 Состояние
         table
             tr
-                th № группы
-                th Имя 1
-                th Фамилия 1
-                th Имя 2
-                th Фамилия 2
+                th Команда
                 th Вариант
                 th Результат
                 th :)
@@ -208,12 +204,8 @@ block content
                 th ->
             each team, index in studentData.teams()
                 tr
-                    td= team.group
+                    td= team.summary()
                         span.teamId= team.id()
-                    td= team.firstname1
-                    td= team.lastname1
-                    td= team.firstname2
-                    td= team.lastname2
                     td: a(href='/su/task?task='+team.taskId target='_blank')= team.taskId
                     td
                         if team.result

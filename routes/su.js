@@ -122,7 +122,7 @@ router
     })
     .post('/save', function(req, res) {
         nameEnding = req.body.nameEnding
-        var nameEndingFinal = nameEnding? '-' + nameEnding: ''
+        var nameEndingFinal = nameEnding? '-' + nameEnding.replace('/', '-'): ''
         var time = (new Date).toISOString().replace(/:/g,'-').replace(/\.\d+\w?$/, '').replace(/T/, '_')
         var fileName = time+nameEndingFinal+'.json'
         var filePath = path.join(dataDir, fileName)
