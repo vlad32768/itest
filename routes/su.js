@@ -111,7 +111,7 @@ router
             res.sendStatus(404)
     })
     .post('/set-team-status', function(req, res) {
-        var taskIndex = req.query.taskIndex || 0
+        var taskIndex = req.body.taskIndex || 0
         if (req.body.taskSolved !== undefined) {
             sd.data.setTaskSolved(req.body.id, taskIndex, toBool(req.body.taskSolved))
         }
