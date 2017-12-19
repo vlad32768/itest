@@ -109,6 +109,11 @@ block content
             .console-data-scroller {
                 overflow: auto;
             }
+    if task.options().noscreensize
+        style.
+            #console-size {
+                display: none;
+            }
     style.
         .black {
             color: #fff;
@@ -175,7 +180,7 @@ block content
                         li: a(href="?taskIndex=#{otherTaskIndex}") Задача #{otherTaskIndex+1}
                     - ++otherTaskIndex
     h1 Вариант #{taskId}
-    p.render-tex!= task.text()
+    .render-tex!= task.text()
     if task.stdin() !== undefined
         #stdin-block
             p Стандартный ввод:
