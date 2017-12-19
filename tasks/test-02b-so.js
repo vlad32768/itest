@@ -7,6 +7,15 @@ var image = util.imgen({
     pointLineDist: '/task-images/point-to-line-dist.png'
 })
 
+var sharedText = {
+    aboutRootMultiplicity: [
+        'Кратностью корня $x_*$ многочлена степени $n$ называют число $p$ от 1 до $n$, такое, что $x_*$ &mdash; является корнем многочлена и всех его производных',
+        'вплоть до $(p-1)$-й включительно и не является корнем $p$-той производной.<br/>',
+        'Замечание. При проверке, является ли $x_*$ корнем многочлена, вычисляйте значение многочлена от $x_*$ и считайте, что является, если вычисленное',
+        'значение не превосходит по абсолютной величине $\\varepsilon=10^{-8}$.'
+    ].join('\n')
+}
+
 module.exports = tasks.Tasks.fromObject({
     description: 'Контрольная работа 2 (переписка) СО 2017 осень',
     options: {
@@ -76,7 +85,7 @@ module.exports = tasks.Tasks.fromObject({
                '$P_2(x)=\\sum\\limits_{k=0}^m b_k x^k$',
                'Напечатайте коэффициенты $c_0, \\ldots c_{n+m}$ многочлена $P(x)=\\sum\\limits_{k=0}^{n+m} c_k x^k = P_1(x)P_2(x)$.'].join('\n'),
         scene: ['program', function(stdin) {
-            var args = ppi(stdin, 'whole n, whole a[n+1], whole m, whole b[m+1]')
+            var args = ppi(stdin, 'whole n, real a[n+1], whole m, real b[m+1]')
             var c = new Array(args.m + args.n + 1).fill(0)
             for (var ia=0; ia<=args.n; ++ia)
                 for (var ib=0;ib<=args.m; ++ib)
@@ -86,14 +95,42 @@ module.exports = tasks.Tasks.fromObject({
         stdin: '2   3 2 1     3   1 2 3 4',
         stdinHint: 'Введите через пробел $n, a_0, \\ldots a_n, m, b_0, \\ldots b_m$'
     }, {
+        text: ['Заданы три последовательности вещественных чисел, $a_{10}, a_{11}, a_{12}, a_{13}$,',
+               '$a_{20}, a_{21}, a_{22}, a_{23}$ и $a_{30}, a_{31}, a_{32}, a_{33}$.',
+               'Это коэффициенты трёх многочленов от переменной $x$, $P_i(x)=\\sum\\limits_{k=0}^3 a_{ik} x^k$, $i=1,2,3$.',
+               'Проверьте, являются ли многочлены $P_1$, $P_2$, $P_3$ линейно независимыми.<br/>',
+               'Замечание. Элементы линейного пространства линейно независимы тогда и только тогда,',
+               'когда матрица их координат в каком-нибудь базисе имеет полный ранг. В свою очередь, матрица',
+               'имеет полный ранг, если в ней найдётся базисный минор, то есть отличный от нуля минор порядка $n$,',
+               'где $n$ &mdash; число строк или столбцов в матрице, смотря чего меньше.',
+               'Для многочленов рассмотрите степенной базис. Вместо сравнения минора с нулём сравнивайие его абсолютное',
+               'значение с пороговой точностью $\\varepsilon=10^{-8}$'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'real a1[4], real a2[4], real a3[4]')
+            function det(c1, c2, c3) {
+                return args.a1[c1]*(args.a2[c2]*args.a3[c3] - args.a3[c2]*args.a2[c3]) -
+                       args.a2[c1]*(args.a1[c2]*args.a3[c3] - args.a3[c2]*args.a1[c3]) +
+                       args.a3[c1]*(args.a1[c2]*args.a2[c3] - args.a2[c2]*args.a1[c3])
+            }
+            function isZero(x) {
+                return Math.abs(x) < 1e-8
+            }
+            var n = 4
+            for (var c1=0; c1<=n-3; ++c1)
+                for (var c2=c1+1; c2<=n-2; ++c2)
+                    for (var c3=c2+1; c3<=n-1; ++c3)
+                        if (!isZero(det(c1, c2, c3)))
+                            return 'Многочлены линейно независимы'
+            return 'Многочлены линейно зависимы'
+        }],
+        stdin: '1 0 0 0\n0 1 0 0\n0 0 1 0',
+        stdinHint: 'Введите через пробел $a_{10}, a_{11}, \\ldots a_{33}$'
+    }, {
         text: ['Задана последовательность вещественных чисел $a_0, \\ldots, a_n$ и вещественное число $x_*$.',
                'В последовательности чисел &mdash; коэффициенты многочлена от переменной $x$, $P(x)=\\sum\\limits_{k=0}^n a_k x^k$.',
                'Требуется определить, является ли $x_*$ корнем многочлена $P(x)$, и если да, то какова его кратность.',
-               'Программа должна печатать 0, если $x_*$ &mdash; не корень и кратность, если корень.<br>',
-               'Кратностью корня называют число $p$ от 1 до $n$, такое, что $x_*$ &mdash; является корнем всех производных многочлена $P(x)$',
-               'вплоть до $(p-1)$-той производной включительно.<br/>',
-               'Замечание. При проверке, является ли $x_*$ корнем многочлена, вычисляйте значение многочлена от $x_*$ и считайте, что является, если вычисленное',
-               'значение не превосходит по абсолютной величине $\\varepsilon=10^{-8}$.'].join('\n'),
+               'Программа должна печатать 0, если $x_*$ &mdash; не корень и кратность, если корень.<br/>',
+               sharedText.aboutRootMultiplicity].join('\n'),
         scene: ['program', function(stdin) {
             var args = ppi(stdin, 'whole n, real a[n+1], real x')
             function val(c, x) {
@@ -119,8 +156,43 @@ module.exports = tasks.Tasks.fromObject({
             }
             return lp().println(p).finish()
         }],
-        stdin: '1   1 1     1',
+        stdin: '3   -9 15 -7 1     3',
         stdinHint: 'Введите через пробел $n, a_0, \\ldots a_n, x_*$'
+    }, {
+        text: ['Задана последовательность вещественных чисел $a_0, a_1, a_2, a_3$.',
+               'Проверьте, имеет ли многочлен $P(x)=\\sum\\limits_{k=0}^{3} a_k x^k$',
+               'вещественные корни кратности 2 и выше. Если да, напечатайте все такие корни и их кратности.',
+               'Кстати, сколько таких корней может быть?<br/>',
+               sharedText.aboutRootMultiplicity].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'real a[4]')
+            var nosuchroots = 'Кратных корней нет'
+            var deg = 3
+            for (var i=3; i>=0 && args.a[i]===0; --i)
+                --deg
+            if (deg < 2)
+                return nosuchroots
+            var da = deg === 3? [args.a[1], args.a[2]*2, args.a[3]*3]: args.a.slice(0, 3)
+            var c = da[0]/da[2], b = 0.5*da[1]/da[2]
+            var D = b*b - c
+            if (D < 0)
+                return nosuchroots
+            function isRoot(x) {
+                return Math.abs(args.a[0] + x*(args.a[1] + x*(args.a[2] + x*args.a[3]))) < 1e-8
+            }
+            var d = Math.sqrt(D)
+            var x = [-b-d]
+            if (d > 1e-8)
+                x.push(-b+d)
+            for (var i=0; i<x.length; ++i)
+                if (deg === 2 || isRoot(x[i])) {
+                    var p = (d > 1e-8? 2: 3) + (deg-3)
+                    return p > 1?   'Корень ' + x[i] + ', кратность ' + p:   nosuchroots
+                }
+            return nosuchroots
+        }],
+        stdin: '-4 8 -5 1',
+        stdinHint: 'Введите через пробел $a_0, a_1, a_2, a_3$'
     }, {
         text: ['Задана последовательность вещественных чисел $x_0, \\ldots, x_n$. Это корни многочлена',
                '$P(x)=\\sum\\limits_{k=0}^{n} a_k x^k$, причём $a_n=1$.',
@@ -141,5 +213,24 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '3   1 2 3',
         stdinHint: 'Введите через пробел $n, x_1, \\ldots x_n$'
+    }, {
+        text: ['Задана последовательность $2n$ вещественных чисел $x_1, y_1, x_2, y_2, \\ldots, x_n, y_n$.',
+               'Это декартовы координаты вершин многоугольника на плоскости. Найдите площадь многоугольника.<br/>',
+               'Указание. Для вычисления площади фигуры $F$ с границей $\\partial F$ используйте формулу',
+               '$\\int\\limits_F dF = \\int\\limits_{\\partial F}x\\,dy$',
+               '(предполагается, что система координат правая, а $\\partial F$ обходится против часовой стрелки).'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, real xy[2*n]')
+            var result = 0
+            for (var i=0, _2n=2*args.n; i<_2n; i+=2) {
+                var inext = (i+2) % _2n
+                var x = 0.5*(args.xy[i] + args.xy[inext])
+                var dy = args.xy[inext+1] - args.xy[i+1]
+                result += x*dy
+            }
+            return lp().println(result).finish()
+        }],
+        stdin: '4   0 0  1 0  1 1  0 1',
+        stdinHint: 'Введите через пробел $n, x_1, y_1 \\ldots x_n, y_n$'
     }
 ]})
