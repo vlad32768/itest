@@ -10,8 +10,8 @@ var flash = require('express-flash')
 var taskOutput = require('./routes/task-output');
 var login = require('./routes/login');
 var routes = require('./routes/index');
-var users = require('./routes/users');
 var su = require('./routes/su');
+var su_task = require('./routes/su-task');
 
 var app = express();
 
@@ -34,10 +34,10 @@ app.use(session({
 }))
 app.use(flash())
 app.use('/', taskOutput)
+app.use('/secret', su_task);
 app.use('/su', su)
 app.use('/', login)
 app.use('/', routes);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,22 +1,12 @@
-/*
-test-em-all - a tool for online examination of students.
-Copyright (C) 2015 Stepan Orlov
-
-This file is part of test-em-all.
-
-Full text of copyright notice can be found in file copyright_notice.txt in the test-em-all root directory.
-License agreement can be found in file LICENSE.md in the test-em-all root directory.
-*/
-
-var
-    express = require('express'),
-    fs = require('fs'),
-    path = require('path'),
-    _ = require('lodash'),
-    crypto = require('crypto'),
-    sd = require('./student-data.js'),
-    allTasks = require('./all-tasks.js'),
-    util = require('./util.js')
+var express = require('express')
+var fs = require('fs')
+var path = require('path')
+var _ = require('lodash')
+var crypto = require('crypto')
+var sd = require('./student-data.js')
+var allTasks = require('./all-tasks.js')
+var util = require('./util.js')
+var su_task = require('./su-task.js')
 
 var dataDir = path.join(__dirname, '..', 'data')
 
@@ -78,11 +68,6 @@ router
                 taskStats: sd.data.taskStatsObj()
             })
         })
-    })
-    .get('/task', function(req, res, next) {
-        var taskId = req.query.task || 'test-01-so'
-        var task = allTasks.tasks()[taskId]
-        res.render('task', { taskId: taskId, task: task, allowUpload: false })
     })
     .get('/team-result', function(req, res, next) {
         var team = sd.data.team(req.query.id)
@@ -216,5 +201,6 @@ router
         sd.data.enableTask(taskId, enable)
         res.sendStatus(200)
     })
+    .use(su_task)
 
 module.exports = router
