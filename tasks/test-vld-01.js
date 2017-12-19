@@ -21,6 +21,14 @@ function mod3(a)
     return Math.sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2])
 }
 
+function print_arr(a, p)
+{
+    a.forEach(function(val){
+        p.print(val)
+    })
+    p.println()
+}
+
 module.exports = tasks.Tasks.fromObject({
     description: 'Tasks from Alexey',
     items: [{
@@ -76,19 +84,14 @@ module.exports = tasks.Tasks.fromObject({
             if (args.x>50)
                 throw new Error('Слишком большое x')
             
-            if (args.x<-10)
+            if (args.x<-15)
                 throw new Error('Слишком малое x')
-                
-            function fact(n){return n<=1?1:fact(n-1)*n}
-            // function fact(n){
-            //     var s=1.0
-            //     for(var i=2;i<=n;++i) s*=i
-            //     return s
-            // }
-            var s=0.0
-            for( var n=0;;++n)
+            var s=1
+            var p=1
+            var n=1
+            for( ;n<200;++n)
             {
-                var p=Math.pow(args.x,n)/fact(n)
+                p*=args.x/n
                 s+=p
                 if (Math.abs(p)<1e-8) break
             } 
@@ -177,11 +180,276 @@ module.exports = tasks.Tasks.fromObject({
             var b = new Array
             args.a.forEach(function(val){b.unshift(val);printer.print(val)})
             printer.println()
-            b.forEach(function(val){printer.print(val)})
+            print_arr(b,printer)
             return printer.finish()
         }],
         stdin: '10    2 4 3 5 4 6 5 7 6 8',
         stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+    },
+    {
+        text: [
+            'Дан неупорядоченный массив целых чисел. Найти (и напечатать) количество участков нестрогой монотонности в нём. Например, в массиве [1,2,2,3] один такой участок, в массиве [1,2,3,2] --- два, а в массиве [1,2,1,2] их три.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            var m_c=0
+            var m_t=-2
+            
+            for(var i=1;i<args.n;++i)
+            {
+                var s=Math.sign(args.a[i-1]-args.a[i])
+                switch(m_t)
+                {
+                case -1:
+                    if (s>0)
+                    {
+                        m_t=1
+                        m_c++
+                    }
+                    break
+                case 1:
+                    if (s<0)
+                    {
+                        m_t=-1
+                        m_c++
+                    }
+                    break
+                default:
+                    if(s!=0)
+                    {
+                        m_t=s
+                        m_c++
+                    }
+                }
+
+            }
+            return printer.println(m_c).finish()
+        }],
+        stdin: '20    2 4 3 5 5 5 5 4 3 2 2 2 3 4 5 6 7 7 6 5',
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+    },
+    {
+        text: [
+            'Дан неупорядоченный массив целых чисел. Найти самый длинный участок строгого возрастания, напечатать индексы элементов в начале и в конце этого участка. Если имеется несколько участков строгого возрастания одной длины, можно выбрать любой из них.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+
+            var acc=false
+            var acc_s=-1,acc_e=-1
+            var acc_s_max=-1,acc_e_max=-1
+            
+            function finish_acc(end_idx)
+            {
+                if (!acc) throw new Error('ERROR!!!111')
+                acc=false
+                acc_e=end_idx
+                if (acc_e-acc_s>acc_e_max-acc_s_max)
+                {
+                    acc_e_max=acc_e
+                    acc_s_max=acc_s
+                }
+            }
+            for(var i=1;i<args.n;++i)
+            {
+                var t=args.a[i]>args.a[i-1]
+                if ((!acc) && t)
+                {
+                    acc=true
+                    acc_s=i-1
+                }
+                if(acc && (!t))
+                    finish_acc(i-1)
+                if(t && (i==args.n-1))
+                    finish_acc(i)
+            }
+            return printer.print(acc_s_max,acc_e_max).finish()
+        }],
+        stdin: '20    2 4 3 5  5 5 5 4 3 2 2   2 3 4 5 6 7   7 6 5',
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+    },
+    {
+        text: [
+            'Дан неупорядоченный массив целых чисел. Циклически сдвинуть его элементы на одну позицию влево, например, [1,5,3,7] $\\rightarrow$ [5,3,7,1]. Напечатать оба массива.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            
+            print_arr(args.a,printer)
+            args.a.push(args.a.shift())
+            print_arr(args.a,printer)
+            return printer.finish()
+        }],
+        stdin: '4   1 5 3 7',
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+    },
+    {
+        text: [
+            'Дана последовательность $x_{n+1}=x_n^2 + c$, $x$ и $c$ --- комплексные числа, $n=0,1,2,\\ldots$ Определить, ограниченна ли эта последовательность при заданных $x_0$ и $c$, напечатать результат. Указание. Последовательность неограниченна, если для некоторого $n$ имеет место неравенство $|x_n|>2\\max\\{1,|c|\\}$.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'real Re_c, real Im_c, real Re_x0, real Im_x0')
+            
+            function mod2(r,i)
+            {
+                return r*r+i*i
+            }
+
+            var mod2_c=mod2(args.Re_c,args.Im_c)
+            var escape=mod2_c>1?4*mod2_c:4
+
+            var Re_x,Im_x
+            var i=0
+            var max_iter=1000
+            for(;i<max_iter;++i)
+            {
+                Re_x=args.Re_x0*args.Re_x0-args.Im_x0*args.Im_x0+args.Re_c
+                Im_x=2*args.Re_x0*args.Im_x0+args.Im_c
+                if(mod2(Re_x,Im_x)>escape) break
+                args.Re_x0=Re_x
+                args.Im_x0=Im_x
+            }
+            var printer=lp()
+            printer.println('Последовательность '+(i==max_iter?'ограничена':'неограничена'))
+            return printer.finish()
+        }],
+        stdin: '-0.99823459867075659  0.28726115158486704 0 0',
+        stdinHint: 'Введите $c$, $x_0$'//TODO:latex Real Im ?
+    },
+    {
+        text: [
+            'Дан упорядоченный массив целых чисел. Он описывает лестницу, разность соседних элементов --- высота ступеней. Имеется животное, способное преодолевать ступени высоты не больше $h$, оно сидит в начале лестницы. До какого элемента массива оно может добраться по этой лестнице?',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole h, whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var i=0
+            for(;i<args.n-1;++i)
+            {
+                if(args.a[i+1]-args.a[i]>args.h) break
+            }
+            return lp().println(i).finish()
+        }],
+        stdin: '2   7  3 5 7 9 11 14 16',
+        stdinHint: 'Введите $h, n, a_1, \\ldots, a_n$'
+    },
+    {
+        text: [
+            'Дан неупорядоченный массив целых чисел. Он описывает что-то вроде лестницы, идущей то вверх, то вниз; разность соседних элементов --- высота ступеней. Имеется животное, способное преодолевать ступени высоты не больше $h$. Куда его можно посадить, чтобы оно не убежало с лестницы? На край лестницы сажать нельзя! Возможно, что подходящего места не найдётся, тогда об этом надо сообщить.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole h, whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+
+            var b=new Array(args.n)
+            b.fill(false)
+            b[0]=b[args.n-1]=true
+
+            for(var i=1;i<args.n-1;++i)
+            {
+                b[i]=Math.abs(args.a[i-1]-args.a[i])<=args.h&&b[i-1]
+                if (!b[i]) break
+            }
+            for(var i=args.n-2;i>0;--i)
+            {
+                if (b[i]) break
+                else
+                {
+                    b[i]=Math.abs(args.a[i]-args.a[i+1])<=args.h&&b[i+1]
+                    if (!b[i]) break
+                }
+            }
+            var no=true
+            b.forEach(function(val,idx){
+                if(!val) 
+                {
+                    printer.print(idx)
+                    no=false
+                }
+            })
+            
+            if(no) printer.println('Нет подходящего места')
+
+            return printer.finish()
+        }],
+        stdin: '2   7     3 5    8 9 11 12   15',
+        stdinHint: 'Введите $h, n, a_1, \\ldots, a_n$'
+    },
+    {
+        text: [
+            'Дан упорядоченный массив целых чисел. Он описывает лестницу, разность соседних элементов --- высота ступеней; одинаковые элементы образуют широкие ступени. Сколько ступеней в лестнице? Например, в массиве [2,2,2] одна ступень, в массиве [2,3,3] их две.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var c=1
+            for(var i=0;i<args.n-1;++i)
+            {
+                if(args.a[i+1]!=args.a[i]) c++
+            }
+            return lp().println(c).finish()
+        }],
+        stdin: '7  3 5 5 5 7 7 8',
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+    },
+    {
+        text: [
+            'Дан неупорядоченный массив целых чисел. Он описывает что-то вроде лестницы, идущей то вверх, то вниз; разность соседних элементов --- высота ступеней. Имеется животное, способное преодолевать ступени высоты не больше $h$ вверх и не больше $H$ вниз. Животное находится в начале массива. До какого элемента сможет дойти животное?',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole h, whole H, whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var i=0
+            for(;i<args.n-1;++i)
+            {
+                var t=args.a[i+1]-args.a[i]
+                if(t>args.h || -t>args.H) break
+            }
+            return lp().println(i).finish()
+        }],
+        stdin: '2 4   7  3 5 7 3 4 1 3 ',
+        stdinHint: 'Введите $h, $H, a_1, \\ldots, a_n$'
+    },
+    {
+        text: [
+            'Задано натуральное число. Написать программу, генерирующую массив делителей этого числа и вычисляющую среднее арифметическое этих делителей. Массив и среднее арифметическое вывести на экран.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            
+            //var a=new Array
+            var s=0,count=0
+            for(var i=1;i<=args.n/2;++i)
+            {
+                if(args.n%i==0)
+                {
+                    printer.print(i)
+                    s+=i
+                    count++
+                }
+            }
+            printer.println('\nСреднее арифметическое=',s/count)
+            return printer.finish()
+        }],
+        stdin: '28',
+        stdinHint: 'Введите $n$'
     },
     {
         text: [
