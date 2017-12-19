@@ -422,7 +422,7 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(i).finish()
         }],
         stdin: '2 4   7  3 5 7 3 4 1 3 ',
-        stdinHint: 'Введите $h, $H, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $h, H, a_1, \\ldots, a_n$'
     },
     {
         text: [
@@ -450,20 +450,6 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '28',
         stdinHint: 'Введите $n$'
-    },
-    {
-        text: [
-            '',
-            '<br>'].join('\n'),
-        scene: ['program', function(stdin) {
-            var args = ppi(stdin, 'whole n')
-            if (args.n > 100)
-                throw new Error('Слишком большое n')
-            var printer=lp()
-            return printer.finish()
-        }],
-        stdin: '',
-        stdinHint: 'Введите $n$'
-    },
+    }
     ]
 })
