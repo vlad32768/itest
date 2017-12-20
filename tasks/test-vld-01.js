@@ -450,6 +450,293 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '28',
         stdinHint: 'Введите $n$'
-    }
+    },
+    { //17
+        text: [
+            'Задан упорядоченный по возрастанию массив $v$ произвольной длины и натуральное число $n$. Написать программу, выполняющую $n$ раз следующее:',
+            '<ul>',
+            '<li> Вычисляется значение $p$ --- среднее арифметическое элементов $v$.</li>',
+            '<li> Полученное значение $p$ вставляется в $v$ так, что $v$ остается упорядоченным.</li>',
+            '</ul>',
+            'Исходный массив и результат $n$ вставок следует вывести на консоль. Массивы выводить в строку, отделяя элементы пробелами. Каждый массив начинать с новой строки.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, whole s,  int a[s]')
+            if (args.s > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.a.join(' '))
+            for(var i=0;i<args.n;++i)
+            {
+                var s=0
+                args.a.forEach(function(val){s+=val})
+                var avg=s/args.a.length
+                for(var j=0;j<args.a.length;++j)
+                {
+                    if(args.a[j]>avg)
+                    {
+                        args.a.splice(j,0,avg)
+                        break
+                    }
+                }
+            }
+            printer.println(args.a.join(' '))
+            return printer.finish()
+        }],
+        stdin: '5  5  2 5 8 15 20 ',
+        stdinHint: 'Введите $n, s, a_1, \\ldots, a_s$'
+    },
+    { //18
+        text: [
+            'Задан упорядоченный по возрастанию массив $v$ произвольной длины и натуральное число $n$. Написать программу, выполняющую $n$ раз следующее:',
+            '\\begin{itemize}',
+            '\\item Находится индекс $i$, такой, что $|v[i]-v[i+1]|=max$.',
+            '\\item Среднее значение $v[i]$ и $v[i+1]$ вставляется в $v$ перед $v[i+1]$.',
+            '\\end{itemize}',
+            'Исходный массив и результат $n$ вставок следует вывести на консоль. Массивы выводить в строку, отделяя элементы пробелами. Каждый массив начинать с новой строки.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, whole s,  int a[s]')
+            if (args.s > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.a.join(' '))
+            for(var i=0;i<args.n;++i)
+            {
+                var max=0,idx=0
+                for(var j=0;j<args.a.length-1;++j)
+                {
+                    var m=args.a[j+1]-args.a[j]
+                    if(m>max)
+                    {
+                        max=m
+                        idx=j
+                    }
+                }
+                args.a.splice(idx+1,0,(args.a[idx]+args.a[idx+1])/2)
+            }
+            printer.println(args.a.join(' '))
+            return printer.finish()
+        }],
+        stdin: '5  5  2 5 8 15 20 ',
+        stdinHint: 'Введите $n, s, a_1, \\ldots, a_s$'
+    },
+    { //19
+        text: [
+            'Задан массив $v$ произвольной длины. Написать программу, генерирующую целочисленный массив $w$ такой же длины, где $w[i]$ --- число элементов $v[j]$, таких, что $v[j]>v[i]$ при $j>i$.',
+            'Программа должна выводить на консоль оба массива. Массивы выводить в строку, отделяя элементы пробелами. Каждый массив начинать с новой строки.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n,int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.a.join(' '))
+            var w = new Array
+            for(var i=0;i<args.n;++i)
+            {
+                var s=0
+                for(var j=i;j<args.n;++j)
+                {
+                    if(args.a[j]>args.a[i]) ++s
+                }
+                w.push(s)
+            }
+            printer.println(w.join(' '))
+            return printer.finish()
+        }],
+        stdin: '10  5 2 5 8 1 4 15 20 1 25',
+        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+    },
+    { //20
+        text: [
+            'Задан массив $v$ произвольной длины, в нем допустимы одинаковые элементы. Составить программу, генерирующую массив $w$, содержащий те же элементы, но только один раз. Например, $v=[1,-2, 3, 1,-2,4]$, $w=[1,-2,3,4]$.',
+            'Программа должна выводить на консоль оба массива. Массивы выводить в строку, отделяя элементы пробелами. Каждый массив начинать с новой строки.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+
+            printer.println(args.a.join(' '))
+
+            function onlyUnique(value, index, self) { 
+                return self.indexOf(value) === index
+            }
+
+            printer.println((args.a.filter(onlyUnique)).join(' '))
+            
+            return printer.finish()
+        }],
+        stdin: '10  5 2 5 8 1 4 15 20 1 25',
+        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+    },
+    { //21
+        text: [
+            'Задан массив $v$ произвольной длины и число $d$. Написать программу, генерирующую массив $w$, полученный из $v$ исключением элемента, ближайшего к $d$.',
+            'Программа должна выводить на консоль оба массива. Массивы выводить в строку, отделяя элементы пробелами. Каждый массив начинать с новой строки.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'int d, whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.a.join(' '))
+
+            var diff=Math.abs(args.a[0]-args.d)
+            var d_val=args.a[0]
+            args.a.forEach(function(val,idx){
+                var t=Math.abs(val-args.d)
+                if(t<diff)
+                {
+                    diff=t
+                    d_val=val
+                }
+            })
+            
+            printer.println(args.a.filter(function(val){return val!=d_val}) )
+
+            return printer.finish()
+        }],
+        stdin: '7  10  5 2 5 8 1 4 15 20 1 25',
+        stdinHint: 'Введите $d, n, v_1, \\ldots, v_n$'
+    },
+    { //22
+        text: [
+            'Задан числовой $v$ массив произвольной длины. Сгенерировать массив $w$, такой, что $w[i]$ --- среднее арифметическое всех элементов $v$ за исключением $v[i]$.',
+            'Программа должна выводить на консоль оба массива. Массивы выводить в строку, отделяя элементы пробелами. Каждый массив начинать с новой строки.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int a[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.a.join(' '))
+
+            var w = new Array
+            args.a.forEach(function(val,idx){
+                var s=0
+                args.a.forEach(function(val2,idx2){ if(idx!=idx2) s+=val2})
+                w.push(s/(args.n-1))
+            })
+            printer.println(w.join(' '))
+
+            return printer.finish()
+        }],
+        stdin: '5   2 4 6 8 10',
+        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+    },
+    { //23
+        text: [
+            'Задан числовой массив $v$ произвольной длины $n$. Обозначим $a_k = \\sum\\limits_{i=0}^{k-1}{v[i]}$, $b_k = \\sum\\limits_{i=k+1}^{n-1}{v[i]}$. Сгенерировать массивы чисел $a_k$ и $b_k$, найти индекс $k$, для которого $|a_k-b_k|=min$. Программа должна выводить на консоль все три массива и найденный индекс. Массивы выводить в строку, отделяя элементы пробелами. Каждый массив начинать с новой строки.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.v.join(' '))
+
+            var a = new Array
+            var b = new Array
+            args.v.forEach(function(val,k){
+                var s=0
+                for(var i=0;i<k;++i) s+=args.v[i]
+                a.push(s)
+
+                s=0
+                for(i=k+1;i<args.n;++i) s+=args.v[i]
+                b.push(s)
+            })
+
+            var idx=0,min=Math.abs(a[0]-b[0])
+            for(var i=1;i<args.n;++i)
+            {
+                var m=Math.abs(a[i]-b[i])
+                if(m<min){
+                    min=m
+                    idx=i
+                }
+            }
+            printer.println(a.join(' '))
+            printer.println(b.join(' '))
+            printer.println(idx)
+            return printer.finish()
+        }],
+        stdin: '5   2 4 6 8 10',
+        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+    },
+    {
+        text: [
+            'Задан числовой массив $v$ произвольной длины $n$. Преобразовать его следующим образом: если $v[i] > v[i-1]$ и $v[i] > v[i+1]$, то $v[i]$ присвоить среднее $v[i-1]$ и $v[i+1]$. Вывести оба массива в строку, каждый массив начать с новой строки.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.v.join(' '))
+            for(var i=1;i!=args.n-1;++i)
+            {
+                if (args.v[i]>args.v[i+1]&&args.v[i]>args.v[i-1]) args.v[i]=(args.v[i-1]+args.v[i+1])/2
+            }
+            printer.println(args.v.join(' '))
+            return printer.finish()
+        }],
+        stdin: '10  5 1 10 5 20 9 3 20 1 25',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+    },
+    { //25
+        text: [
+            'Задан целочисленный массив $v$ произвольной длины $n$. Вывести на экран индексы четных элементов $v$, но только тех, за которыми непосредственно следует нечетный элемент. Например, $v=[1,2,3,4,6,7,8]\\rightarrow[1,4]$',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            for(var i=0;i!=args.n-1;++i)
+            {
+                if(args.v[i]%2==0&&args.v[i+1]%2!=0) printer.print(i)
+            }
+            return printer.finish()
+        }],
+        stdin: '10  5 2 5 8 2 4 15 20 1 25',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+    },
+    { //26
+        text: [
+            'Написать программу, генерирующую $n$ чисел $F_k$, где $n$ --- произвольное натуральное число. Числа $F_k$ задаются соотношением: $F_0=0$, $F_1=1$, $F_k=F_{k-1}+F_{k-2}$. Например, для $n=7$ $F=[0,1,1,2,3,5,8]$.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+
+            var f2=0,f1=1
+            var f
+            for(var i=0;i!=args.n;++i)
+            {
+                if (i<=1) f=i
+                else
+                {
+                    f=f2+f1
+                    f2=f1
+                    f1=f
+                }
+                printer.print(f)
+            }
+            return printer.finish()
+        }],
+        stdin: '7',
+        stdinHint: 'Введите $n$'
+    },
     ]
 })
+
+
+// 23 -- вопрос по индексам а и b: a[0] и b[n-1]
+// 19 -- тире
+// 17,18 -- список в оформлении условия
