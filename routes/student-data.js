@@ -69,16 +69,17 @@ Data.fromJson = function(d) {
         var team = new Team
         var teamData = d.list[key]
         if (version < 2) {
-            var members = [{firstname: teamData.firstname1, lastname: teamData.lastname1}]
+            var members = [{firstname: teamData.firstname1, lastname: teamData.lastname1, mark: teamData.mark || ''}]
             if (teamData.firstname2)
-                members.push({firstname: teamData.firstname2, lastname: teamData.lastname2})
-            var newTeamData =  _.pick(teamData, ['group', 'startTime', 'result', 'mark'])
+                members.push({firstname: teamData.firstname2, lastname: teamData.lastname2, mark: teamData.mark || ''})
+            var newTeamData =  _.pick(teamData, ['group', 'startTime'])
             if (version === 0   &&   teamData.taskIndex !== undefined)
                 teamData.taskId = 'test-01-so:' + (teamData.taskIndex+1)
             newTeamData.tasks = teamData.taskId?  [{
                 id:  teamData.taskId,
                 solved: teamData.taskSolved,
-                abandoned: teamData.taskAbandoned
+                abandoned: teamData.taskAbandoned,
+                result: teamData.result || ''
             }]: []
             newTeamData.members = members
             teamData = newTeamData
@@ -87,6 +88,7 @@ Data.fromJson = function(d) {
         result.addTeam(team, version)
     }
     _.assign(result.statusData, d.statusData)
+    _.merge(result, _.pick(d, 'maxTeamSize', 'maxTasksPerTeam', 'allowAllTasksAtOnce'))
     result.unsaved = false
     result.denyLogin = true
     return result

@@ -34,7 +34,10 @@ router
     })
     .post('/upload-result', function(req, res, next) {
         var team = sd.data.team(req.session.teamId)
-        team.result = req.body.result
+        var teamTaskIndex = req.body.taskIndex || 0
+        if (!(teamTaskIndex >= 0   &&   teamTaskIndex < team.tasks.length))
+            return res.sendStatus(400).send('taskIndex is out of range')
+        team.tasks[teamTaskIndex].result = req.body.result
         res.sendStatus(200)
     })
     .get('/logout-warning-message', function(req, res) {

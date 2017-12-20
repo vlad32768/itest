@@ -4,7 +4,7 @@ block content
     link(rel='stylesheet', href='stylesheets/jquery-ui.min.css')
     link(rel='stylesheet' href='/stylesheets/messages.css')
     style.
-        .teamId {
+        .teamId, .memberIndex {
             display: none;
         }
         #control input[type="radio"] {
@@ -45,12 +45,12 @@ block content
             function teamId(element) {
                 return $(element).closest('.team').find('.teamId').text()
             }
+            function memberIndex(element) {
+                return $(element).closest('.member').find('.memberIndex').text()
+            }
             $('.mark').change(function() {
-                $.post('/su/set-mark', {id: teamId(this), mark: $(this).val()})
+                $.post('/su/set-mark', {id: teamId(this), memberIndex: memberIndex(this), mark: $(this).val()})
                     .fail(msg.ajaxError)
-            })
-            $('.team-result').each(function() {
-                this.href = encodeURI(this.href+'?id='+teamId(this))
             })
             var currentTeamId
             $('.remove').click(function() {
@@ -63,7 +63,7 @@ block content
                     .fail(msg.ajaxError)
             })
             $('.taskAbandoned').click(function() {
-                $.post('/su/set-team-status', {id: teamId(this), taskAbandoned: $(this).prop('checked')})
+                $.post('/su/set-team-status', {id: teamId(this), taskIndex: $(this).val(), taskAbandoned: $(this).prop('checked')})
                     .done(reload)
                     .fail(msg.ajaxError)
             })
@@ -223,10 +223,11 @@ block content
                         td= team.group
                             span.teamId= team.id()
                         td: table: tbody
-                            each member in team.members
-                                tr
+                            each member, memberIndex in team.members
+                                tr.member
                                     td(title='Имя и фамилия студента')= member.firstname + ' ' + member.lastname
-                                    td: input(title='Оценка студента' type='text' value='TODO')
+                                        span.memberIndex= memberIndex
+                                    td: input.mark(title='Оценка студента' type='text' value=member.mark || '')
                         td: table: tbody
                             each teamTask, teamTaskIndex in team.tasks
                                 tr
@@ -237,7 +238,7 @@ block content
                                         else
                                             | нет результата
                                     td(title='Команда решила задачу'): input.taskSolved(type='checkbox' checked=teamTask.solved value=teamTaskIndex)
-                                    td(title='Команда отказалась от задачи или не смогла решить её'): input.taskAbandoned(type='checkbox' checked=teamTask.abandoned)
+                                    td(title='Команда отказалась от задачи или не смогла решить её'): input.taskAbandoned(type='checkbox' checked=teamTask.abandoned value=teamTaskIndex)
                         td
                             input.relogin(title='Разрешить повторный вход' type='checkbox' checked=team.allowExtraLogin)
                             input.remove(title='Удалить команду' type='button' value='X')

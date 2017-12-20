@@ -77,8 +77,9 @@ router
     })
     .post('/set-mark', function(req, res, next) {
         var team = sd.data.team(req.body.id)
-        if (team) {
-            team.mark = req.body.mark
+        var memberIndex = req.body.memberIndex
+        if (team && memberIndex >= 0 && memberIndex < team.members.length) {
+            team.members[memberIndex].mark = req.body.mark
             sd.data.unsaved = true
             res.sendStatus(200)
         }
