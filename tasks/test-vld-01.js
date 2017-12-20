@@ -733,6 +733,69 @@ module.exports = tasks.Tasks.fromObject({
         stdin: '7',
         stdinHint: 'Введите $n$'
     },
+    { //27
+        text: [
+            'Задан целочисленный массив $v$ произвольной длины $n$. Вычислить и вывести на экран максимальную длину участка, состоящего лишь из четных чисел.',
+            'Также вывести исходный массив.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            
+            var even=false
+            var start=-1
+            var maxlen=0
+            function testPart(end)
+            {
+                even=false
+                var t=end-start+1
+                if(t>maxlen) maxlen=t
+            }
+            for(var i=0;i!=args.n;++i)
+            {
+                var t=(args.v[i]%2==0)
+                if(!even&&t) 
+                {
+                    even=true
+                    start=i
+                }
+                if(even&&(!t)) testPart(i-1)
+                if(even&&(i==args.n-1) ) testPart(i) 
+            }
+            var printer=lp()
+            printer.println(args.v.join(' '))
+            printer.println(maxlen)
+            return printer.finish()
+        }],
+        stdin: '10 1 2 2 2 3 4 4 4 4 5',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+    },
+    { //28
+        text: [
+            'Дано целое число $N$. Создать массив $v$, такой, что $v[i]$ есть $i$-я цифра числа $N$. Вычислить и вывести на экран сумму цифр числа $N$. Вывести на экран массив $v$.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n')
+            //if (args.n > 100)
+            //    throw new Error('Слишком большое n')
+            var printer=lp()
+            var a=new Array
+            var s=0
+            while(args.n>0)
+            {
+                var d=args.n%10
+                a.unshift(d)
+                s+=d
+                args.n=Math.floor(args.n/10) //positive
+            }
+            printer.println(a.join(' '))
+            printer.println(s)
+            return printer.finish()
+        }],
+        stdin: '132435',
+        stdinHint: 'Введите $n$'
+    },
     ]
 })
 
