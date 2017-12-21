@@ -890,21 +890,248 @@ module.exports = tasks.Tasks.fromObject({
             'Задан вещественный массив $v$ произвольной длины $2n$. Массив определяет последовательность $n$ отрезков числовой оси: начало $i$-го отрезка --- элемент $v[2i]$, конец --- $v[2i+1]$. Также задан отрезок $[a;b]$. Вывести на экран индексы отрезков из $v$, целиком лежащих внутри $[a,b]$.',
             '<br>'].join('\n'),
         scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'real a, real b, whole n, real v[2*n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            for (var i=0;i!=args.n;++i)
+            {
+                if (args.a<=args.v[2*i]&&args.b>=args.v[2*i+1]) printer.print(i)
+            }
+            return printer.finish()
+        }],
+        stdin: ' 3 8   10   1 3  2 4  3 5  4 6  5 7  6 8  7 9  8 10  9 11  10 12',
+        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_n$'
+    },
+    { //33
+        text: [
+            'Задан вещественный массив $v$ произвольной длины $2n$. Массив определяет последовательность $n$ отрезков числовой оси: начало $i$-го отрезка --- элемент $v[2i]$, конец --- $v[2i+1]$. Также задан отрезок $[a;b]$. Вывести на экран индексы отрезков из $v$, целиком содержащих внутри себя $[a,b]$. Учесть ситуацию, когда $v[2i+1]<v[2i]$ (отрезок задан задом наперед).',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'real a, real b, whole n, real v[2*n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            for (var i=0;i!=args.n;++i)
+            {
+                var x,y
+                if (args.v[2*i]<=args.v[2*i+1])
+                {
+                    x=args.v[2*i]
+                    y=args.v[2*i+1]
+                }
+                else
+                {
+                    y=args.v[2*i]
+                    x=args.v[2*i+1]
+                }
+                if (args.a<=x&&args.b>=y) printer.print(i)
+            }
+            return printer.finish()
+        }],
+        stdin: ' 3 8   10   1 3  2 4  3 5  4 6  5 7  6 8  7 9  8 10  9 11  10 12',
+        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_n$'
+    },
+    {   //34
+        text: [
+            'Даны два целых числа $M$ и $N$. Записать в массив $v$ все общие делители этих чисел. Вывести на экран числа $M$ и $N$, а также массив $v$ (в строку, разделяя элементы пробелами).',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'int m, int n')
+            if (Math.abs(args.n) > 200||Math.abs(args.m) > 200)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            
+            var x=args.n<args.m?args.n:args.m
+
+            printer.println(args.m,args.n)
+            for (var i=1;i<=x;++i)
+            {
+                if (args.n%i==0&&args.m%i==0) printer.print(i)
+            }
+
+            return printer.finish()
+        }],
+        stdin: '28 36',
+        stdinHint: 'Введите $M, N$'
+    },
+    {   //35 //27?
+        text: [
+            'Задан вещественный массив $v$ произвольной длины $n$. Вывести на экран индексы начала и конца самого длинного участка, состоящего только из положительных чисел. Например: ',
+            '$',
+            '[1,2,3, -1, 2]\\rightarrow[0,2] \\quad [0, 1, 2, -3, 2]\\rightarrow[1,2] \\quad [-1,-2,0]\\rightarrow[]',
+            '$',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var posi=false
+            var start=-1
+            var maxlen=0,maxstart=-1,maxend=-1
+            function testPart(end)
+            {
+                posi=false
+                var t=end-start+1
+                if(t>maxlen) 
+                {
+                    maxlen=t
+                    maxstart=start
+                    maxend=end
+                }
+            }
+            for(var i=0;i!=args.n;++i)
+            {
+                var t=(args.v[i]>0)
+                if(!posi&&t) 
+                {
+                    posi=true
+                    start=i
+                }
+                if(posi&&(!t)) testPart(i-1)
+                if(posi&&(i==args.n-1) ) testPart(i) 
+            }
+             
+            var printer=lp()
+            if (maxstart===-1) return printer.println('no').finish()
+            //printer.println(args.v.join(' '))
+            printer.println(maxstart,maxend)
+            return printer.finish()
+        }],
+        stdin: '10   3 3 -1 -1 -1 3 -1 3 3 3',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+    },
+    {   //36
+        text: [
+            'Задан массив положительных целых чисел $v$ произвольной длины $n$. Найти и вывести на экран наибольший общий делитель $M$ всех элементов массива. Также вывести на экран исходный массив и массив $v/M$. Вывод каждого массива начинать с новой строки, элементы выводить в строку через пробел.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
             var args = ppi(stdin, 'whole n, int v[n]')
             if (args.n > 100)
                 throw new Error('Слишком большое n')
             var printer=lp()
+            printer.println(args.v.join(' '))
+            var min=args.v[0]
+            args.v.forEach(function(val){if(min>Math.abs(val))min=Math.abs(val)})
+            var gcd=0
+            for(var i=1;i<=min;++i)
+            {
+                var s=0
+                args.v.forEach(function(val){s+=val%i})
+                if(s==0&&gcd<i) gcd=i
+            }
+            printer.println(gcd)
+            args.v.forEach(function(val){printer.print(val/gcd)})
             return printer.finish()
         }],
-        stdin: '',
+        stdin: '4  28 196 32 56',
         stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+    },
+    {   //37
+        text: [
+            'Задан массив вещественных чисел $v$ длины $2n$, содержащий координаты вершин $n$-угольника в виде $x_0,y_0,x_1,y_1,....,x_{n-1},y_{n-1}$, то есть координаты $i$-ой вершины есть $(v[2i],v[2i+1])$. Вычислить периметр многоугольника. Вывести на экран значение периметра и исходный массив.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, real v[2*n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.v.join(' '))
+            var p=0
+
+            var a=args.v[0]-args.v[2*args.n-2]
+            var b=args.v[1]-args.v[2*args.n-1]
+            p+=Math.sqrt(a*a+b*b)     
+            for(var i=0;i!=args.n-1;++i)
+            {
+                a=args.v[2*i]-args.v[2*i+2]
+                b=args.v[2*i+1]-args.v[2*i+3]
+                p+=Math.sqrt(a*a+b*b)
+            }
+            return printer.println(p).finish()
+        }],
+        stdin: '5  0 0  0 2  4 5  8 2  8 0',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+    },
+    {   //38
+        text: [
+            'Задан массив вещественных чисел $v$ произвольной длины $n$. Найти и вывести на экран индекс $i$ такого элемента, для которого $|(v[i])^2 - (v[i+1])^2 -(v[i-1])^2|\\rightarrow \\min$. Также вывести исходный массив в строку, разделяя элементы пробелами.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, real v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.v.join(' '))
+            var min=Math.abs(args.v[1]*args.v[1]-(args.v[2]*args.v[2]-args.v[0]*args.v[0]))
+            var idx=-1
+
+            for(var i=2;i<args.n-1;++i)
+            {
+                var t=Math.abs(args.v[i]*args.v[i]-(args.v[i+1]*args.v[i+1]-args.v[i-1]*args.v[i-1]))
+                if(min>t) {
+                    min=t
+                    idx=i
+                }
+            }
+            return printer.println(idx).finish()
+        }],
+        stdin: '7   1 2 3 4 5 6 7',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+    },
+    {   //39
+        text: [
+            'Задан массив вещественных чисел $v$ произвольной длины $n$. Найти и вывести на экран индексы $i$ таких элементов, для которых $v[i] > v[i+1] +v[i-1]$. Также вывести исходный массив в строку, разделяя элементы пробелами.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            printer.println(args.v.join(' '))
+            for(var i=2;i!=args.n-1;++i)
+            {
+                if(args.v[i]>args.v[i+1]+args.v[i-1]) printer.print(i)
+            }
+            return printer.finish()
+        }],
+        stdin: '10   1 2 3 10 5 6 7 8 9 0',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+    },
+    {   //40
+        text: [
+            'Задан вещественный массив $v$ произвольной длины $2n$. Массив определяет последовательность $n$ отрезков числовой оси: начало $i$-го отрезка --- элемент $v[2i]$, конец --- $v[2i+1]$. Также задано вещественное число $a$. Вывести на экран индексы отрезков из $v$, содержащих внутри себя $a$. Учесть ситуацию, когда $v[2i+1] < v[2i]$ (отрезок задан задом наперед).',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'real a, whole n, real v[2*n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            for (var i=0;i!=args.n;++i)
+            {
+                var x,y
+                if (args.v[2*i]<=args.v[2*i+1])
+                {
+                    x=args.v[2*i]
+                    y=args.v[2*i+1]
+                }
+                else
+                {
+                    y=args.v[2*i]
+                    x=args.v[2*i+1]
+                }
+                if (args.a>=x&&args.a<=y) printer.print(i)
+            }
+            return printer.finish()
+        }],
+        stdin: '4  5   1 3  2 4  3 5  4 6  5 7',
+        stdinHint: 'Введите $a, n, v_0, \\ldots, v_n$'
     },
     ]
 })
 
-// 32 -- тире
+// format for real args?
+// 32,33,30,19,40 -- тире
 // 31 = 23 ?
-// 30 -- тире
 // 23 -- вопрос по индексам а и b: a[0] и b[n-1]
-// 19 -- тире
 // 17,18 -- список в оформлении условия
