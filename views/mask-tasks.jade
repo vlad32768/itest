@@ -14,7 +14,7 @@ block content
                     .fail(msg.ajaxError)
                     .done(reload)
             })
-            $('.task').click(function() {
+            $('.taskCheck').click(function() {
                 $.get('/su/mask-task', { task: $(this).next().text(), enable: this.checked } )
                     .fail(msg.ajaxError)
                     .done(reload)
@@ -23,6 +23,12 @@ block content
     style.
         .taskContainer {
             padding-left: 2em;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .task {
+            padding-right: 2em;
+            display: flex;
         }
         .info {
             display: none;
@@ -39,8 +45,8 @@ block content
                     span= ': ' + allTasks.taskSetDescription(taskSetId)
                 div.taskContainer
                     each taskId in taskSet
-                        div
-                            input.task(type='checkbox' checked=!sd.data.taskStatus(taskId).blocked)
+                        div.task
+                            input.taskCheck(type='checkbox' checked=!sd.data.taskStatus(taskId).blocked)
                             span.info= taskId
                             - var taskStatusFormatted = sd.data.taskStatusFormatted(taskId)
                             a(href='/su/task?task='+taskId target='_blank')= taskId.replace(taskSetId+':', '') + (taskStatusFormatted? ': ' + taskStatusFormatted: '')
