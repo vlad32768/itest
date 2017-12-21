@@ -19,8 +19,17 @@ block content
                     .fail(msg.ajaxError)
                     .done(reload)
             })
+            var timeoutId
+            function loadPreview(url) {
+                timeoutId = undefined
+                $('#link-preview iframe').attr('src', url)
+            }
             $('a.preview').mouseenter(function() {
-                $('#link-preview iframe').attr('src', this.href)
+                timeoutId = setTimeout(loadPreview.bind(null, this.href), 500)
+                })
+            .mouseleave(function() {
+                if (timeoutId !== undefined)
+                    clearTimeout(timeoutId)
             })
         })
     style.
