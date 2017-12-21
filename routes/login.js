@@ -5,44 +5,67 @@ var _ = require('lodash')
 var router = express.Router();
 router
     .get('/login', function(req, res, next) {
-        res.render('login', {message: req.flash('loginMessage'), loginData: req.session.loginData || {}})
+        res.render('login', {studentData: sd.data, message: req.flash('loginMessage'), loginData: req.session.loginData || {}})
     })
     .post('/login', function(req, res, next) {
         var b = req.session.loginData = req.body
-        b = _.pick(b, ['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2'])
+        b = _.pick(b, ['group', 'firstname', 'lastname'])
         if (sd.data.denyLogin) {
             req.flash('loginMessage', 'Идентификация в данный момент запрещена')
             return res.redirect( '/login' )
         }
-        var ok = true
-        if (!(b.group && b.firstname1 && b.lastname1)) {
-            req.flash('loginMessage', 'Поля "Номер группы", "Имя" и "Фамилия" (для студента 1) должны быть заполнены')
-            ok = false
+        var teamSize
+        if (typeof b.firstname === 'string'   &&   typeof b.lastname === 'string') {
+            b.firstname = [b.firstname]
+            b.lastname = [b.firstname]
+            teamSize = 1
         }
-        if (b.group && !b.group.match(/\d+\/\d+/)) {
+        else if ((b.firstname instanceof Array) && (b.lastname instanceof Array)) {
+            if (b.firstname.length !== b.lastname.length) {
+                req.flash('loginMessage', 'Неправильные данные')
+                return res.redirect('/login')
+            }
+            teamSize = b.firstname.length
+        }
+        if (teamSize > sd.data.maxTeamSize) {
+            req.flash('loginMessage', 'Слишком большая команда, максимально допустимое число студентов в команде: ' + sd.data.maxTeamSize)
+            return res.redirect('/login')
+        }
+        if (teamSize === 0) {
+            req.flash('loginMessage', 'В команде должен быть хотя бы один студент')
+            return res.redirect('/login')
+        }
+        var members = []
+        for (var i=0; i<teamSize; ++i) {
+            members.push({firstname: b.firstname[i], lastname: b.lastname[i]})
+        }
+        var fieldsFilled = b.group? true: false
+        members.forEach(function(member) {
+            if (!member.firstname || !member.lastname)
+                fieldsFilled = false
+        })
+        if (!fieldsFilled) {
+            req.flash('loginMessage', 'Поля "Номер группы", "Имя" и "Фамилия" должны быть заполнены')
+            return res.redirect('/login')
+        }
+        if (!b.group.match(/\d+\/\d+/)) {
             req.flash('loginMessage', 'Номер группы должен иметь формат 12345/6')
-            ok = false
+            return res.redirect('/login')
         }
-        if ((b.firstname2?true:false) !== (b.lastname2?true:false)) {
-            req.flash('loginMessage', 'Для второго студента следует задать либо имя и фамилию, либо ничего')
-            ok = false
-        }
-        var team = new sd.Team(b)
+        var team = new sd.Team({group: b.group, members: members})
         if (!sd.data.canAddTeam(team)) {
             team = sd.data.team(team.id())  // Pick existing team
             if (team && team.allowExtraLogin)
                 team.allowExtraLogin = false
             else if (team) {
                 req.flash('loginMessage', 'Эта команда уже зарегистрирована. Попросите у преподавателя разрешение на повторный вход, объясните причину.')
-                ok = false
+                return res.redirect( '/login' )
             }
             else {
                 req.flash('loginMessage', 'Как минимум один студент из этой команды уже зарегистрирован. Повторный вход для всей команды возможен с разрешения преподавателя.')
-                ok = false
+                return res.redirect( '/login' )
             }
         }
-        if (!ok)
-            return res.redirect( '/login' )
         try {
             sd.data.addTeam(team)
         }
@@ -56,8 +79,12 @@ router
     .get('/logout', function(req, res, next) {
         if (req.session.teamId) {
             var team = sd.data.team(req.session.teamId)
-            if (team && !team.taskSolved)
-                sd.data.setTaskAbandoned(req.session.teamId, true)
+            if (team) {
+                team.tasks.forEach(function(teamTask, index) {
+                    if (!teamTask.solved)
+                        sd.data.setTaskAbandoned(req.session.teamId, index, true)
+                })
+            }
         }
         delete req.session.teamId
         res.redirect('/')

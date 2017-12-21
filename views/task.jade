@@ -60,7 +60,7 @@ block content
                 var text = $('#student-result').val()
                 if (!text)
                     return msg.error('Слишком мало букв!')
-                $.post('/upload-result', { result: text })
+                $.post('/upload-result', { result: text, taskIndex: '#{teamTaskIndex}' })
                     .done(msg.info.bind(this, 'Текст отправлен на сервер'))
                     .fail(msg.ajaxError)
             })
@@ -72,7 +72,7 @@ block content
                 modal: true,
                 buttons: {
                     "Да, выйти": function() {
-                        location.pathname='/logout'
+                        location.href = '/logout'
                     },
                     "Отмена": function() {
                         $(this).dialog('close')
@@ -109,6 +109,11 @@ block content
             .console-data-scroller {
                 overflow: auto;
             }
+    if task.options().noscreensize
+        style.
+            #console-size {
+                display: none;
+            }
     style.
         .black {
             color: #fff;
@@ -131,7 +136,7 @@ block content
             overflow: hidden;
             position: absolute;
         }
-        p {
+        p, .render-tex {
             font-size: 16px;
         }
         h1 {
@@ -154,12 +159,28 @@ block content
             font-weight: bold;
             color: #644;
         }
+        .task-links {
+            padding-left: 0;
+        }
+        .task-links li {
+            display: inline;
+            margin-right: 1em;
+        }
     if team
         p.team-summary= team.summary()
-        if team.taskSolved
-            p.win Задача решена, можно идти домой!
+        if maxTasks > 1
+            ul.task-links
+                - var otherTaskIndex = 0
+                while otherTaskIndex < maxTasks
+                    if otherTaskIndex == teamTaskIndex
+                        li Задача #{otherTaskIndex+1}
+                    else
+                        li: a(href="?taskIndex=#{otherTaskIndex}") Задача #{otherTaskIndex+1}
+                    - ++otherTaskIndex
+        if team.tasks[teamTaskIndex].solved
+            p.win Задача решена!
     h1 Вариант #{taskId}
-    p.render-tex!= task.text()
+    .render-tex!= task.text()
     if task.stdin() !== undefined
         #stdin-block
             p Стандартный ввод:

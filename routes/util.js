@@ -5,6 +5,16 @@ function clamp(x, xmin, xmax, xdefault) {
     return x<xmin? xmin: x>xmax? xmax: x
 }
 
+function imgen(imgdb) {
+    return function(name) {
+        var src = imgdb[name]
+        if(typeof src !== 'string')
+            throw new Error('Invalid image name ' + name)
+        return '<img src="' + src + '"/>'
+    }
+}
+
 module.exports = {
-    clamp: clamp
+    clamp: clamp,
+    imgen: imgen
 }

@@ -1,6 +1,8 @@
 extends layout
 
 block content
+    link(rel='stylesheet' href='/stylesheets/messages.css')
+    script(src='/javascripts/jquery-3.2.1.min.js')
     style.
         .error {
             color: #c00;
@@ -15,6 +17,73 @@ block content
             margin-top: 25px;
             margin-left: 15px;
         }
+        .remove-student {
+            margin-left: 15px;
+            margin-right: 5px;
+        }
+        #add-student {
+            margin-top: 2ex;
+        }
+        .hidden {
+            display: none;
+        }
+    script.
+        $(document).ready(function() {
+            var  maxTeamSize = #{studentData.maxTeamSize}
+            function showOrHide(w, condition) {
+                w[condition ?   'show' :   'hide']('fast')
+            }
+            function addStudent(d) {
+                var students = $('#students')
+                var teamSize = students.children().length
+                if (teamSize >= maxTeamSize)
+                    return msg.error('Достигнут максимальный размер команды!')
+                var sld = $('#studentLoginDataTemplate')
+                    .clone(true)
+                    .prop('id', '')
+                    .appendTo(students)
+                    .show('fast')
+                sld
+                    .find('.student-ordinal').text(teamSize+1)
+                if (d) {
+                    sld.find('[name="firstname"]').val(d.firstname)
+                    sld.find('[name="lastname"]').val(d.lastname)
+                }
+                
+                ++teamSize
+                showOrHide($('#add-student'), teamSize < maxTeamSize)
+                showOrHide($('.remove-student'), teamSize > 1)
+            }
+            $('#add-student').click(addStudent)
+            $('.remove-student').click(function() {
+                var teamSize = $('#students').children().length
+                if (teamSize < 2)
+                return msg.error('Достигнут минимальный размер команды!')
+                $(this).parent().hide('fast', function() { this.remove() })
+                --teamSize
+                showOrHide($('#add-student'), teamSize < maxTeamSize)
+                showOrHide($('.remove-student'), teamSize > 1)
+            })
+            ;(function() {
+                var loginData = !{JSON.stringify(loginData)}
+                var hasLoginData = loginData.firstname !== undefined
+                if (hasLoginData) {
+                    var firstname = loginData.firstname
+                    var lastname = loginData.lastname
+                    var teamSize = typeof firstname === 'string'? 1: firstname.length
+                    if (teamSize === 1) {
+                        firstname = [firstname]
+                        lastname = [lastname]
+                    }
+                    for (var i=0; i<teamSize; ++i)
+                        addStudent({firstname: firstname[i], lastname: lastname[i]})
+                }
+                else
+                    addStudent()
+            })()
+        })
+
+
     h1 Идентификация
     p Введите, пожалуйста, свои данные
     if message && message.length > 0
@@ -22,14 +91,14 @@ block content
     form(action='login' method='POST')
         label(for='group') Номер группы
         input(type='text' name='group' value=loginData.group autofocus)
-        p Студент 1
-            label(for='firstname1') Имя
-            input(type='text' name='firstname1' value=loginData.firstname1)
-            label(for='lastname1') Фамилия
-            input(type='text' name='lastname1' value=loginData.lastname1)
-        p Студент 2
-            label(for='firstname2') Имя
-            input(type='text' name='firstname2' value=loginData.firstname2)
-            label(for='lastname2') Фамилия
-            input(type='text' name='lastname2' value=loginData.lastname2)
+        #students
+        input.hidden#add-student(type='button' value='Добавить студента')
         input(type='submit' value='Войти')
+    .hidden#studentLoginDataTemplate
+        p Студент&nbsp;
+            span.student-ordinal [[N]]
+        label(for='firstname') Имя
+        input(type='text' name='firstname')
+        label(for='lastname') Фамилия
+        input(type='text' name='lastname')
+        input.remove-student(type='button' name='remove' value='Удалить студента')

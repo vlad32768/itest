@@ -1,22 +1,12 @@
-/*
-test-em-all - a tool for online examination of students.
-Copyright (C) 2015 Stepan Orlov
-
-This file is part of test-em-all.
-
-Full text of copyright notice can be found in file copyright_notice.txt in the test-em-all root directory.
-License agreement can be found in file LICENSE.md in the test-em-all root directory.
-*/
-
-var
-    express = require('express'),
-    fs = require('fs'),
-    path = require('path'),
-    _ = require('lodash'),
-    crypto = require('crypto'),
-    sd = require('./student-data.js'),
-    allTasks = require('./all-tasks.js'),
-    util = require('./util.js')
+var express = require('express')
+var fs = require('fs')
+var path = require('path')
+var _ = require('lodash')
+var crypto = require('crypto')
+var sd = require('./student-data.js')
+var allTasks = require('./all-tasks.js')
+var util = require('./util.js')
+var su_task = require('./su-task.js')
 
 var dataDir = path.join(__dirname, '..', 'data')
 
@@ -26,6 +16,14 @@ var router = express.Router()
 
 function toBool(x) {
     return typeof x === 'string'?   x === 'true' || x === '1':   x == true
+}
+
+function postScalarValue(req, res, cb) {
+    var b = req.body
+    if (b.value === undefined)
+        return res.status(400).send('Query \'value\' is required')
+    if (cb(b.value) !== false)
+        res.sendStatus(200)
 }
 
 var nameEnding = ''
@@ -71,19 +69,17 @@ router
             })
         })
     })
-    .get('/task', function(req, res, next) {
-        var taskId = req.query.task || 'test-01-so'
-        var task = allTasks.tasks()[taskId]
-        res.render('task', { taskId: taskId, task: task, allowUpload: false })
-    })
     .get('/team-result', function(req, res, next) {
         var team = sd.data.team(req.query.id)
-        res.type('text/plain').send('// ' + team.summary() + '\n' + team.result)
+        var taskIndex = req.query.taskIndex || 0
+        var teamTask = team.tasks[taskIndex]
+        res.type('text/plain').send('// ' + team.summary() + '\n' + teamTask.result)
     })
     .post('/set-mark', function(req, res, next) {
         var team = sd.data.team(req.body.id)
-        if (team) {
-            team.mark = req.body.mark
+        var memberIndex = req.body.memberIndex
+        if (team && memberIndex >= 0 && memberIndex < team.members.length) {
+            team.members[memberIndex].mark = req.body.mark
             sd.data.unsaved = true
             res.sendStatus(200)
         }
@@ -101,11 +97,12 @@ router
             res.sendStatus(404)
     })
     .post('/set-team-status', function(req, res) {
+        var taskIndex = req.body.taskIndex || 0
         if (req.body.taskSolved !== undefined) {
-            sd.data.setTaskSolved(req.body.id, toBool(req.body.taskSolved))
+            sd.data.setTaskSolved(req.body.id, taskIndex, toBool(req.body.taskSolved))
         }
         if (req.body.taskAbandoned !== undefined) {
-            sd.data.setTaskAbandoned(req.body.id, toBool(req.body.taskAbandoned))
+            sd.data.setTaskAbandoned(req.body.id, taskIndex, toBool(req.body.taskAbandoned))
         }
         if (req.body.allowExtraLogin !== undefined) {
             sd.data.team(req.body.id).allowExtraLogin = toBool(req.body.allowExtraLogin)
@@ -114,7 +111,7 @@ router
     })
     .post('/save', function(req, res) {
         nameEnding = req.body.nameEnding
-        var nameEndingFinal = nameEnding? '-' + nameEnding: ''
+        var nameEndingFinal = nameEnding? '-' + nameEnding.replace('/', '-'): ''
         var time = (new Date).toISOString().replace(/:/g,'-').replace(/\.\d+\w?$/, '').replace(/T/, '_')
         var fileName = time+nameEndingFinal+'.json'
         var filePath = path.join(dataDir, fileName)
@@ -151,12 +148,43 @@ router
        res.redirect('/su')
     })
     .post('/deny-login', function(req, res) {
-        var b = req.body
-        if (b.value === undefined)
-            return res.status(400).send('Query \'value\' is required')
-        var v = toBool(b.value)
-        sd.data.denyLogin = v
-        res.sendStatus(200)
+        postScalarValue(req, res, function(value) {
+            sd.data.denyLogin = toBool(value)
+        })
+    })
+    .post('/set-max-team-size', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            var v = +value
+            if (v < 1 || v > 2) {
+                res.status(400).send('Enter size from 1 to 2')
+                return false
+            }
+            else
+                sd.data.maxTeamSize = v
+        })
+    })
+    .post('/set-tasks-per-team', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            var v = +value
+            if (v < 1 || v > 3) {
+                res.status(400).send('Enter size from 1 to 3')
+                return false
+            }
+            else
+                sd.data.maxTasksPerTeam = v
+        })
+    })
+    .post('/tasks-allow-all-tasks-at-once', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            sd.data.allowAllTasksAtOnce = toBool(value)
+        })
+    })
+    .post('/tasks-start-with-test', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            sd.data.startWithTest = toBool(value)
+            res.status(400).send('Feature is not implemented (TODO)')
+            return false
+        })
     })
     .get('/mask-tasks', function(req, res) {
         var taskSets = allTasks.taskSets()
@@ -174,5 +202,6 @@ router
         sd.data.enableTask(taskId, enable)
         res.sendStatus(200)
     })
+    .use(su_task)
 
 module.exports = router

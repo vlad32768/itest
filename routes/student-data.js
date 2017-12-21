@@ -2,7 +2,8 @@ var _ = require('lodash')
 var allTasks = require('./all-tasks.js')
 
 function Team(options) {
-    _.merge(this, _.pick(options || {}, ['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2']))
+    _.merge(this, _.pick(options || {}, ['group', 'members']))
+    this.tasks = []
     this.startTime = Date.now()
 }
 
@@ -14,29 +15,45 @@ Team.prototype.keys = function() {
     function key(firstName, lastName) {
         return [verbKey(firstName, lastName), verbKey(lastName, firstName)]
     }
-    var keys = key(self.firstname1, self.lastname1)
-    if (self.firstname2 && self.lastname2)
-        keys = keys.concat(key(self.firstname2, self.lastname2))
+    var keys = []
+    self.members.forEach(function(member) {
+        keys = keys.concat(key(member.firstname, member.lastname))
+    })
     keys.push(self.id())
     return keys
 }
 
 Team.prototype.id = function() {
-    return _(this).pick(['group', 'firstname1', 'lastname1', 'firstname2', 'lastname2']).values().join('-')
+    var items = [this.group]
+    this.members.forEach(function(member) {
+        items.push(member.firstname + '-' + member.lastname)
+    })
+    return items.join('-')
 }
 
 Team.prototype.summary = function() {
-    var result = 'Группа ' + this.group + ', ' + this.firstname1 + ' ' + this.lastname1
-    if (this.firstname2 && this.lastname2)
-        result += ', ' + this.firstname2 + ' ' + this.lastname2
-    return result
+    var items = ['Группа ' + this.group]
+    this.members.forEach(function(member) {
+        items.push(member.firstname + ' ' + member.lastname)
+    })
+    return items.join(', ')
+}
+
+Team.prototype.task = function(taskIndex) {
+    var teamTask = this.tasks[taskIndex]
+    if (!teamTask)
+        throw new Error('Invalid team task index')
+    return teamTask
 }
 
 function Data() {
-    this.version = 1
+    this.version = 2
     this.list = {}
     this.unsaved = false
     this.denyLogin = true
+    this.maxTeamSize = 2
+    this.maxTasksPerTeam = 1
+    this.allowAllTasksAtOnce = false
     this.statusData = _.reduce(allTasks.allTaskIds(), function(o, taskId) {
         o[taskId] = { chosen: 0, blocked: false, solved: 0, abandoned: 0 }
         return o
@@ -50,16 +67,28 @@ Data.fromJson = function(d) {
         if (result.list.hasOwnProperty(key))
             continue
         var team = new Team
-        _.merge(team, d.list[key])
-        switch (version) {
-        case 0:
-            team.taskId = 'test-01-so:' + (team.taskIndex+1)
-            result.statusData[team.taskId].chosen = true
-            break
+        var teamData = d.list[key]
+        if (version < 2) {
+            var members = [{firstname: teamData.firstname1, lastname: teamData.lastname1, mark: teamData.mark || ''}]
+            if (teamData.firstname2)
+                members.push({firstname: teamData.firstname2, lastname: teamData.lastname2, mark: teamData.mark || ''})
+            var newTeamData =  _.pick(teamData, ['group', 'startTime'])
+            if (version === 0   &&   teamData.taskIndex !== undefined)
+                teamData.taskId = 'test-01-so:' + (teamData.taskIndex+1)
+            newTeamData.tasks = teamData.taskId?  [{
+                id:  teamData.taskId,
+                solved: teamData.taskSolved,
+                abandoned: teamData.taskAbandoned,
+                result: teamData.result || ''
+            }]: []
+            newTeamData.members = members
+            teamData = newTeamData
         }
+        _.merge(team, teamData)
         result.addTeam(team, version)
     }
     _.assign(result.statusData, d.statusData)
+    _.merge(result, _.pick(d, 'maxTeamSize', 'maxTasksPerTeam', 'allowAllTasksAtOnce'))
     result.unsaved = false
     result.denyLogin = true
     return result
@@ -96,27 +125,30 @@ Data.prototype.taskStatsObj = function() {
     }
 }
 
-Data.prototype.addTeam = function(team) {
-    if (!team.taskId) {
-        // Generate task for the team
-        var stats = this.taskStats()
-        var filters = [
-            function(st) { return !st.blocked && !st.chosen },
-            function(st) { return !st.blocked && st.chosen && st.abandoned },
-            function(st) { return !st.blocked && st.chosen && st.solved },
-            function(st) { return !st.blocked && st.chosen && !st.abandoned && !st.solved }
-        ]
-        var filterIndex = _.findIndex(stats, function(x) { return x > 0})
-        if (filterIndex === -1)
-            throw new Error('Для Вас не хватило задания :\'(<br/>Приходите в другой раз!')
-        var taskIndex = Math.floor(Math.random() * stats[filterIndex])
-        team.taskId = _(this.statusData).pickBy(filters[filterIndex]).keys().nth(taskIndex)
-        this.statusData[team.taskId].chosen++
-    }
+Data.prototype.allocTask = function(team) {
+    // Generate task for the team
+    var stats = this.taskStats()
+    var filters = [
+        function(st) { return !st.blocked && !st.chosen },
+        function(st) { return !st.blocked && st.chosen && st.abandoned },
+        function(st) { return !st.blocked && st.chosen && st.solved },
+        function(st) { return !st.blocked && st.chosen && !st.abandoned && !st.solved }
+    ]
+    var filterIndex = _.findIndex(stats, function(x) { return x > 0})
+    if (filterIndex === -1)
+        throw new Error('Для Вас не хватило задания :\'(<br/>Приходите в другой раз!')
+    var taskIndex = Math.floor(Math.random() * stats[filterIndex])
+    var taskId = _(this.statusData).pickBy(filters[filterIndex]).keys().nth(taskIndex)
+    team.tasks.push({id: taskId})
+    this.statusData[taskId].chosen++
+}
 
+Data.prototype.addTeam = function(team) {
+    var self = this
+    if (team.tasks.length === 0)
+        self.allocTask(team)
 
     // Add team keys
-    var self = this
     _.each(team.keys(), function(key) {
         self.list[key] = team
     })
@@ -129,8 +161,10 @@ Data.prototype.removeTeam = function(team) {
     _.each(team.keys(), function(key) {
         delete self.list[key]
     })
-    self.statusData[team.taskId].chosen--
-    this.unsaved = true
+    _.each(team.tasks, function(teamTask) {
+        self.statusData[teamTask.id].chosen--
+    })
+    self.unsaved = true
 }
 Data.prototype.teams = function() {
     var self = this
@@ -184,17 +218,17 @@ Data.prototype.enableTask = function(taskId, enable) {
     this.unsaved = true
 }
 
-Data.prototype.setTaskSolved = function(teamId, taskSolved) {
-    var team = this.team(teamId)
-    team.taskSolved = taskSolved
-    this.statusData[team.taskId].solved += (taskSolved? 1: -1)
+Data.prototype.setTaskSolved = function(teamId, taskIndex, taskSolved) {
+    var teamTask = this.team(teamId).task(taskIndex)
+    teamTask.solved = taskSolved
+    this.statusData[teamTask.id].solved += (taskSolved? 1: -1)
     this.unsaved = true
 }
 
-Data.prototype.setTaskAbandoned = function(teamId, taskAbandoned) {
-    var team = this.team(teamId)
-    team.taskAbandoned = taskAbandoned
-    this.statusData[team.taskId].abandoned += (taskAbandoned? 1: -1)
+Data.prototype.setTaskAbandoned = function(teamId, taskIndex, taskAbandoned) {
+    var teamTask = this.team(teamId).task(taskIndex)
+    teamTask.abandoned = taskAbandoned
+    this.statusData[teamTask.id].abandoned += (taskAbandoned? 1: -1)
     this.unsaved = true
 }
 

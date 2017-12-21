@@ -4,9 +4,38 @@ block content
     link(rel='stylesheet', href='stylesheets/jquery-ui.min.css')
     link(rel='stylesheet' href='/stylesheets/messages.css')
     style.
-        .teamId {
+        .teamId, .memberIndex {
             display: none;
         }
+        #control input[type="radio"] {
+            margin-left: 1em;
+        }
+        input[type="checkbox"] {
+            margin-right: 0.5em;
+        }
+        input[type="text"] {
+            margin-left: 0.5em;
+        }
+        input.remove {
+            width: 1.5em;
+            height: 1.5em;
+            padding: 1px 1px;
+            position: relative;
+            top: -0.15em;
+        }
+        .state {
+            border-collapse: collapse;
+        }
+        .state > * > tr > * {
+            border-right: solid 1px #ccc; 
+            border-left: solid 1px #ccc;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .state > tbody > tr:nth-child(odd) {
+            background-color: #eee;
+        }
+
     script(src='/javascripts/jquery-3.2.1.min.js')
     script(src='/javascripts/jquery-ui.min.js')
     script(src='/javascripts/messages.js')
@@ -14,14 +43,14 @@ block content
         $(document).ready(function() {
             var reload = location.reload.bind(location)
             function teamId(element) {
-                return $(element).closest('tr').find('.teamId').text()
+                return $(element).closest('.team').find('.teamId').text()
+            }
+            function memberIndex(element) {
+                return $(element).closest('.member').find('.memberIndex').text()
             }
             $('.mark').change(function() {
-                $.post('/su/set-mark', {id: teamId(this), mark: $(this).val()})
+                $.post('/su/set-mark', {id: teamId(this), memberIndex: memberIndex(this), mark: $(this).val()})
                     .fail(msg.ajaxError)
-            })
-            $('.team-result').each(function() {
-                this.href = encodeURI(this.href+'?id='+teamId(this))
             })
             var currentTeamId
             $('.remove').click(function() {
@@ -29,12 +58,12 @@ block content
                 $('#confirm-remove').dialog('open')
             })
             $('.taskSolved').click(function() {
-                $.post('/su/set-team-status', {id: teamId(this), taskSolved: $(this).prop('checked')})
+                $.post('/su/set-team-status', {id: teamId(this), taskIndex: $(this).val(), taskSolved: $(this).prop('checked')})
                     .done(reload)
                     .fail(msg.ajaxError)
             })
             $('.taskAbandoned').click(function() {
-                $.post('/su/set-team-status', {id: teamId(this), taskAbandoned: $(this).prop('checked')})
+                $.post('/su/set-team-status', {id: teamId(this), taskIndex: $(this).val(), taskAbandoned: $(this).prop('checked')})
                     .done(reload)
                     .fail(msg.ajaxError)
             })
@@ -108,27 +137,67 @@ block content
 
             // Process the Deny login checkbox
             $('#denyLogin').click(function() {
-                var checked = $(this).prop('checked')
-                $.post('/su/deny-login', {value: checked})
+                $.post('/su/deny-login', { value: $(this).prop('checked') })
                     .fail(msg.ajaxError)
             })
 
+            $('#startWithTest').click(function() {
+                $.post('/su/tasks-start-with-test', { value: $(this).prop('checked') }).fail(msg.ajaxError)
+            })
+            $('[name="maxTeamSize"]').click(function() {
+                $.post('/su/set-max-team-size', {value: $(this).val()}).fail(msg.ajaxError)
+            })
+            $('[name="maxTasksPerTeam"]').click(function() {
+                $.post('/su/set-tasks-per-team', {value: $(this).val()}).fail(msg.ajaxError)
+            })
+            $('#allowAllTasksAtOnce').click(function() {
+                $.post('/su/tasks-allow-all-tasks-at-once', { value: $(this).prop('checked') }).fail(msg.ajaxError)
+            })
         })
     #hdr
         h1 Страница экзаменатора
     #control
         h2 Управление
         .nested
-            u(style='list-style-type: none;')
+            ul(style='list-style-type: none;')
                 li: a(href='/su/exit') Выход
                 li: a#clear-data(href='/su/clear') Очистить данные
-                li: a(href='/su/mask-tasks', target='_blank') Доступные задания
-                    | (новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress})
+
+            .nested
+                h3 Структура работы<br>
+                .nested
+                    ul(style='list-style-type: none;')
+                        li
+                            input#startWithTest(type='checkbox' checked=studentData.startWithTest)
+                            label(for='denyLogin')
+                                | Начать с&nbsp;
+                                a(href='/su/mask-test-questions', target='_blank') теста
+                        li: a(href='/su/mask-tasks', target='_blank') Доступные задачи
+                            | (новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress})
+                        li Максимальное число студентов в команде:
+                            input#teamSize1(type='radio' name='maxTeamSize' value='1' checked=studentData.maxTeamSize===1)
+                            label(for='maxTeamSize1') 1
+                            input#maxTeamSize2(type='radio' name='maxTeamSize' value='2' checked=studentData.maxTeamSize===2)
+                            label(for='maxTeamSize2') 2
+                        li Максимальное число задач на команду:
+                            input#maxTasksPerTeam1(type='radio' name='maxTasksPerTeam' value='1' checked=studentData.maxTasksPerTeam===1)
+                            label(for='maxTasksPerTeam1') 1
+                            input#maxTasksPerTeam2(type='radio' name='maxTasksPerTeam' value='2' checked=studentData.maxTasksPerTeam===2)
+                            label(for='maxTasksPerTeam2') 2
+                            input#maxTasksPerTeam3(type='radio' name='maxTasksPerTeam' value='3' checked=studentData.maxTasksPerTeam===3)
+                            label(for='maxTasksPerTeam3') 3
+                        li
+                            input#allowAllTasksAtOnce(type='checkbox' checked=studentData.allowAllTasksAtOnce)
+                            label(for='allowAllTasksAtOnce') Разрешить брать несколько задач одновременно
+                        li
+                            input#denyLogin(type='checkbox' checked=studentData.denyLogin)
+                            label(for='denyLogin') Запретить идентификацию вновь прибывших
+
         .nested
             h3 Сохранение данных<br>
             .nested
                 form
-                    span.label окончание имени
+                    label(for='nameEnding') окончание имени
                     input#nameEnding(type='text' name='nameEnding' value=nameEnding)
                     br
                     input#save(type='submit' value='Сохранить')
@@ -140,58 +209,66 @@ block content
                     each file in files
                         tr
                             td: a(href='/su/load?file='+file)= file
-            h3 Разное
-            .nested#misc
-                span
-                    if studentData.denyLogin
-                        input#denyLogin(type='checkbox' checked)
-                    else
-                        input#denyLogin(type='checkbox')
-                    | Запретить идентификацию вновь прибывших
     #students
         h2 Состояние
-        table
-            tr
-                th № группы
-                th Имя 1
-                th Фамилия 1
-                th Имя 2
-                th Фамилия 2
-                th Вариант
-                th Результат
-                th :)
-                th :(
-                th Оценка
-                th ...
-                th ->
-            each team, index in studentData.teams()
+        table.state
+            thead: tr
+                th Группы
+                th Студенты
+                th Задачи
+                th Управление
+            tbody
+                each team in studentData.teams()
+                    tr.team
+                        td= team.group
+                            span.teamId= team.id()
+                        td: table: tbody
+                            each member, memberIndex in team.members
+                                tr.member
+                                    td(title='Имя и фамилия студента')= member.firstname + ' ' + member.lastname
+                                        span.memberIndex= memberIndex
+                                    td: input.mark(title='Оценка студента' type='text' value=member.mark || '')
+                        td: table: tbody
+                            each teamTask, teamTaskIndex in team.tasks
+                                tr
+                                    td(title='Задача для команды'): a(href='/su/task?task=#{teamTask.id}' target='_blank')= teamTask.id
+                                    td(title='Предложенное командой решение задачи')
+                                        if teamTask.result
+                                            a.team-result(href='/su/team-result?id=#{team.id()}&taskIndex=#{teamTaskIndex}' target='_blank') результат
+                                        else
+                                            | нет результата
+                                    td(title='Команда решила задачу'): input.taskSolved(type='checkbox' checked=teamTask.solved value=teamTaskIndex)
+                                    td(title='Команда отказалась от задачи или не смогла решить её'): input.taskAbandoned(type='checkbox' checked=teamTask.abandoned value=teamTaskIndex)
+                        td
+                            input.relogin(title='Разрешить повторный вход' type='checkbox' checked=team.allowExtraLogin)
+                            input.remove(title='Удалить команду' type='button' value='X')
+        //-
+            table
                 tr
-                    td= team.group
-                        span.teamId= team.id()
-                    td= team.firstname1
-                    td= team.lastname1
-                    td= team.firstname2
-                    td= team.lastname2
-                    td: a(href='/su/task?task='+team.taskId target='_blank')= team.taskId
-                    td
-                        if team.result
-                            a.team-result(href='/su/team-result' target='_blank') есть
-                        else
-                            | нет
-                    if team.taskSolved
-                        td: input.taskSolved(type='checkbox' checked)
-                    else
-                        td: input.taskSolved(type='checkbox')
-                    if team.taskAbandoned
-                        td: input.taskAbandoned(type='checkbox' checked)
-                    else
-                        td: input.taskAbandoned(type='checkbox')
-                    td: input.mark(type='text' value=team.mark||'')
-                    td: input.remove(type='button' value='удалить')
-                    if team.allowExtraLogin
-                        td: input.relogin(type='checkbox' checked)
-                    else
-                        td: input.relogin(type='checkbox')
+                    th Команда
+                    th Вариант
+                    th Результат
+                    th :)
+                    th :(
+                    th Оценка
+                    th ...
+                    th ->
+                each team, index in studentData.teams()
+                    tr
+                        td(style='rowspan: #{team.tasks.length};')= team.summary()
+                            span.teamId= team.id()
+                        each teamTask, teamTaskIndex in team.tasks
+                            td: a(href='/su/task?task=#{teamTask.id}' target='_blank')= teamTask.id
+                            td
+                                if teamTask.result
+                                    a.team-result(href='/su/team-result?id=#{team.id()}&taskIndex=#{teamTaskIndex}' target='_blank') есть
+                                else
+                                    | нет
+                            td: input.taskSolved(type='checkbox' checked=teamTask.solved)
+                            td: input.taskAbandoned(type='checkbox' checked=teamTask.abandoned)
+                        td(style='rowspan: #{team.tasks.length};'): input.mark(type='text' value=team.mark||'')
+                        td(style='rowspan: #{team.tasks.length};'): input.remove(type='button' value='удалить')
+                        td(style='rowspan: #{team.tasks.length};'): input.relogin(type='checkbox' checked=team.allowExtraLogin)
     #confirm-remove(title="Действитьельно удалить?")
     #confirm-clear(title="Очистить данные?")
         p Текущее состояние не сохранено!
