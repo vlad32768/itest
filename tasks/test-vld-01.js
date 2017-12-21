@@ -476,7 +476,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5  5  2 5 8 15 20 ',
-        stdinHint: 'Введите $n, s, a_1, \\ldots, a_s$'
+        stdinHint: 'Введите $n, size, a_1, \\ldots, v_{size-1}$'
     },
     { //18
         text: [
@@ -511,7 +511,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5  5  2 5 8 15 20 ',
-        stdinHint: 'Введите $n, s, a_1, \\ldots, a_s$'
+        stdinHint: 'Введите $n, size, v_1, \\ldots, v_{size-1}$'
     },
     { //19
         text: [
@@ -538,7 +538,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 2 5 8 1 4 15 20 1 25',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$'
     },
     { //20
         text: [
@@ -562,7 +562,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 2 5 8 1 4 15 20 1 25',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$'
     },
     { //21
         text: [
@@ -592,7 +592,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '7  10  5 2 5 8 1 4 15 20 1 25',
-        stdinHint: 'Введите $d, n, v_1, \\ldots, v_n$'
+        stdinHint: 'Введите $d, n, v_1, \\ldots, v_{n-1}$'
     },
     { //22
         text: [
@@ -617,7 +617,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5   2 4 6 8 10',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$'
     },
     { //23
         text: [
@@ -657,7 +657,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5   2 4 6 8 10',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$'
     },
     { //24
         text: [
@@ -677,7 +677,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 1 10 5 20 9 3 20 1 25',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     { //25
         text: [
@@ -695,7 +695,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 2 5 8 2 4 15 20 1 25',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     { //26
         text: [
@@ -761,7 +761,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10 1 2 2 2 3 4 4 4 4 5',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     { //28
         text: [
@@ -804,7 +804,7 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(f,d).finish()
         }],
         stdin: '3   5   4 2 3 1 2',
-        stdinHint: 'Введите $x, n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $x, n, v_0, \\ldots, v_{n-1}$'
     },
     { //30
         text: [
@@ -839,7 +839,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10   2 3 2 3 2 1 2 3 2 2',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     { //31  = 23
         text: [
@@ -883,7 +883,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5   2 4 6 8 10',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     { //32
         text: [
@@ -901,7 +901,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: ' 3 8   10   1 3  2 4  3 5  4 6  5 7  6 8  7 9  8 10  9 11  10 12',
-        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_{2n-1}$'
     },
     { //33
         text: [
@@ -930,7 +930,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: ' 3 8   10   1 3  2 4  3 5  4 6  5 7  6 8  7 9  8 10  9 11  10 12',
-        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_{2n-1}$'
     },
     {   //34
         text: [
@@ -999,7 +999,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10   3 3 -1 -1 -1 3 -1 3 3 3',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     {   //36
         text: [
@@ -1025,7 +1025,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '4  28 196 32 56',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     {   //37
         text: [
@@ -1051,7 +1051,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.println(p).finish()
         }],
         stdin: '5  0 0  0 2  4 5  8 2  8 0',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{2n-1}$'
     },
     {   //38
         text: [
@@ -1077,7 +1077,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.println(idx).finish()
         }],
         stdin: '7   1 2 3 4 5 6 7',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     {   //39
         text: [
@@ -1096,7 +1096,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10   1 2 3 10 5 6 7 8 9 0',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     {   //40
         text: [
@@ -1125,8 +1125,136 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '4  5   1 3  2 4  3 5  4 6  5 7',
-        stdinHint: 'Введите $a, n, v_0, \\ldots, v_n$'
+        stdinHint: 'Введите $a, n, v_0, \\ldots, v_{2n-1}$'
     },
+    {   //41
+        text: [
+            'Задан массив вещественных чисел $v$ длины $2n$, содержащий координаты точек на плоскости в виде $x_0,y_0,x_1,y_1,....,x_{n-1},y_{n-1}$, то есть координаты $i$-ой точки есть $(v[2i],v[2i+1])$. Дана точка $A$ с координатами $(x_A,y_A)$. Вывести на экран индекс точки из $v$, ближайшей к $A$.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'real x, real y, whole n, real v[2*n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            function len2(x,y,x1,y1)
+            {
+                return (x-x1)*(x-x1)+(y-y1)*(y-y1)
+            }
+            var min=len2(args.x,args.y,args.v[0],args.v[1])
+            var idx=0
+            for(var i=1;i!=args.n;++i)
+            {
+                let t=len2(args.x,args.y,args.v[2*i],args.v[2*i+1])
+                if(min>t)
+                {
+                    min=t
+                    idx=i
+                }   
+            }
+            return printer.println(idx).finish()
+        }],
+        stdin: ' 3 4    5     1 1  2 2  3 3  4 4  5 5',
+        stdinHint: 'Введите $ x_A, y_A, n, v_0, \\ldots, v_{2n-1}$'
+    },
+    {   //42
+        text: [
+            'Даны два массива вещественных чисел $x$ и $y$ длины $n$. Значения в массиве $x$ упорядочены по возрастанию. Считая, что массивы задают табличную функцию $y(x)$, вычислить интеграл',
+            '$',
+            '\\int\\limits_{x_1}^{x_{n}}y(x)dx = \\sum\\limits_{i=1}^{n-1}\\frac{1}{2}\\left(y_{i+1}+y_{i}\\right)\\left(x_{i+1}-x_i\\right)',
+            '$',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, real x[n], real y[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var s=0
+            for(var i=0;i!=args.n-1;++i)
+            {
+                s+=(args.y[i+1]+args.y[i])*(args.x[i+1]-args.x[i])/2
+            }
+            
+            return lp().println(s).finish()
+        }],
+        stdin: ' 7   0 0.2617993877991494 0.5235987755982988 0.7853981633974483 1.0471975511965976 1.308996938995747 1.5707963267948963  0 0.25881904510252074 0.49999999999999994 0.7071067811865475 0.8660254037844386 0.9659258262890682 1',
+        stdinHint: 'Введите $n, x_1, \\ldots, x_{n}, y_1, \\ldots, y_{n}$'
+    },
+    {   //43
+        text: [
+            'Дан массив $v$ длины $n$. Вывести на экран индексы элементов, значения которых больше суммы впереди стоящих элементов: $v_k>\\sum\\limits_{i=0}^{k-1}v_i$. Например, $v=\\left[1,3,2,-3,4\\right]\\rightarrow \\left[0,1,4\\right]$.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            var s=0
+            for(var i=0;i!=args.n;++i)
+            {
+                if (args.v[i]>s) printer.print(i)
+                s+=args.v[i]
+            }
+            return printer.finish()
+        }],
+        stdin: '5   1 3 2 -3 4',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+    },
+    {
+        text: [
+            'Даны целочисленные массивы $u$ и $v$ длины $n$. Каждый массив это число, а каждый элемент массива - отдельная цифра. Младший разряд числа хранится в элементе с индексом ноль. Например, число 1239 при $n=10$ запишется как $u=[9,3,2,1,0,0,0,0,0,0]$. Написать программу, выполняющую сложение чисел $u$ и $v$. Результат записывается в массив $w$ такой же длины. Например, для приведенного выше $u$ и $v=[5,4,3,9,9,0,0,0,0,0]$ (число 99345) получим результат $w=[4,8,5,0,0,1,0,0,0,0]$ (число 100584).',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, uint u[n], uint v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            
+            var w = new Array
+            
+            var s=0
+            var carry=0
+            var razr=1
+            for(var i=0;i!=args.n;++i)
+            {
+                let t=args.u[i]+args.v[i]+carry
+                carry=Math.floor(t/10)
+                w.push(t%10)
+                s+=(t%10)*razr
+                razr*=10
+            }
+            s+=carry*razr
+            printer.println(w.join(' '))
+            return printer.finish()
+        }],
+        stdin: '10   9 3 2 1 0 0 0 0 0 0   5 4 3 9 9 0 0 0 0 0',
+        stdinHint: 'Введите $n, u_0, \\ldots, u_{n-1}  v_0, \\ldots, v_{n-1}$'
+    },
+    {
+        text: [
+            'Задан целочисленный массив $v$ длины $n$. Найти разность индексов первого и последнего четных элементов массива. Например: $v=[1,2,3,3,4,6,7]\\rightarrow 4$.',
+            '<br>'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, real v[n]')
+            if (args.n > 100)
+                throw new Error('Слишком большое n')
+            var printer=lp()
+            var b=true
+            var first=-1, last=-1
+            args.v.forEach(function(val,idx){
+                if (val%2===0)
+                { 
+                    if(b)
+                    {
+                        b=false
+                        first=idx
+                    }
+                    else last=idx
+                }
+            })
+            return printer.println(last-first).finish()
+        }],
+        stdin: '7    1 2 3 3 4 6 7',
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+    }
     ]
 })
 
