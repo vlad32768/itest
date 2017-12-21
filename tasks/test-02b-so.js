@@ -2,6 +2,7 @@ var tasks = require('../routes/tasks.js')
 var ppi = require('../routes/parse-program-input.js')
 var lp = require('../routes/line-printer.js')
 var util = require('../routes/util.js')
+var polynomial = require('../routes/polynomial.js')
 
 var image = util.imgen({
     pointLineDist: '/task-images/point-to-line-dist.png'
@@ -85,12 +86,8 @@ module.exports = tasks.Tasks.fromObject({
                '$P_2(x)=\\sum\\limits_{k=0}^m b_k x^k$',
                'Напечатайте коэффициенты $c_0, \\ldots c_{n+m}$ многочлена $P(x)=\\sum\\limits_{k=0}^{n+m} c_k x^k = P_1(x)P_2(x)$.'].join('\n'),
         scene: ['program', function(stdin) {
-            var args = ppi(stdin, 'whole n, real a[n+1], whole m, real b[m+1]')
-            var c = new Array(args.m + args.n + 1).fill(0)
-            for (var ia=0; ia<=args.n; ++ia)
-                for (var ib=0;ib<=args.m; ++ib)
-                    c[ia+ib] += args.a[ia]*args.b[ib]
-            return c.join(' ');
+            var args = ppi(stdin, 'uint n, real a[n+1], uint m, real b[m+1]')
+            return polynomial(args.a).mul(args.b).coeff.join(' ')
         }],
         stdin: '2   3 2 1     3   1 2 3 4',
         stdinHint: 'Введите через пробел $n, a_0, \\ldots a_n, m, b_0, \\ldots b_m$'
@@ -104,7 +101,7 @@ module.exports = tasks.Tasks.fromObject({
                'имеет полный ранг, если в ней найдётся базисный минор, то есть отличный от нуля минор порядка $n$,',
                'где $n$ &mdash; число строк или столбцов в матрице, смотря чего меньше.',
                'Для многочленов рассмотрите степенной базис. Вместо сравнения минора с нулём сравнивайие его абсолютное',
-               'значение с пороговой точностью $\\varepsilon=10^{-8}$'].join('\n'),
+               'значение с пороговой точностью $\\varepsilon=10^{-8}$.'].join('\n'),
         scene: ['program', function(stdin) {
             var args = ppi(stdin, 'real a1[4], real a2[4], real a3[4]')
             function det(c1, c2, c3) {
@@ -112,14 +109,11 @@ module.exports = tasks.Tasks.fromObject({
                        args.a2[c1]*(args.a1[c2]*args.a3[c3] - args.a3[c2]*args.a1[c3]) +
                        args.a3[c1]*(args.a1[c2]*args.a2[c3] - args.a2[c2]*args.a1[c3])
             }
-            function isZero(x) {
-                return Math.abs(x) < 1e-8
-            }
             var n = 4
             for (var c1=0; c1<=n-3; ++c1)
                 for (var c2=c1+1; c2<=n-2; ++c2)
                     for (var c3=c2+1; c3<=n-1; ++c3)
-                        if (!isZero(det(c1, c2, c3)))
+                        if (!util.isZero(det(c1, c2, c3)))
                             return 'Многочлены линейно независимы'
             return 'Многочлены линейно зависимы'
         }],
@@ -132,27 +126,15 @@ module.exports = tasks.Tasks.fromObject({
                'Программа должна печатать 0, если $x_*$ &mdash; не корень и кратность, если корень.<br/>',
                sharedText.aboutRootMultiplicity].join('\n'),
         scene: ['program', function(stdin) {
-            var args = ppi(stdin, 'whole n, real a[n+1], real x')
-            function val(c, x) {
-                var result = 0
-                for (var i=c.length-1; i>=0; --i)
-                    result = result*x + c[i]
-                return result
-            }
-            function isRoot(c, x) {
-                return Math.abs(val(c, x)) <= 1e-8
-            }
-            function dpol(c) {
-                var result = []
-                for (var i=1; i<c.length; ++i)
-                    result.push(c[i]*i)
-                return result
+            var args = ppi(stdin, 'uint n, real a[n+1], real x')
+            var pol = polynomial(args.a)
+            function isRoot(x) {
+                return util.isZero(pol.val(x))
             }
             var p = 0
-            var c = args.a
-            while (p < args.n && isRoot(c, args.x)) {
+            while (p < args.n && isRoot(args.x)) {
                 ++p
-                c = dpol(c)
+                pol.d()
             }
             return lp().println(p).finish()
         }],
@@ -199,17 +181,11 @@ module.exports = tasks.Tasks.fromObject({
                'Программа должна печатать коэффициенты многочлена $a_0, \\ldots a_n$.'].join('\n'),
         scene: ['program', function(stdin) {
             var args = ppi(stdin, 'whole n, real x[n]')
-            function mulMono(c, x) {
-                var result = [0].concat(c.slice())
-                for (var i=0; i<c.length; ++i)
-                    result[i] -= x*c[i]
-                return result
-            }
-            var result = [1]
+            var result = polynomial(1)
             args.x.forEach(function(x) {
-                result = mulMono(result, x)
+                result.multiplyByMonomial(x)
             })
-            return result.join(' ')
+            return result.coeff.join(' ')
         }],
         stdin: '3   1 2 3',
         stdinHint: 'Введите через пробел $n, x_1, \\ldots x_n$'
@@ -232,5 +208,49 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '4   0 0  1 0  1 1  0 1',
         stdinHint: 'Введите через пробел $n, x_1, y_1 \\ldots x_n, y_n$'
+    }, {
+        text: [
+            'На плоскости заданы своими координатами $x_i$, $y_i$ четыре точки ($i=1,\\ldots,4$),',
+            'причём абсциссы всех точек различны. Программа должна напечатать коэффициенты',
+            'интерполяционного многочлена Лагранжа $y=L(x)$, проходящего через эти точки.<br/>',
+            'Замечание. $L(x)=\\sum\\limits_{i=1}^4 L_i(x)$,',
+            '$L_i(x)=\\prod\\limits_{k=1,\\ldots,4,k\\ne i}\\frac{x-x_k}{x_i-x_k}$'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'real x[4], real y[4]')
+            var L = polynomial()
+            for (var i=0; i<4; ++i) {
+                var c = polynomial(1)
+                for (var j=0; j<4; ++j)
+                    if (j !== i)
+                        c.multiplyByMonomial(args.x[j])
+                var d = c.val(args.x[i])
+                if (Math.abs(d) < 1e-8)
+                    throw new Error('Значение абсциссы ' + args.x[i] + ' встречается больше одного раза')
+                c.mul(args.y[i]/d)
+                L.add(c)
+            }
+            return L.coeff.join(' ')
+        }],
+        stdin: '1 2 3 4   1 2 3 4',
+        stdinHint: 'Введите через пробел $x_1, x_2, x_3, x_4, y_1, y_2, y_3, y_4$'
+    }, {
+        text: ['Задана матрица $A$ размера $3\\times 3$. Программа должна напечатать коэффициенты',
+               'характеристического многочлена этой матрицы.<br/>',
+               'Замечание. Характеристическим многочленом квадратной матрицы $A$ называется',
+               'определитель $P(\\lambda)=|A-\\lambda E|$, где $E$ &mdash; единичная матрица.'].join('\n'),
+        scene: ['program', function(stdin) {
+            // TODO
+            var args = ppi(stdin, 'real a11, real a12, real a13, real a21, real a22, real a23, real a31, real a32, real a33')
+            var chi = polynomial(args.a11, -1).mul(
+                polynomial(args.a22, -1).mul([args.a33, -1]).sub(args.a23*args.a32)
+            ).sub(
+                polynomial(args.a33, -1).mul(args.a12).sub(args.a13*args.a32).mul(args.a21)
+            ).add(
+                polynomial(args.a22, -1).mul(-args.a13).add(args.a12*args.a23).mul(args.a31)
+            )
+            return chi.coeff.join(' ')
+        }],
+        stdin: '1 2 3   4 5 6   7 8 10',
+        stdinHint: 'Введите через пробел $A_{11}, A_{12}, A_{13}, A_{21}, \\ldots A_{33}.$'
     }
 ]})

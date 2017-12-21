@@ -5,6 +5,12 @@ function clamp(x, xmin, xmax, xdefault) {
     return x<xmin? xmin: x>xmax? xmax: x
 }
 
+function isZero(x, threshold) {
+    if (arguments.length < 2)
+        threshold = 1e-8
+    return Math.abs(x) < threshold
+}
+
 function imgen(imgdb) {
     return function(name) {
         var src = imgdb[name]
@@ -14,7 +20,17 @@ function imgen(imgdb) {
     }
 }
 
+function construct(constructor, args) {
+    function F() {
+        return constructor.apply(this, args);
+    }
+    F.prototype = constructor.prototype;
+    return new F();
+}
+
 module.exports = {
     clamp: clamp,
-    imgen: imgen
+    isZero: isZero,
+    imgen: imgen,
+    construct: construct
 }
