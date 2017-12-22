@@ -28,9 +28,25 @@ function construct(constructor, args) {
     return new F();
 }
 
+function formatTimeSpan(msec) {
+    function formatTwoDigits(n) {
+        return (n < 10? '0': '') + n
+    }
+    var seconds = Math.floor(msec/1000)
+    var minutes = Math.floor(seconds/60)
+    seconds %= 60
+    var hours = Math.floor(minutes/60)
+    minutes %= 60
+    if (hours > 10)
+        return '--'
+    else
+        return formatTwoDigits(hours) + ':' + formatTwoDigits(minutes) + ':' + formatTwoDigits(seconds)
+}
+
 module.exports = {
     clamp: clamp,
     isZero: isZero,
     imgen: imgen,
-    construct: construct
+    construct: construct,
+    formatTimeSpan: formatTimeSpan
 }

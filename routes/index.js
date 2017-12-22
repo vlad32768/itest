@@ -42,10 +42,23 @@ router
     })
     .get('/logout-warning-message', function(req, res) {
         var team = sd.data.team(req.session.teamId)
-        if (team.taskSolved)
-            res.send('Задача решена, можно уходить')
-        else
-            res.send('Вам придётся прийти в другой раз, не сегодня')
+        var nTasksSolved = _.reduce(team.tasks, function(sum, task) { return sum + (task.solved? 1: 0) }, 0)
+        var text
+        if (nTasksSolved === sd.data.maxTasksPerTeam) {
+            if (sd.data.maxTasksPerTeam === 1)
+                text = 'Задача решена, можно уходить'
+            else
+                text = 'Все задачи решены, можно уходить'
+        }
+        else if (nTasksSolved === 0) {
+            if (sd.data.maxTasksPerTeam === 1)
+                text = 'Задача не решена. Вам придётся прийти в другой раз, не сегодня'
+            else
+                text = 'Ни одна из задач не решена. Вам придётся прийти в другой раз, не сегодня'
+        }
+        else 
+            text = 'Не все задачи решены, ещё есть над чем поработать.'
+        res.send(text)
     })
 
 module.exports = router
