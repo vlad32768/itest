@@ -4,12 +4,19 @@
     // Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/bin/www"
+            "program": "${workspaceFolder}/bin/www",
+        }, {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug tasks",
+            "program": "${workspaceFolder}/bin/www",
+            "env": {
+                "DEBUG_TASKS": "YES"
+            }
         }
     ]
 }
