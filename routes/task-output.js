@@ -41,16 +41,6 @@ router
                 height: taskParam.height,
                 data: task.scene().paint(taskParam.width, taskParam.height, taskParam.stdin)
             }))
-
-        /*
-        // Note: This code was previously used to run tasks within the main process
-        //
-        var taskSet = req.query.taskId || 'test-01-so:1'
-        var task = allTasks.tasks()[taskSet]
-        var w = util.clamp(req.query.width, 1, 160, 80)
-        var h = util.clamp(req.query.height, 1, 50, 24)
-        var stdin = req.query.stdin || task.stdin()
-        */
     })
 
 module.exports = router
