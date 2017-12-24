@@ -414,7 +414,7 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(i).finish()
         }],
         stdin: '2 4   7  3 5 7 3 4 1 3 ',
-        stdinHint: 'Введите $h, H, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $h, H, n, a_1, \\ldots, a_n$'
     },
     {   //16
         text: [
@@ -454,7 +454,9 @@ module.exports = tasks.Tasks.fromObject({
             '<br>'].join('\n'),
         scene: ['program', function(stdin) {
             var args = ppi(stdin, 'whole n, whole s,  int a[s]')
-            if (args.s > 100)
+            if (args.s > 20)
+                throw new Error('Слишком большое s')
+            if (args.n > 20)
                 throw new Error('Слишком большое n')
             var printer=lp()
             printer.println(args.a.join(' '))
@@ -538,7 +540,7 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 2 5 8 1 4 15 20 1 25',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
     },
     { //20
         text: [
@@ -1063,12 +1065,12 @@ module.exports = tasks.Tasks.fromObject({
                 throw new Error('Слишком большое n')
             var printer=lp()
             printer.println(args.v.join(' '))
-            var min=Math.abs(args.v[1]*args.v[1]-(args.v[2]*args.v[2]-args.v[0]*args.v[0]))
+            var min=Math.abs(args.v[1]*args.v[1]-args.v[2]*args.v[2]-args.v[0]*args.v[0])
             var idx=-1
 
             for(var i=2;i<args.n-1;++i)
             {
-                var t=Math.abs(args.v[i]*args.v[i]-(args.v[i+1]*args.v[i+1]-args.v[i-1]*args.v[i-1]))
+                var t=Math.abs(args.v[i]*args.v[i]-args.v[i+1]*args.v[i+1]-args.v[i-1]*args.v[i-1])
                 if(min>t) {
                     min=t
                     idx=i
@@ -1076,7 +1078,7 @@ module.exports = tasks.Tasks.fromObject({
             }
             return printer.println(idx).finish()
         }],
-        stdin: '7   1 2 3 4 5 6 7',
+        stdin: '7   1 2 3 5 4 6 7',
         stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
     {   //39
@@ -1198,7 +1200,7 @@ module.exports = tasks.Tasks.fromObject({
         stdin: '5   1 3 2 -3 4',
         stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
     },
-    {
+    {   //44
         text: [
             'Даны целочисленные массивы $u$ и $v$ длины $n$. Каждый массив это число, а каждый элемент массива - отдельная цифра. Младший разряд числа хранится в элементе с индексом ноль. Например, число 1239 при $n=10$ запишется как $u=[9,3,2,1,0,0,0,0,0,0]$. Написать программу, выполняющую сложение чисел $u$ и $v$. Результат записывается в массив $w$ такой же длины. Например, для приведенного выше $u$ и $v=[5,4,3,9,9,0,0,0,0,0]$ (число 99345) получим результат $w=[4,8,5,0,0,1,0,0,0,0]$ (число 100584).',
             '<br>'].join('\n'),
@@ -1228,9 +1230,9 @@ module.exports = tasks.Tasks.fromObject({
         stdin: '10   9 3 2 1 0 0 0 0 0 0   5 4 3 9 9 0 0 0 0 0',
         stdinHint: 'Введите $n, u_0, \\ldots, u_{n-1}  v_0, \\ldots, v_{n-1}$'
     },
-    {
+    {   //45
         text: [
-            'Задан целочисленный массив $v$ длины $n$. Найти разность индексов первого и последнего четных элементов массива. Например: $v=[1,2,3,3,4,6,7]\\rightarrow 4$.',
+            'Задан целочисленный массив $v$ длины $n$. Найти разность индексов  последнего и первого четных элементов массива. Например: $v=[1,2,3,3,4,6,7]\\rightarrow 4$.',
             '<br>'].join('\n'),
         scene: ['program', function(stdin) {
             var args = ppi(stdin, 'whole n, real v[n]')
@@ -1250,7 +1252,12 @@ module.exports = tasks.Tasks.fromObject({
                     else last=idx
                 }
             })
-            return printer.println(last-first).finish()
+            if(last===-1)
+            {
+                printer.println(first===-1?'В массиве нет чётных элементов':'В массиве только один чётный элемент')
+            }
+            else printer.println(last-first)
+            return printer.finish()
         }],
         stdin: '7    1 2 3 3 4 6 7',
         stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'

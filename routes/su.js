@@ -40,7 +40,7 @@ router
         var hash = shasum.digest('hex');
         if(hash === SuPassHash) {
             req.session.supervisor = true
-            return res.redirect('/su')
+            return res.redirect(req.session.originalUrl || '/su')
         }
         req.flash('suAuthErrorMessage', 'Неверный пароль')
         res.redirect('/su/auth')
@@ -50,8 +50,10 @@ router
         res.redirect('/su/auth')
     })
     .use('/', function(req, res, next) {
-        if (!req.session.supervisor)
+        if (!req.session.supervisor) {
+            req.session.originalUrl = req.originalUrl
             return res.redirect('/su/auth')
+        }
         next()
     })
     .get('/', function(req, res, next) {
@@ -65,7 +67,8 @@ router
                 studentData: sd.data,
                 files: files,
                 nameEnding: nameEnding,
-                taskStats: sd.data.taskStatsObj()
+                taskStats: sd.data.taskStatsObj(),
+                util: util
             })
         })
     })

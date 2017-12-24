@@ -3,9 +3,11 @@ extends layout
 block content
     link(rel='stylesheet', href='/stylesheets/jquery-ui.min.css')
     link(rel='stylesheet' href='/stylesheets/messages.css')
+    link(rel='stylesheet' href='/stylesheets/jquery.splitter.css')
     script(src='/javascripts/jquery-3.2.1.min.js')
     script(src='/javascripts/jquery-ui.min.js')
     script(src='/javascripts/messages.js')
+    script(src='/javascripts/jquery.splitter-0.14.0.js')
     script.
         $(document).ready(function() {
             var reload = location.reload.bind(location)
@@ -24,14 +26,20 @@ block content
                 timeoutId = undefined
                 $('a.preview').parent().removeClass('current-preview')
                 $(a).parent().addClass('current-preview')
-                $('#link-preview iframe').attr('src', a.href)
+                $('#link-preview').attr('src', a.href)
             }
-            $('a.preview').mouseenter(function() {
-                timeoutId = setTimeout(loadPreview.bind(null, this), 500)
+            $('a.preview')
+                .mouseenter(function() {
+                    timeoutId = setTimeout(loadPreview.bind(null, this), 500)
+                    })
+                .mouseleave(function() {
+                    if (timeoutId !== undefined)
+                        clearTimeout(timeoutId)
                 })
-            .mouseleave(function() {
-                if (timeoutId !== undefined)
-                    clearTimeout(timeoutId)
+            $('#main').split({
+                orientation: 'horizontal',
+                limit: 20,
+                position: '50%', // if there is no percentage it interpret it as pixels
             })
         })
     style.
@@ -50,6 +58,21 @@ block content
         #main {
             position: fixed;
             top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #alltasks {
+            position: fixed;
+            overflow: auto;
+        }
+        #alltasks div {
+            padding-left: 3em;
+        }
+        /*
+        #alltasks {
+            position: fixed;
+            top: 0;
             left: 3em;
             right: 0;
             height: 55%;
@@ -62,13 +85,11 @@ block content
             width: 100%;
             height: 45%;
         }
-        #link-preview iframe {
+        */
+        #link-preview {
             width: 100%;
             height: 100%;
-            border-top: 2px solid #ccc;
-            border-left: none;
-            border-right: none;
-            border-bottom: none;
+            border: none;
             transform: scale(1.0);
             transform-origin: 0 0;
         }
@@ -81,22 +102,22 @@ block content
             border: 1px solid #ddd;
         }
     #main
-        #hdr
-            h1 Доступные задания
-            p новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress}
-        #tasks
-            each taskSet, taskSetId in taskSets
-                div
-                    div.taskSetContainer
-                        input.taskSet(type='checkbox' checked=sd.data.taskSetStatus(taskSetId)==='enabled')
-                        span= taskSetId
-                        span= ': ' + allTasks.taskSetDescription(taskSetId)
-                    div.taskContainer
-                        each taskId in taskSet
-                            div.task
-                                input.taskCheck(type='checkbox' checked=!sd.data.taskStatus(taskId).blocked)
-                                span.info= taskId
-                                - var taskStatusFormatted = sd.data.taskStatusFormatted(taskId)
-                                a.preview(href='/su/task?task='+taskId target='_blank')= taskId.replace(taskSetId+':', '') + (taskStatusFormatted? ': ' + taskStatusFormatted: '')
-    #link-preview
-        iframe
+        #alltasks
+            #hdr
+                h1 Доступные задания
+                p новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress}
+            #tasks
+                each taskSet, taskSetId in taskSets
+                    div
+                        div.taskSetContainer
+                            input.taskSet(type='checkbox' checked=sd.data.taskSetStatus(taskSetId)==='enabled')
+                            span= taskSetId
+                            span= ': ' + allTasks.taskSetDescription(taskSetId)
+                        div.taskContainer
+                            each taskId in taskSet
+                                div.task
+                                    input.taskCheck(type='checkbox' checked=!sd.data.taskStatus(taskId).blocked)
+                                    span.info= taskId
+                                    - var taskStatusFormatted = sd.data.taskStatusFormatted(taskId)
+                                    a.preview(href='/su/task?task='+taskId target='_blank')= taskId.replace(taskSetId+':', '') + (taskStatusFormatted? ': ' + taskStatusFormatted: '')
+        iframe#link-preview

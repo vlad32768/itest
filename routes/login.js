@@ -17,7 +17,7 @@ router
         var teamSize
         if (typeof b.firstname === 'string'   &&   typeof b.lastname === 'string') {
             b.firstname = [b.firstname]
-            b.lastname = [b.firstname]
+            b.lastname = [b.lastname]
             teamSize = 1
         }
         else if ((b.firstname instanceof Array) && (b.lastname instanceof Array)) {
