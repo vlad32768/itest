@@ -73,7 +73,39 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: 4,
         stdinHint: 'Введите $n$:'
-    }, { //No 5
+    }, { //No 4
+        text: ['Дано число, состоящее из четного числа цифр $2n$. Написать программу,',
+            'определяющую, является ли это число номером <<счастливого>> билета, то есть равны ли между',
+            'собой суммы первых $n$ и последних $n$ цифр. Число цифр в числе заранее не известно!',
+            'Если вдруг число цифр нечетное --- вывести об этом сообщение и далее не считать.'
+        ].join(' '),
+        scene: ['program', function(stdin){
+            var pr = lp()
+            var n = ppi(stdin,'whole n').n
+            if ( n > Math.pow(2,32) )
+                throw new Error( 'Слишком большое число!' )
+            var n2=n
+            for (var nfigs=0; n2; nfigs++) {
+                n2-=n2%10
+                n2/=10
+            }
+            if (nfigs%2)
+                throw new Error('Нечетное количество цифр!')
+            n2=n
+            var nums=[0,0]
+            for (var k=0; k<2; k++ ) for ( var i=0; i < nfigs/2; i++ ) {
+                nums[k] += n2%10
+                n2 = (n2-n2%10)/10
+            }
+            if (nums[0] == nums[1])
+                pr.println( 'Билет счастливый!' )
+            else
+                pr.println( 'Билет не счастливый' )
+            return pr.finish()
+        }],
+        stdin: 4655,
+        stdinHint: 'Введите $n$:'
+    },{ //No 5
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n\\times 2n$ символов, как показано в примере.',
             'В начале и конце каждой строки по 2 звездочки. $n-1$-я и $n$-я строки целиком состоят из звездочек.',
@@ -195,6 +227,105 @@ module.exports = tasks.Tasks.fromObject({
             pr.println( s + '*.*' + s )
             for (i=0; i < n-1; i++)
                 pr.println('.'.repeat(2*n+1))
+            return pr.finish()
+        }],
+        stdin: 4,
+        stdinHint: 'Введите $n$:'
+    },{ //No 11
+        text: ['Написать программу, получающую на входе целое число $n$',
+            'и выводящую на консоль квадрат из $n\\times n$ символов, как показано в примере.'
+        ].join(' '),
+        scene: ['program', function(stdin){
+            var pr = lp()
+            var n = ppi(stdin,'whole n').n
+            if ( n > 20 )
+                throw new Error('Слишком большое n')
+            for (var i=0; i < n; i++) {
+                if (i%2==0){
+                    pr.println('<>'.repeat(n/2+1).substr(0,n))
+                }
+                else
+                    pr.println('.'.repeat(n))
+            }
+            return pr.finish()
+        }],
+        stdin: 4,
+        stdinHint: 'Введите $n$:'
+    },{ //No 12
+        text: ['Написать программу, получающую на входе целое число $n$',
+            'и выводящую на консоль квадрат из $n\\times n$ символов, как показано в примере.'
+        ].join(' '),
+        scene: ['program', function(stdin){
+            var pr = lp()
+            var n = ppi(stdin,'whole n').n
+            if ( n > 20 )
+                throw new Error('Слишком большое n')
+            pr.println('+'.repeat(n))
+            for ( var i = 1; i < n-1; i++ ){
+                pr.println('+' + '.'.repeat(n-2-i) + '*'.repeat(i) + '+')
+            }
+            if (n>1)
+                pr.println('+'.repeat(n))
+            return pr.finish()
+        }],
+        stdin: 4,
+        stdinHint: 'Введите $n$:'
+    },{ //No 13
+        text: ['Написать программу, получающую на входе целое число $n$',
+            'и выводящую на консоль квадрат из $2n+1\\times 2n+1$ символов, как показано в примере.'
+        ].join(' '),
+        scene: ['program', function(stdin){
+            var pr = lp()
+            var n = ppi(stdin,'whole n').n
+            if ( n > 10 )
+                throw new Error('Слишком большое n')
+            for (var i=0; i < n-1; i++)
+                pr.println('.'.repeat(2*n+1))
+            var s = '.'.repeat(n-1)
+            pr.println( s + '.*.' + s ) 
+            pr.println( s + '*.*' + s )
+            pr.println( s + '.*.' + s )
+            for (i=0; i < n-1; i++)
+                pr.println('.'.repeat(2*n+1))
+            return pr.finish()
+        }],
+        stdin: 4,
+        stdinHint: 'Введите $n$:'
+    },{ //No 14
+        text: ['Написать программу, получающую на входе целое число $n$',
+            'и выводящую на консоль квадрат из $n\\times n$ символов, как показано в примере.'
+        ].join(' '),
+        scene: ['program', function(stdin){
+            var pr = lp()
+            var n = ppi(stdin,'whole n').n
+            if ( n > 20 )
+                throw new Error('Слишком большое n')
+            for (var i=0; i < n; i++) {
+                pr.println( ( ( i%2 ? '+' : '*' ) + '.' ).repeat(n/2+1).substr(0,n) )
+            }
+            return pr.finish()
+        }],
+        stdin: 4,
+        stdinHint: 'Введите $n$:'
+    },{ //No 15
+        text: ['Написать программу, получающую на входе целое число $n$',
+            'и выводящую на консоль квадрат из $2n\\times 2n$ символов, как показано в примере.'
+        ].join(' '),
+        scene: ['program', function(stdin){
+            var pr = lp()
+            var n = ppi(stdin,'whole n').n
+            if ( n > 10 )
+                throw new Error('Слишком большое n')
+            var s1 = '*'.repeat(n-1) + '<>' + '*'.repeat(n-1)
+            pr.println(s1)
+            pr.println(s1)
+            var s2 = '.'.repeat(n-1) + '<>' + '.'.repeat(n-1)
+            for ( var i = 2; i < 2*n-2; i++ )
+                pr.println(s2)
+            if (n>1){
+                pr.println(s1)
+                pr.println(s1)
+            }
             return pr.finish()
         }],
         stdin: 4,
