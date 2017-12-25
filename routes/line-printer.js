@@ -6,14 +6,24 @@ function Printer()
 {
     this.lines = []
     this.pendingLine = ''
+    this.tabSize = 8
 }
 
 Printer.prototype.append = function(text) {
-    if (this.pendingLine && text)
-        this.pendingLine = this.pendingLine + ' ' + text
-    else if (text)
-        this.pendingLine = text
-    return this
+    var self = this
+    function adjustCaret(tab) {
+        if (tab) {
+            var n = self.tabSize - self.pendingLine.length % self.tabSize
+            self.pendingLine += new Array(n).fill(' ').join('')
+        }
+        else if (self.pendingLine)
+            self.pendingLine += ' '
+    }
+    text.split('\t').forEach(function(token, i) {
+        adjustCaret(i !== 0)
+        self.pendingLine += token
+    })
+    return self
 }
 
 Printer.prototype.newline = function() {
@@ -32,6 +42,12 @@ Printer.prototype.println = function()
 Printer.prototype.print = function()
 {
     this.append(args2arr(arguments).join(' '))
+    return this
+}
+
+Printer.prototype.putc = function(c)
+{
+    this.pendingLine += c
     return this
 }
 
