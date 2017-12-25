@@ -36,11 +36,19 @@ function checkedNum(x, name) {
     return x
 }
 
+function checkedDigit(x, name) {
+    x = +x
+    if (!Number.isInteger(x) || x < 0 || x >= 10)
+        throwFailMessage('Ожидалось число от 0 до 9', name)
+    return x
+}
+
 var checkedInput = {
     int: checkedInt,
     uint: checkedNonnegativeInt,
     whole: checkedPositiveInt,
-    real: checkedNum
+    real: checkedNum,
+    digit: checkedDigit
 }
 
 function InputReader(stdin) {
