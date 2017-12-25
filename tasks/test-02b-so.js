@@ -22,7 +22,8 @@ module.exports = tasks.Tasks.fromObject({
     options: {
         noscreensize: true
     },
-    items: [{
+    tags: ['so-tests'],
+    items: [{   // 1
         text: [
             'На плоскости своими декартовыми координатами заданы три точки, $A$, $B$ и $C$. Найдите ресстояние от точки $A$ до отрезка $BC$, то есть',
             '$\\min\\limits_{{\\bf r}\\in BC} |{\\bf r}_A - {\\bf r}|$ (здесь ${\\bf r}_A$ &mdash;',
@@ -60,8 +61,9 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(result).finish()
         }],
         stdin: '5 5 0 0 10 0',
-        stdinHint: 'Введите через пробел $x_A, y_A, x_B, y_B, x_C, y_C$'
-    }, {
+        stdinHint: 'Введите через пробел $x_A, y_A, x_B, y_B, x_C, y_C$',
+        tags: ['complexity-3', 'math', 'planimetry', 'numeric']
+    }, {   // 2
         text: ['Задан массив натуральных чисел $a_1, \\ldots, a_n$. Нарисуйте гистограмму, на которой по оси абсцисс отложен',
                'индекс элемента, а по оси ординат &mdash; его значение.'].join('\n'),
         scene: ['program', function(stdin) {
@@ -79,8 +81,9 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10 1 2 3 4 5 1 2 3 2 1',
-        stdinHint: 'Введите через пробел $n, a_1, \\ldots a_n$'
-    }, {
+        stdinHint: 'Введите через пробел $n, a_1, \\ldots a_n$',
+        tags: ['complexity-3', 'arrays']
+    }, {   // 3
         text: ['Заданы две последовательности вещественных чисел, $a_0, \\ldots, a_n$ и $b_0, \\ldots, b_m$.',
                'Это коэффициенты двух многочленов от переменной $x$, $P_1(x)=\\sum\\limits_{k=0}^n a_k x^k$ и',
                '$P_2(x)=\\sum\\limits_{k=0}^m b_k x^k$',
@@ -90,8 +93,9 @@ module.exports = tasks.Tasks.fromObject({
             return polynomial(args.a).mul(args.b).coeff.join(' ')
         }],
         stdin: '2   3 2 1     3   1 2 3 4',
-        stdinHint: 'Введите через пробел $n, a_0, \\ldots a_n, m, b_0, \\ldots b_m$'
-    }, {
+        stdinHint: 'Введите через пробел $n, a_0, \\ldots a_n, m, b_0, \\ldots b_m$',
+        tags: ['complexity-3', 'arrays', 'math', 'polynomials']
+    }, {   // 4
         text: ['Заданы три последовательности вещественных чисел, $a_{10}, a_{11}, a_{12}, a_{13}$,',
                '$a_{20}, a_{21}, a_{22}, a_{23}$ и $a_{30}, a_{31}, a_{32}, a_{33}$.',
                'Это коэффициенты трёх многочленов от переменной $x$, $P_i(x)=\\sum\\limits_{k=0}^3 a_{ik} x^k$, $i=1,2,3$.',
@@ -118,8 +122,9 @@ module.exports = tasks.Tasks.fromObject({
             return 'Многочлены линейно зависимы'
         }],
         stdin: '1 0 0 0\n0 1 0 0\n0 0 1 0',
-        stdinHint: 'Введите через пробел $a_{10}, a_{11}, \\ldots a_{33}$'
-    }, {
+        stdinHint: 'Введите через пробел $a_{10}, a_{11}, \\ldots a_{33}$',
+        tags: ['complexity-3', 'arrays', 'math', 'polynomials', 'matrices']
+    }, {   // 5
         text: ['Задана последовательность вещественных чисел $a_0, \\ldots, a_n$ и вещественное число $x_*$.',
                'В последовательности чисел &mdash; коэффициенты многочлена от переменной $x$, $P(x)=\\sum\\limits_{k=0}^n a_k x^k$.',
                'Требуется определить, является ли $x_*$ корнем многочлена $P(x)$, и если да, то какова его кратность.',
@@ -139,8 +144,9 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(p).finish()
         }],
         stdin: '3   -9 15 -7 1     3',
-        stdinHint: 'Введите через пробел $n, a_0, \\ldots a_n, x_*$'
-    }, {
+        stdinHint: 'Введите через пробел $n, a_0, \\ldots a_n, x_*$',
+        tags: ['complexity-4', 'arrays', 'math', 'polynomials']
+    }, {   // 6
         text: ['Задана последовательность вещественных чисел $a_0, a_1, a_2, a_3$.',
                'Проверьте, имеет ли многочлен $P(x)=\\sum\\limits_{k=0}^{3} a_k x^k$',
                'вещественные корни кратности 2 и выше. Если да, напечатайте все такие корни и их кратности.',
@@ -174,8 +180,9 @@ module.exports = tasks.Tasks.fromObject({
             return nosuchroots
         }],
         stdin: '-4 8 -5 1',
-        stdinHint: 'Введите через пробел $a_0, a_1, a_2, a_3$'
-    }, {
+        stdinHint: 'Введите через пробел $a_0, a_1, a_2, a_3$',
+        tags: ['complexity-3', 'arrays', 'math', 'polynomials']
+    }, {   // 7
         text: ['Задана последовательность вещественных чисел $x_1, \\ldots, x_n$. Это корни многочлена',
                '$P(x)=\\sum\\limits_{k=0}^{n} a_k x^k$, причём $a_n=1$.',
                'Программа должна печатать коэффициенты многочлена $a_0, \\ldots a_n$.'].join('\n'),
@@ -188,8 +195,9 @@ module.exports = tasks.Tasks.fromObject({
             return result.coeff.join(' ')
         }],
         stdin: '3   1 2 3',
-        stdinHint: 'Введите через пробел $n, x_1, \\ldots x_n$'
-    }, {
+        stdinHint: 'Введите через пробел $n, x_1, \\ldots x_n$',
+        tags: ['complexity-3', 'arrays', 'math', 'polynomials']
+    }, {   // 8
         text: ['Задана последовательность $2n$ вещественных чисел $x_1, y_1, x_2, y_2, \\ldots, x_n, y_n$.',
                'Это декартовы координаты вершин многоугольника на плоскости. Найдите площадь многоугольника.',
                'Считайте, что граница прямоугольника не имеет самопересечений.<br/>',
@@ -209,8 +217,9 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(Math.abs(result)).finish()
         }],
         stdin: '4   0 0  1 0  1 1  0 1',
-        stdinHint: 'Введите через пробел $n, x_1, y_1 \\ldots x_n, y_n$'
-    }, {
+        stdinHint: 'Введите через пробел $n, x_1, y_1 \\ldots x_n, y_n$',
+        tags: ['complexity-3', 'arrays', 'math', 'planimetry', 'numeric']
+    }, {   // 9
         text: [
             'На плоскости заданы своими координатами $x_i$, $y_i$ четыре точки ($i=1,\\ldots,4$),',
             'причём абсциссы всех точек различны. Программа должна напечатать коэффициенты',
@@ -234,8 +243,9 @@ module.exports = tasks.Tasks.fromObject({
             return L.coeff.join(' ')
         }],
         stdin: '1 2 3 4   1 2 3 4',
-        stdinHint: 'Введите через пробел $x_1, x_2, x_3, x_4, y_1, y_2, y_3, y_4$'
-    }, {
+        stdinHint: 'Введите через пробел $x_1, x_2, x_3, x_4, y_1, y_2, y_3, y_4$',
+        tags: ['complexity-4', 'arrays', 'math', 'polynomials', 'numeric']
+    }, {   // 10
         text: ['Задана матрица $A$ размера $3\\times 3$. Программа должна напечатать коэффициенты',
                'характеристического многочлена этой матрицы.<br/>',
                'Замечание. Характеристическим многочленом квадратной матрицы $A$ называется',
@@ -253,6 +263,7 @@ module.exports = tasks.Tasks.fromObject({
             return chi.coeff.join(' ')
         }],
         stdin: '1 2 3   4 5 6   7 8 10',
-        stdinHint: 'Введите через пробел $A_{11}, A_{12}, A_{13}, A_{21}, \\ldots A_{33}.$'
+        stdinHint: 'Введите через пробел $A_{11}, A_{12}, A_{13}, A_{21}, \\ldots A_{33}.$',
+        tags: ['complexity-4', 'arrays', 'math', 'polynomials', 'matrices']
     }
 ]})

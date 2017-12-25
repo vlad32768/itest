@@ -27,7 +27,8 @@ module.exports = tasks.Tasks.fromObject({
     options: {
         noscreensize: true
     },
-    items: [{
+    tags: ['so-tests'],
+    items: [{   // 1
         text: [
             'Задано натуральное число $n$. Напечатать биномиальные коэффициенты $a_0,\\ldots,a_n$ в разложении $(1+x)^n=a_0 + a_1 x + \\ldots + a_n x^n$.',
             'Воспользлваться формулой $a_k = \\frac{n!}{k!(n-k)!}$, а лучше треугольником Паскаля:',
@@ -54,8 +55,9 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(bc.join(' ')).finish()
         }],
         stdin: '5',
-        stdinHint: 'Введите $n$'
-    }, {
+        stdinHint: 'Введите $n$',
+        tags: ['complexity-3', 'arrays', 'math', 'combinatorics']
+    }, {    // 2
         text: 'Даны натуральные числа $n$, $m$, прямоугольная матрица $A$ вещественных чисел (в ней $n$ строк и $m$ столбцов) и столбец $x$ из $m$ элементов. Напечатать матричное произведение $Ax$.',
         scene: ['program', function(stdin) {
             var args = ppi(stdin, 'whole n, whole m, real a[n*m], real x[m]')
@@ -69,8 +71,9 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '3 2    1 2   3 4   5 6     7 8',
-        stdinHint: 'Введите через пробел $n, m, A_{11}, A_{12}, \\ldots A_{nn}, x_1, \\ldots x_n$'
-    }, {
+        stdinHint: 'Введите через пробел $n, m, A_{11}, A_{12}, \\ldots A_{nn}, x_1, \\ldots x_n$',
+        tags: ['complexity-3', 'arrays', 'math', 'matrices']
+    }, {    // 3
         text: 'Даны натуральные числа $n$, $m$, прямоугольная матрица $A$ вещественных чисел (в ней $n$ строк и $m$ столбцов) и столбец $x$ из $n$ элементов. Напечатать матричное произведение $x^T A$.',
         scene: ['program', function(stdin) {
             var args = ppi(stdin, 'whole n, whole m, real a[n*m], real x[n]')
@@ -84,8 +87,9 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '3 2    1 2   3 4   5 6     7 8 9',
-        stdinHint: 'Введите через пробел $n, m, A_{11}, A_{12}, \\ldots A_{nn}, x_1, \\ldots x_m$'
-    }, {
+        stdinHint: 'Введите через пробел $n, m, A_{11}, A_{12}, \\ldots A_{nn}, x_1, \\ldots x_m$',
+        tags: ['complexity-3', 'arrays', 'math', 'matrices']
+    }, {    // 4
         text: [
             'Задана последовательность $a_1, \\ldots, a_n$ из $n$ цифр от 0 до 9. Подсчитать и напечатать частоты этих цифр.',
             'Частота $\\omega_k$ цифры $k$ определяется по формуле $\\omega_k=\\frac{n_k}{n}$,',
@@ -105,8 +109,9 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '50 8 6 1 5 7 4 7 4 4 3 3 3 3 1 6 8 4 1 0 2 5 6 6 0 9 9 4 0 3 3 1 8 6 1 4 4 9 5 0 1 1 7 3 8 0 4 0 8 1 0',
-        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n$'
-    }, {
+        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n$',
+        tags: ['complexity-3', 'arrays', 'math', 'probability']
+    }, {    // 5
         text: [
             'Заданы два натуральных числа, $r$ и $n$. Мультииндекс размера $r$ &mdash; это массив натуральных чисел, каждое от 1 до $n$.',
             'Напечатать все возможные для данных $r$ и $n$ мультииндексы.',
@@ -135,8 +140,9 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '2 3',
-        stdinHint: 'Введите через пробел $r, n$'
-    }, {
+        stdinHint: 'Введите через пробел $r, n$',
+        tags: ['complexity-4', 'arrays', 'math', 'tensors']
+    }, {    // 6
         text: [
             'Перестановкой называется упорядоченный набор из <b>всех</b> чисел от $1$ до $n$. Заданы число $n$ и массив целых чисел $a_1, \\ldots a_n$.',
             'Определить, перестановка в этом массиве или нет (чтобы это была перестановка, все элементы должны быть от 1 до $n$,',
@@ -146,8 +152,9 @@ module.exports = tasks.Tasks.fromObject({
             return isPermutation(args.a)? 'Перестановка': 'Не перестановка'
         }],
         stdin: '5   1 5 3 4 2',
-        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n$'
-    }, {
+        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n$',
+        tags: ['complexity-3', 'arrays', 'math', 'permutations']
+    }, {    // 7
         text: [
             'Перестановкой называется упорядоченный набор из <b>всех</b> чисел от $1$ до $n$.',
             'Транспозицией называется операция над перестановкой, когда два элемента меняются местами. Результат транспозиции &mdash; другая перестановка.',
@@ -168,8 +175,9 @@ module.exports = tasks.Tasks.fromObject({
             return nd === 2? 'Можно': 'Нельзя'
         }],
         stdin: '5   1 5 3 4 2   1 5 2 4 3',
-        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n, b_1, \\ldots, b_n$'
-    }, {
+        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n, b_1, \\ldots, b_n$',
+        tags: ['complexity-3', 'arrays', 'math', 'permutations']
+    }, {    // 8
         text: [
             'Задано натуральное число $n$ и массив из $2n$ вещественных чисел. Это декартовы координаты векторов на плоскости',
             '(в первом и втором элементах &mdash; координаты первого вектора, в третьем и четвёртом &mdash; координаты второго и т. д.).',
@@ -186,8 +194,9 @@ module.exports = tasks.Tasks.fromObject({
             return args.xy.slice(ilongest, ilongest+2).join(' ')
         }],
         stdin: '5   -2 0  -1 1   0 2   1 3   2 4',
-        stdinHint: 'Введите через пробел $n, x_1, y_1 \\ldots, x_n, y_n$'
-    }, {
+        stdinHint: 'Введите через пробел $n, x_1, y_1 \\ldots, x_n, y_n$',
+        tags: ['complexity-2', 'arrays', 'math', 'planimetry']
+    }, {    // 9
         text: [
             'Заданы 8 вещественных чисел. Это декартовы координаты четырёх точек, ${\\bf p}_1$, ${\\bf p}_2$, ${\\bf q}_1$, ${\\bf q}_2$, лежащих на плоскости.',
             'Эти точки &mdash; концы двух отрезков на плоскости (один отрезок между точками ${\\bf p}_1$ и ${\\bf p}_2$, другой &mdash; между ${\\bf q}_1$ и ${\\bf q}_2$).',
@@ -212,8 +221,9 @@ module.exports = tasks.Tasks.fromObject({
                         'Отрезки пересекаются' : 'Отрезки не пересекаются'
         }],
         stdin: '-1 0 1 0 0 -1 0 1',
-        stdinHint: 'Введите через пробел $p_{1,x}, p_{1,y}, p_{2,x}, p_{2,y}, q_{1,x}, q_{1,y}, q_{2,x}, q_{2,y}$'
-    }, {
+        stdinHint: 'Введите через пробел $p_{1,x}, p_{1,y}, p_{2,x}, p_{2,y}, q_{1,x}, q_{1,y}, q_{2,x}, q_{2,y}$',
+        tags: ['complexity-3', 'math', 'planimetry', 'numeric']
+    }, {    // 10
         text: [
             'Автодорога состоит из $n$ дуг окружности радиусов $R_1,\\ldots,R_n$. Расставьте знаки ограничения скорости на каждой дуге,',
             'исходя из требования непревышения заданного ускорения $a_{\\max}$. Учтите, что максимально допустимая скорость в любом случае',
@@ -240,8 +250,9 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5 110   3   1000   100   10',
-        stdinHint: 'Введите через пробел $a_{\\max}, v_{\\max}, n, R_1, \\ldots, R_n$'
-    }, {
+        stdinHint: 'Введите через пробел $a_{\\max}, v_{\\max}, n, R_1, \\ldots, R_n$',
+        tags: ['complexity-3', 'arrays', 'mechanics']
+    }, {    // 11
         text: [
             'В квадратном зале пол покрыт квадратными плитками ($2n$ плиток в длину и столько же в ширину); зал разделён двумя перегородками',
             'на 4 одинаковые квадратные части. В каждой половине каждой перегородки имеется проём шириной в одну плитку. В одном углу зала,',
@@ -330,8 +341,9 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '4 2 7 1 6',
-        stdinHint: 'Введите через пробел $n, x_1, x_2, y_1, y_2$'
-    }, {
+        stdinHint: 'Введите через пробел $n, x_1, x_2, y_1, y_2$',
+        tags: ['complexity-4', 'arrays']
+    }, {    // 12
         text: [
             'Заданы две последовательности целых чисел, $a_1, \\ldots a_n$ и $b_1, \\ldots b_m$,',
             'Определить, встречается ли вторая последовательность в первой, т. е. существует ли такое',
@@ -351,7 +363,8 @@ module.exports = tasks.Tasks.fromObject({
             return 'Не встречается'
         }],
         stdin: '9   1 2 3 4 3 2 3 4 7     3   2 3 4',
-        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n, m, b_1, \\ldots, b_m$'
+        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n, m, b_1, \\ldots, b_m$',
+        tags: ['complexity-3', 'arrays', 'search']
     }
 ]})
 /*

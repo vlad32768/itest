@@ -18,7 +18,8 @@ Task.fromObject = function(o) {
         scene: pgen(sceneClasses, o.scene),
         stdin: o.stdin,
         stdinHint: o.stdinHint,
-        options: o.options || {}
+        options: o.options || {},
+        tags: o.tags || []
     })
 }
 Task.prototype.text = function() {
@@ -33,6 +34,9 @@ Task.prototype.stdin = function() {
 Task.prototype.stdinHint = function() {
     return this.data.stdinHint
 }
+Task.prototype.tags = function() {
+    return this.data.tags
+}
 Task.prototype.options = function() {
     return this.data.options
 }
@@ -41,10 +45,11 @@ function Tasks(data) {
     this.data = data
 }
 Tasks.fromObject = function(o) {
-    var data = { description: o.description || '', items: [], options: o.options || {} }
+    var data = { description: o.description || '', items: [], options: o.options || {}, tags: o.tags || [] }
     o.items.forEach(function(item) {
         var task = Task.fromObject(item)
         _.extend(task.data.options, data.options)
+        task.data.tags = task.data.tags.concat(data.tags)
         data.items.push(task)
     })
     return new Tasks(data)

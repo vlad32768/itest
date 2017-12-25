@@ -8,6 +8,7 @@ module.exports = tasks.Tasks.fromObject({
     options: {
         noscreensize: true
     },
+    tags: ['so-exams'],
     items: [{
         text: [ // 1
             'Задано натуральное число $n$ и массив из $n$ целых чисел $a_0, a_1, \\ldots, a_{n-1}$.',
@@ -24,6 +25,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '6 1 6 3 4 5 8',
         stdinHint: 'Введите через пробел $n, a_0, \\ldots, a_{n-1}$',
+        tags: ['complexity-2', 'arrays'],
         origin: '160315.doc'
     }, {
         text: [ // 2
@@ -39,6 +41,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '6 1 6 3 4 5 8',
         stdinHint: 'Введите через пробел $n, a_0, \\ldots, a_{n-1}$',
+        tags: ['complexity-2', 'arrays'],
         origin: '160315.doc'
     }, {
         text: [ // 3
@@ -69,6 +72,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '5   10 20 30 40 50     33',
         stdinHint: 'Введите через пробел $n, a_0, \\ldots, a_{n-1}, x$',
+        tags: ['complexity-3', 'arrays'],
         origin: '160315.doc'
     }, {
         text: [ // 4
@@ -98,6 +102,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '5   1 2 3 1 5     1',
         stdinHint: 'Введите через пробел $n, a_0, \\ldots, a_{n-1}, x$',
+        tags: ['complexity-3', 'arrays'],
         origin: '160315.doc'
     }, {
         text: [ // 5
@@ -114,6 +119,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '10   2 1 1 2 1 1 2 1 1 2',
         stdinHint: 'Введите через пробел $n, x_0, \\ldots, x_{n-1}$',
+        tags: ['complexity-2', 'arrays'],
         origin: '151111-test151111.pdf'
     }, {
         text: [ // 6
@@ -135,6 +141,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '-5 -5   5 -5   0 5   0 0',
         stdinHint: 'Введите через пробел $x_1, y_1 \\ldots, x_4, y_4$',
+        tags: ['complexity-2', 'math', 'planimetry'],
         origin: '151111-test151111.pdf'
     }, {
         text: [ // 7
@@ -154,6 +161,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '0.7 1e-8',
         stdinHint: 'Введите через пробел $c, \\varepsilon$',
+        tags: ['complexity-2', 'math', 'sequence', 'convergence'],
         origin: '151111-test151111.pdf'
     }, {
         text: [ // 8
@@ -176,6 +184,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '0 4 2 9 6 3',
         stdinHint: 'Введите через пробел $n_1,\\ldots, n_6$',
+        tags: ['complexity-2', 'arrays'],
         origin: '151111-test151111.pdf'
     }, {
         text: [ // 9
@@ -218,6 +227,7 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '3   2 4 6     7   1 2 3 4 5 6 7',
         stdinHint: 'Введите через пробел $n, a_0\\ldots, a_{n-1}, m, b_0, \\ldots, b_{m-1}$',
+        tags: ['complexity-3', 'arrays'],
         origin: '151111-test151111.pdf'
     }, {
         text: [ // 10
@@ -243,51 +253,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '3     10   1 1 1 1 1 10 10 10 10 10',
         stdinHint: 'Введите через пробел $n, N, x_0\\ldots, x_{N-1}$',
+        tags: ['complexity-2', 'numeric', 'arrays', 'elegant-solution'],
         origin: '141222-test-02.tex'
     }, {
         text: [ // 11
-            'Даны два упорядоченных по возрастанию массива вещественных чисел $a_0,\\ldots,a_{n-1}$',
-            'и $b_0,\\ldots,b_{m-1}$, причем $m\\geqslant n$. Определить, можно ли получить массив $a_k$, удаляя',
-            'некоторые элементы из массива $b_k$. Если можно, напечатать индексы тех',
-            'элементов массива $b_k$, которые надо удалить.'].join('\n'),
-        scene: ['program', function(stdin) {
-            function checkGrowth(x, name) {
-                for (var i=1; i<x.length; ++i)
-                    if (x[i] < x[i-1])
-                        throw new Error('Нарушено условие упорядоченности по возрастанию для массива ' + name)
-            }
-            var args = ppi(stdin, 'uint n, real a[n], uint m, real b[m]')
-            var a = args.a,   b = args.b,   n = args.n,   m = args.m
-            if (n > m)
-                throw new Error('Не выполнено условие m >= n')
-            checkGrowth(a, 'a')
-            checkGrowth(b, 'b')
-            var rm = []
-            var ia = 0,   ib = 0
-            while(ia < n && ib < m) {
-                var ai = a[ia],   bi = b[ib]
-                if (ai === bi)
-                    ++ia, ++ib
-                else if (ai < bi)
-                    break
-                else
-                    rm.push(ib++)
-            }
-            if (ia === n) {
-                for (; ib<m; ++ib)
-                    rm.push(ib)
-                if (rm.length === 0)
-                    return 'Можно: массивы одинаковые, ничего удалять не нужно'
-                else
-                    return 'Можно:\n' + rm.join(' ')
-            }
-            return 'Нельзя'
-        }],
-        stdin: '3   2 4 6     7   1 2 3 4 5 6 7',
-        stdinHint: 'Введите через пробел $n, a_0\\ldots, a_{n-1}, m, b_0, \\ldots, b_{m-1}$',
-        origin: '151111-test151111.pdf'
-    }, {
-        text: [ // 12
             'Дан неупорядоченный непустой массив целых неотрицательных чисел $a_1, \\ldots a_n$.',
             'Найти два самых больших элемента $a$, $b$, причем $b&lt;a$.',
             'Если все элементы массива одинаковы, то $b$ не определено. Напечатать массив и найденные $a$, $b$.'].join('\n'),
@@ -312,9 +281,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '5   6 9 9 1 0',
         stdinHint: 'Введите через пробел $n, a_1\\ldots, a_n$',
+        tags: ['complexity-3', 'arrays'],
         origin: '141222-test-02.tex'
     }, {
-        text: [ // 13
+        text: [ // 12
             'Дан неупорядоченный массив целых чисел $x_i$, $i=0,\\ldots,N-1$, $N&gt;2$. Найти элемент $x_j$, $0&lt;j&lt;N-1$,',
             'наиболее отличающийся от своих соседей справа и слева: $j=\\arg\\max\\limits_j\\left(|x_j-x_{j-1}| + |x_j-x_{j+1}|\\right)$.',
             'Напечатать массив, $j$, $x_j$.'].join('\n'),
@@ -335,9 +305,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '10   0 3 2 2 10 3 3 20 4 4',
         stdinHint: 'Введите через пробел $N, x_0\\ldots, x_{N-1}$',
+        tags: ['complexity-2', 'arrays'],
         origin: '141222-test-02.tex'
     }, {
-        text: [ // 14
+        text: [ // 13
             'Дан неупорядоченный массив натуральных чисел $a_1,\\ldots,a_N$ и натуральное число $n>1$. Напечатать все элементы,',
             'не имеющие простых делителей от 2 до $n$ (включительно, если $n$ простое). <br/>',
             'Указание. Если у числа нет простых делителей от 2 до $n$, то непростых тоже нет, и наоборот.'].join('\n'),
@@ -365,9 +336,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '10      10   70 71 72 73 74 75 76 77 78 79',
         stdinHint: 'Введите через пробел $n, N, a_1\\ldots, a_N$',
+        tags: ['complexity-2', 'arrays'],
         origin: '141222-test-02.tex'
     }, {
-        text: [ // 15
+        text: [ // 14
             'Кусочно-линейная непрерывная функция $f(x)$ задана таблицей значений $x_i$, $f_i$, $i=0,\\ldots,n-1$ &mdash; двумя массивами вещественных чисел,',
             'причем $x_i$ строго монотонно возрастают. Найти номер участка, на котором производная $\\frac{df}{dx}$ имеет наибольшее значение.',
             'Вывести этот номер и значение производной. Считать, что первый участок имеет номер 0.'].join('\n'),
@@ -394,9 +366,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '5   2 3 4 4.1 5   1 2 3 4 5',
         stdinHint: 'Введите через пробел $n, x_0\\ldots, x_{n-1}, f_0, \\ldots, f_{n-1}$',
+        tags: ['complexity-2', 'arrays', 'math'],
         origin: '141222-test-02.tex'
     }, {
-        text: [ // 16
+        text: [ // 15
             'Дважды дифференцируемая функция $f(x)$ задана таблицей значений $f_i$, $i=0,\\ldots,n-1$ &mdash; массивом вещественных чисел,',
             'причем $f_i=f(hi)$ &mdash; значения в узлах $x_i=hi$ равномерной сетки. Найти номер узла, в котором вторая производная',
             '$\\frac{d^2f}{dx^2}$ имеет наибольшее значение. Вторую производную вычислить по формуле',
@@ -418,9 +391,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '5   1 1 0 1 1',
         stdinHint: 'Введите через пробел $n, f_0, \\ldots, f_{n-1}$',
+        tags: ['complexity-2', 'arrays', 'math'],
         origin: '141222-test-02.tex'
     }, {
-        text: [ // 17
+        text: [ // 16
             'Даны два массива вещественных чисел, $x$ и $y$. Их длина одинакова и равна $n$. Каждый ($i$-й) элемент массива $x$ содержит',
             'абсциссу некоторой точки ${\\bf r}_i$ на плоскости, а элемент массива $y$ &mdash; её ординату. Найти среди этих точек',
             'ближайшую к началу координат и напечатать её координаты.'].join('\n'),
@@ -439,9 +413,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '8   3 3 0 -1 -1 -1 0 3   0 2 2 2 0 -4 -4 -4',
         stdinHint: 'Введите через пробел $n, x_0, \\ldots, x_{n-1}, y_0, \\ldots, y_{n-1}$',
+        tags: ['complexity-2', 'arrays', 'math', 'planimetry'],
         origin: '151106-test.tex'
     }, {
-        text: [ // 18
+        text: [ // 17
             'Найти приближенное решение уравнения $x=f(x)$, где $f(x)=\\alpha e^x$, при $\\alpha=0.2$ методом простой итерации:',
             '$x_{n+1}=f(x_n)$. В качестве начального приближения взять $x_0=0$. Итерации продолжать до тех пор,',
             'пока $|x_{n+1}-x_n|\\geqslant \\varepsilon$, где $\\varepsilon$ &mdash; заданная точность.',
@@ -465,9 +440,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '1e-8',
         stdinHint: 'Введите $\\varepsilon$',
+        tags: ['complexity-2', 'arrays', 'math', 'numeric'],
         origin: '151106-test.tex'
     }, {
-        text: [ // 19
+        text: [ // 18
             'Даны два массива вещественных чисел, $x$ и $y$. Их длина одинакова и равна $n$. Каждый ($i$-й) элемент массива $x$ содержит',
             'абсциссу некоторой точки ${\\bf r}_i$ на плоскости, а элемент массива $y$ &mdash; её ординату. Найти пару точек, расстояние',
             'между которыми минимально (если таких пар несколько, можно выбрать любую). Напечатать номера точек и расстояние между ними.'].join('\n'),
@@ -488,9 +464,10 @@ module.exports = tasks.Tasks.fromObject({
         }],
         stdin: '8   3 3 0 -1 -1 -1 0 3   0 2 2 2 0 -4 -4 -4',
         stdinHint: 'Введите через пробел $n, x_0, \\ldots, x_{n-1}, y_0, \\ldots, y_{n-1}$',
+        tags: ['complexity-2', 'arrays', 'math', 'planimetry'],
         origin: '151106-test.tex'
     }, {
-        text: [ // 20
+        text: [ // 19
             'Дан массив целых чисел $a_0, \\ldots a_{n-1}$, $n&gt;1$. Найти самый длинный участок строгой монотонности, напечатать индекс его начала и длину.',
             'Например, для массива $\\{1, 2, 3, 2, 0, -5, -5, 1\\}$ программа должна напечатать 2, 4.'].join('\n'),
         scene: ['program', function(stdin) {
@@ -502,25 +479,125 @@ module.exports = tasks.Tasks.fromObject({
                 var d = a[i] - a[i-1]
                 return d > 0? 1: d < 0? -1: 0
             }
-            return 'TODO'
+            var d0 = 0,   i0 = 0,   i0best = 0,   lbest = 1
+            function count(i) {
+                var l = i - i0
+                if (l > lbest) {
+                    lbest = l
+                    i0best = i0
+                }
+            }
+            for (var i=1; i<n; ++i) {
+                var d = dir(i)
+                if (d !== d0) {
+                    if (d0)
+                        count(i)
+                    i0 = i-1
+                    d0 = d
+                }
+            }
+            count (i)
+            return lp().println(i0best, lbest).finish()
         }],
         stdin: '8   1 2 3 2 0 -5 -5 1',
         stdinHint: 'Введите через пробел $n, a_0, \\ldots, a_{n-1}$',
+        tags: ['complexity-4', 'arrays'],
         origin: '151106-test.tex'
+    }, {
+        text: [ // 20
+            'Дан массив целых чисел $x_k$, $k=0, \\ldots n$, $n>1$. Напечатать самую большую по модулю разность соседних элементов $x_k-x_{k-1}$.',
+            'Например, для массива $\\{1, 2, 3, 2, 0, -5, -5, -3\\}$ программа должна напечатать $-5$ (в данном массиве это $x_5-x_4$).',
+            'То есть искать надо самую большую по модулю разность, но печатать саму разность, не вычисляя модуль.'].join('\n'),
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, int x[n]')
+            var n = args.n,   x = args.x
+            if (n < 2)
+                throw new Error('Нарушено условие n>1')
+            var dmax = 0
+            for (var i=1; i<n; ++i) {
+                var d = x[i]-x[i-1]
+                if (Math.abs(dmax) < Math.abs(d))
+                    dmax = d
+            }
+            return lp().println(dmax).finish()
+        }],
+        stdin: '8   1 2 3 2 0 -5 -5 -3',
+        stdinHint: 'Введите через пробел $n, a_0, \\ldots, a_{n-1}$',
+        tags: ['complexity-2', 'arrays'],
+        origin: '151106-test.tex'
+    }, {    // 21
+        text: 'Даны два массива, $A$ и $B$, размеров $n$ и $m$ соответственно, содержащие вещественные числа $a_i$ и $b_j$ соответственно. Напечатать всевозможные упорядоченные пары ($a_i$, $b_j$).',
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'uint n, real a[n], uint m, real b[m]')
+            var printer = lp()
+            args.a.forEach(function(ai) {
+                args.b.forEach(function(bi) {
+                    printer.println(ai, bi)
+                })
+            })
+            return printer.finish()
+        }],
+        stdin: '2 4 5 3 7 8 9',
+        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n, m, b_1, \\ldots, b_m$',
+        tags: ['complexity-1', 'arrays']
+    }, {    // 22
+        text: 'Дан массив $A$ размера $n$, содержащий вещественные числа $a_i$. Напечатать всевозможные неупорядоченные пары $(a_i, a_j)$ (Если напечатана пара $(a_1, a_2)$, то пару $(a_2, a_1)$ печатать не надо.)',
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'uint n, real a[n]')
+            var printer = lp()
+            for (var i=0; i<args.n; ++i)
+                for (var j=0; j<=i; ++j)
+                    printer.println(args.a[i], args.a[j])
+            return printer.finish()
+        }],
+        stdin: '4 1 2 3 4',
+        stdinHint: 'Введите через пробел $n, a_1, \\ldots, a_n$',
+        tags: ['complexity-1', 'arrays']
+    }, {    // 23
+        text: 'Дан массив, содержащий $2n$ натуральных чисел. Там находятся размеры прямоугольных матриц $A_1, \\ldots A_n$ (например, первый элемент массива &mdash; число строк в $A_1$, второй &mdash; число столбцов в $A_1$, третий &mdash; число строк в $A_2$, четвёртый &mdash; число столбцов в $A_2$, и т. д.). Программа должна выяснить, определено ли матричное произведение $A_1 A_2 \\ldots A_n$, и если да, то сколько строк и столбцов в матрице, которая будет результатом этого произведения.',
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, whole a[2*n]')
+            var printer = lp()
+            var ok = true
+            var _2n = 2*args.n
+            for (var i=1; i+2<_2n; i+=2)
+                if (args.a[i] !== args.a[i+1]) {
+                    ok = false
+                    break
+                }
+            if (ok)
+                printer
+                    .println('Матричное произведение определено')
+                    .println('Оно имеет размер ', args.a[0], 'x', args.a[_2n-1], ' (строк x столбцов)')
+            else
+                printer.println('Матричное произведение не определено')
+            return printer.finish()
+        }],
+        stdin: '3 5 2 2 4 5 6',
+        stdinHint: 'Введите через пробел $n$, число строк в $A_1$, число столбцов в $A_1, \\ldots,$ число строк в $A_n$, число столбцов в $A_n$',
+        tags: ['complexity-2', 'arrays']
+    }, {    // 24
+        text: 'Дан массив, содержащий $2n$ натуральных чисел. Там находятся размеры прямоугольных матриц $A_1, \\ldots A_n$ (например, первый элемент массива &mdash; число строк в $A_1$, второй &mdash; число столбцов в $A_1$, третий &mdash; число строк в $A_2$, четвёртый &mdash; число столбцов в $A_2$, и т. д.). Программа должна выяснить, определено ли матричное произведение $A_1^T A_2^T \\ldots A_n^T$, и если да, то сколько строк и столбцов в матрице, которая будет результатом этого произведения.',
+        scene: ['program', function(stdin) {
+            var args = ppi(stdin, 'whole n, whole a[2*n]')
+            var printer = lp()
+            var ok = true
+            var _2n = 2*args.n
+            for (var i=0; i+3<_2n; i+=2)
+                if (args.a[i] !== args.a[i+3]) {
+                    ok = false
+                    break
+                }
+            if (ok)
+                printer
+                    .println('Матричное произведение определено')
+                    .println('Оно имеет размер ', args.a[1], 'x', args.a[_2n-2], ' (строк x столбцов)')
+            else
+                printer.println('Матричное произведение не определено')
+            return printer.finish()
+        }],
+        stdin: '3 2 5 4 2 6 5',
+        stdinHint: 'Введите через пробел $n$, число строк в $A_1$, число столбцов в $A_1, \\ldots,$ число строк в $A_n$, число столбцов в $A_n$',
+        tags: ['complexity-2', 'arrays']
     }
 ]})
-
-/*
-// 151106-test.tex
-
-# unknown
-\item
-Дан массив целых чисел $x_k$. Напечатать самую большую по модулю разность соседних элементов $x_k-x_{k-1}$. Например, для массива $\{1, 2, 3, 2, 0, -5, -5, 1\}$ программа должна напечатать $-5$ (в данном массиве это $x_5-x_4$).
-
-// 150615-1-task-data__c1.tex
-
-# unknown
-\item
-Дан неупорядоченный непустой массив целых неотрицательных чисел. Найти два самых маленьких элемента $a$, $b$, причем $b>a$. Если все элементы массива одинаковы, то $b$ не определено. Напечатать массив и найденные $a$, $b$.
-
-*/
