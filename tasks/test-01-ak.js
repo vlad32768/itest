@@ -200,10 +200,10 @@ module.exports = tasks.Tasks.fromObject({
 
             for ( var i = 0; i < 2*n+1; ++i ) {
                 for (var j=0; j<n; ++j)
-                    pr.print('.')
-                pr.print(i%2 ? '<' : '>')
+                    pr.putc('.')
+                pr.putc(i%2 ? '<' : '>')
                 for (j=0; j<n; ++j)
-                    pr.print('.')
+                    pr.putc('.')
                 pr.newline()
             }
             return pr.finish()
@@ -249,7 +249,7 @@ module.exports = tasks.Tasks.fromObject({
             }
             return pr.finish()
         }],
-        stdin: 4,
+        stdin: 7,
         stdinHint: 'Введите $n$:'
     },{ //No 12
         text: ['Написать программу, получающую на входе целое число $n$',
@@ -268,7 +268,7 @@ module.exports = tasks.Tasks.fromObject({
                 pr.println('+'.repeat(n))
             return pr.finish()
         }],
-        stdin: 4,
+        stdin: 7,
         stdinHint: 'Введите $n$:'
     },{ //No 13
         text: ['Написать программу, получающую на входе целое число $n$',
@@ -305,7 +305,7 @@ module.exports = tasks.Tasks.fromObject({
             }
             return pr.finish()
         }],
-        stdin: 4,
+        stdin: 8,
         stdinHint: 'Введите $n$:'
     },{ //No 15
         text: ['Написать программу, получающую на входе целое число $n$',
@@ -331,6 +331,5 @@ module.exports = tasks.Tasks.fromObject({
         stdin: 4,
         stdinHint: 'Введите $n$:'
     }
-
     ]
 })
