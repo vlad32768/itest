@@ -18,7 +18,7 @@ block content
             background-color: #eef;
             padding: 5px;
         }
-        #qb-menu {
+        #qb-menu, #qb-menu-advanced {
             position: absolute;
             width: 50%;
             border: 1px solid #ccc;
@@ -26,6 +26,7 @@ block content
             background-color: #efe;
             padding: 5px;
             display: flex;
+            align-items: center;
             flex-wrap: wrap;
             display: none;
             cursor: default;
@@ -44,17 +45,9 @@ block content
         .qb-control-logical {
             background-color: #fff;
         }
-        .qb-control {
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            background-color: #eee;
-            width: 3ex;
-            height: 4ex;
-            padding-left: 1ex;
-            cursor: pointer;
-        }
         .qb-logical, .qb-tag {
             display: flex;
+            align-items: center;
             flex-wrap: nowrap;
             padding: 3px;
             margin: 3px;
@@ -73,15 +66,24 @@ block content
             border-radius: 3px;
             background-color: #ffe;
         }
+        .qb-control {
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #eee;
+            width: 2.5ex;
+            height: 3ex;
+            padding-left: 1ex;
+            cursor: pointer;
+        }
         .qb-add-control::before {
-            font-size: 200%;
-            line-height: 2ex;
+            font-size: 130%;
+            line-height: 2.5ex;
             color: #0c0;
             content: '+';
         }
         .qb-del-control::before {
-            font-size: 200%;
-            line-height: 2ex;
+            font-size: 130%;
+            line-height: 2.5ex;
             color: #c00;
             content: '\2012';
         }
@@ -89,63 +91,145 @@ block content
         $(document).ready(function() {
             $.get('/su/tags')
                 .done(function(data) {
-                    // msg.info(data)
                     var menu = $('#qb-menu')
+                    var menuAdvanced = $('#qb-menu-advanced')
                     var tags = JSON.parse(data)
                     tags.forEach(function(tag) {
                         menu.append($('<div>').addClass('qb-control-tag').text(tag))
                     })
                     var query = $('#qb-query')
-                    function enterAddQueryItem() {
-                        $(this).append(menu.detach())
-                        menu.fadeIn('fast')
+                    function detachMenu(menu) {
+                        $('body').append(menu.detach())
                     }
-                    function leaveAddQueryItem() {
-                        menu.fadeOut('fast')
+                    function setMenuOnHover(element, menu) {
+                        function enterAddQueryItem() {
+                            $(this).append(menu.stop().detach())
+                            menu.fadeIn('fast')
+                        }
+                        function leaveAddQueryItem() {
+                            menu.fadeOut('fast', detachMenu.bind(this, menu))
+                        }
+                        element.mouseenter(enterAddQueryItem).mouseleave(leaveAddQueryItem)
+                        return element
                     }
                     function newAddControl(multiple) {
-                        return $('<div>').addClass('qb-control qb-add-control' + (multiple? ' qb-multiple': ''))
-                            .mouseenter(enterAddQueryItem).mouseleave(leaveAddQueryItem)
+                        return setMenuOnHover(
+                            $('<div>').addClass('qb-control qb-add-control' + (multiple? ' qb-multiple': '')),
+                            menu)
                     }
                     query.append(newAddControl())
                     function removeQueryItem() {
-                        var text = $(this).next().text()
-                        msg.info('TODO: Remove query item ' + $(this).parent().parent().children().length)
+                        var btn = $(this)
+                        var item = btn.parent()
+                        var next = item.next()
+                        var prev = item.prev()
+                        var last = next.hasClass('qb-add-control') && (prev.length === 0   ||   prev.hasClass('qb-label'))
+                        item.remove()
+                        if (last)
+                            next.show()
                     }
                     function newQueryItem(contentGenerator) {
+                        var control = $(this)
+                        var item = contentGenerator()
+                            .prepend($('<div>')
+                                .addClass('qb-control qb-del-control')
+                                .click(removeQueryItem))
+                            .insertBefore(control)
+                        if (!control.hasClass('qb-multiple'))
+                            control.hide()
+                        return item
+                    }
+                    function closeMenuThen(menu, then) {
                         menu.fadeOut('fast', function() {
-                            var control = menu.parent()
-                            $('body').append(menu.detach())
-                            contentGenerator()
-                                .prepend($('<div>')
-                                    .addClass('qb-control qb-del-control')
-                                    .click(removeQueryItem))
-                                .insertBefore(control)
-                            if (!control.hasClass('qb-multiple'))
-                                control.hide()
+                            var target = menu.parent()[0]
+                            detachMenu(menu)
+                            then.call(target)
                         })
+                    }
+                    function closeMenuThenNewQueryItem(contentGenerator) {
+                        closeMenuThen(menu, newQueryItem.bind(menu.parent(), contentGenerator))
+                    }
+                    function newLogicalGenerator(text) {
+                        return $('<div>')
+                            .addClass('qb-logical')
+                            .append(setMenuOnHover($('<div>')
+                                .addClass('qb-label').text(text), menuAdvanced))
+                            .append(newAddControl(text !== 'NOT'))
                     }
                     function newLogical() {
                         var text = $(this).text()
-                        newQueryItem.call(this, function() {
-                            return $('<div>')
-                                .addClass('qb-logical')
-                                .append($('<div>')
-                                    .addClass('qb-label').text(text))
-                                .append(newAddControl(text !== 'NOT'))
-                        })
+                        closeMenuThenNewQueryItem(newLogicalGenerator.bind(this, text))
                     }
                     function newTag() {
                         var text = $(this).text()
-                        newQueryItem.call(this, function() {
+                        closeMenuThenNewQueryItem(function() {
                             return $('<div>')
                                 .addClass('qb-tag')
-                                .append($('<div>')
-                                    .addClass('qb-label').text(text))
+                                .append(setMenuOnHover($('<div>')
+                                    .addClass('qb-label').text(text), menuAdvanced))
                         })
                     }
-                    $('.qb-control-logical').click(newLogical)
-                    $('.qb-control-tag').click(newTag)
+
+                    function removeWrappingItem() {
+                        var item = $(this)
+                        var multiple = item.parent().children('.qb-multiple').length == 1
+                        var content = item.children('.qb-logical, .qb-tag')
+                        if (!multiple && content.length > 1)
+                            return msg.error('Failed to unwrap: multiple items from wrapper contents are not allowed for wrapper parent')
+                        content.detach().insertBefore(item)
+                        if (content.length === 0)
+                            item.next().show()
+                        item.remove()
+                    }
+
+                    function wrapQueryItem(op) {
+                        var item = $(this)
+                        var wrappingItem = newQueryItem.call(item, newLogicalGenerator.bind(this, op))
+                        item.show().detach().insertAfter(wrappingItem.children('.qb-label'))
+                        var next = item.next()
+                        if (!next.hasClass('qb-multiple'))
+                            next.hide()
+                    }
+
+                    function invertQueryItem() {
+                        var item = $(this)
+                        if (item.hasClass('qb-logical') && item.children('.qb-label').text() === 'NOT')
+                            // Remove this NOT
+                            removeWrappingItem.call(item[0])
+                        else {
+                            var parentItem = item.parent()
+                            if (parentItem.hasClass('qb-logical') && parentItem.children('.qb-label').text() === 'NOT') {
+                                // Remove parent NOT
+                                removeWrappingItem.call(item.parent()[0])
+                            }
+                            else {
+                                // Add parent NOT
+                                wrapQueryItem.call(item[0], 'NOT')
+                            }
+                        }
+                    }
+
+                    function advancedMenuCommand() {
+                        var command = $(this).text()
+                        closeMenuThen(menuAdvanced, function() {
+                            var itemThis = $(this).parent()[0]
+                            switch(command) {
+                                case 'Invert':
+                                    return invertQueryItem.call(itemThis)
+                                case 'Remove wrapper':
+                                    return removeWrappingItem.call(itemThis)
+                                case 'Wrap with AND':
+                                    return wrapQueryItem.call(itemThis, 'AND')
+                                case 'Wrap with OR':
+                                    return wrapQueryItem.call(itemThis, 'OR')
+                                default:
+                                    return msg.warning('Don\'t know how to handle advanced menu command ' + command)
+                            }
+                        })
+                    }
+                    menu.children('.qb-control-logical').click(newLogical)
+                    menu.children('.qb-control-tag').click(newTag)
+                    menuAdvanced.children('.qb-control-logical').click(advancedMenuCommand)
                 })
                 .fail(msg.ajaxError)
         })
@@ -157,3 +241,8 @@ block content
             .qb-control-logical AND
             .qb-control-logical OR
             .qb-control-logical NOT
+        #qb-menu-advanced
+            .qb-control-logical Invert
+            .qb-control-logical Remove wrapper
+            .qb-control-logical Wrap with AND
+            .qb-control-logical Wrap with OR
