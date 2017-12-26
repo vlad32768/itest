@@ -43,12 +43,12 @@ block content
             })
         })
     style.
-        .taskContainer {
+        .taskContainer, .tagContainer {
             padding-left: 2em;
             display: flex;
             flex-wrap: wrap;
         }
-        .task {
+        .task, .taskTag {
             padding-right: 2em;
             display: flex;
         }
@@ -106,16 +106,23 @@ block content
             #hdr
                 h1 Доступные задания
                 p новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress}
+            //- #tags
+            //-     h1 Теги
+            //-     div.tagQuery
+            //-     .tagContainer
+            //-         each tag in allTasks.taskTags()
+            //-             .taskTag= tag
             #tasks
+                //- h2 Задачи
                 each taskSet, taskSetId in taskSets
                     div
                         div.taskSetContainer
                             input.taskSet(type='checkbox' checked=sd.data.taskSetStatus(taskSetId)==='enabled')
                             span= taskSetId
                             span= ': ' + allTasks.taskSetDescription(taskSetId)
-                        div.taskContainer
+                        .taskContainer
                             each taskId in taskSet
-                                div.task
+                                .task
                                     input.taskCheck(type='checkbox' checked=!sd.data.taskStatus(taskId).blocked)
                                     span.info= taskId
                                     - var taskStatusFormatted = sd.data.taskStatusFormatted(taskId)
