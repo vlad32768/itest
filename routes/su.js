@@ -205,6 +205,12 @@ router
         sd.data.enableTask(taskId, enable)
         res.sendStatus(200)
     })
+    .get('/query-builder', function(req, res) {
+        res.render('query-builder')
+    })
+    .get('/tags', function(req, res) {
+        res.send(JSON.stringify(allTasks.taskTags()))
+    })
     .use(su_task)
 
 module.exports = router

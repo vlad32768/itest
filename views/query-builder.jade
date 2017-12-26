@@ -1,0 +1,159 @@
+extends layout
+
+block content
+    link(rel='stylesheet', href='/stylesheets/jquery-ui.min.css')
+    link(rel='stylesheet' href='/stylesheets/messages.css')
+    link(rel='stylesheet' href='/stylesheets/jquery.splitter.css')
+    script(src='/javascripts/jquery-3.2.1.min.js')
+    script(src='/javascripts/jquery-ui.min.js')
+    script(src='/javascripts/messages.js')
+    style.
+        #qb-info, #qb-query {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #qb-query {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #eef;
+            padding: 5px;
+        }
+        #qb-menu {
+            position: absolute;
+            width: 50%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #efe;
+            padding: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            display: none;
+            cursor: default;
+        }
+        .qb-control-tag, .qb-control-logical {
+            padding: 3px 5px;
+            margin: 3px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .qb-control-tag {
+            background-color: #eee;
+        }
+        .qb-control-logical {
+            background-color: #fff;
+        }
+        .qb-control {
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #eee;
+            width: 3ex;
+            height: 4ex;
+            padding-left: 1ex;
+            cursor: pointer;
+        }
+        .qb-logical, .qb-tag {
+            display: flex;
+            flex-wrap: nowrap;
+            padding: 3px;
+            margin: 3px;
+        }
+        .qb-label {
+            line-height: 4ex;
+            padding: 0 3px;
+        }
+        .qb-logical {
+            border: 1px solid #fcc;
+            border-radius: 3px;
+            background-color: #fee;
+        }
+        .qb-tag {
+            border: 1px solid #ffc;
+            border-radius: 3px;
+            background-color: #ffe;
+        }
+        .qb-add-control::before {
+            font-size: 200%;
+            line-height: 2ex;
+            color: #0c0;
+            content: '+';
+        }
+        .qb-del-control::before {
+            font-size: 200%;
+            line-height: 2ex;
+            color: #c00;
+            content: '\2012';
+        }
+    script.
+        $(document).ready(function() {
+            $.get('/su/tags')
+                .done(function(data) {
+                    // msg.info(data)
+                    var menu = $('#qb-menu')
+                    var tags = JSON.parse(data)
+                    tags.forEach(function(tag) {
+                        menu.append($('<div>').addClass('qb-control-tag').text(tag))
+                    })
+                    var query = $('#qb-query')
+                    function enterAddQueryItem() {
+                        $(this).append(menu.detach())
+                        menu.fadeIn('fast')
+                    }
+                    function leaveAddQueryItem() {
+                        menu.fadeOut('fast')
+                    }
+                    function newAddControl(multiple) {
+                        return $('<div>').addClass('qb-control qb-add-control' + (multiple? ' qb-multiple': ''))
+                            .mouseenter(enterAddQueryItem).mouseleave(leaveAddQueryItem)
+                    }
+                    query.append(newAddControl())
+                    function removeQueryItem() {
+                        var text = $(this).next().text()
+                        msg.info('TODO: Remove query item ' + $(this).parent().parent().children().length)
+                    }
+                    function newQueryItem(contentGenerator) {
+                        menu.fadeOut('fast', function() {
+                            var control = menu.parent()
+                            $('body').append(menu.detach())
+                            contentGenerator()
+                                .prepend($('<div>')
+                                    .addClass('qb-control qb-del-control')
+                                    .click(removeQueryItem))
+                                .insertBefore(control)
+                            if (!control.hasClass('qb-multiple'))
+                                control.hide()
+                        })
+                    }
+                    function newLogical() {
+                        var text = $(this).text()
+                        newQueryItem.call(this, function() {
+                            return $('<div>')
+                                .addClass('qb-logical')
+                                .append($('<div>')
+                                    .addClass('qb-label').text(text))
+                                .append(newAddControl(text !== 'NOT'))
+                        })
+                    }
+                    function newTag() {
+                        var text = $(this).text()
+                        newQueryItem.call(this, function() {
+                            return $('<div>')
+                                .addClass('qb-tag')
+                                .append($('<div>')
+                                    .addClass('qb-label').text(text))
+                        })
+                    }
+                    $('.qb-control-logical').click(newLogical)
+                    $('.qb-control-tag').click(newTag)
+                })
+                .fail(msg.ajaxError)
+        })
+    #qb
+        h1 Query builder
+        #qb-query
+        #qb-info
+        #qb-menu
+            .qb-control-logical AND
+            .qb-control-logical OR
+            .qb-control-logical NOT
