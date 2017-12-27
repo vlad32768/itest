@@ -28,7 +28,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     }, { // No 2
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n+1\\times 2n+1$ символов, как показано в примере:'
@@ -47,7 +48,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     }, { //No 3
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n\\times 2n$ символов, как показано в примере.',
@@ -72,7 +74,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     }, { //No 4
         text: ['Дано число, состоящее из четного числа цифр $2n$. Написать программу,',
             'определяющую, является ли это число номером <<счастливого>> билета, то есть равны ли между',
@@ -104,7 +107,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4655,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-2']
     },{ //No 5
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n\\times 2n$ символов, как показано в примере.',
@@ -128,7 +132,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     }, { //No 6
         text: ['Написать программу, получающую на входе целое число $1\\leq n\\leq 10$',
             'и выводящую на консоль квадрат из цифр следующего вида'
@@ -146,7 +151,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     }, { //No 7
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n+1\\times 2n+1$ символов, как показано в примере.'
@@ -167,7 +173,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     },{ //No 8
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n+1\\times 2n+1$ символов, как показано в примере.'
@@ -183,7 +190,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     }, { //No 9
         text: ['Написать программу, получающую на входе натуральное число $n$',
             'и выводящую на консоль квадрат из $2n+1\\times 2n+1$, как показано в примере.'
@@ -209,7 +217,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: '4',
-        stdinHint: 'Введите $n$'
+        stdinHint: 'Введите $n$',
+        tags: ['complexity-1', 'console-painting']
     },{ //No 10
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n+1\\times 2n+1$ символов, как показано в примере.'
@@ -230,7 +239,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     },{ //No 11
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $n\\times n$ символов, как показано в примере.'
@@ -250,7 +260,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 7,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     },{ //No 12
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $n\\times n$ символов, как показано в примере.'
@@ -269,7 +280,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 7,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     },{ //No 13
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n+1\\times 2n+1$ символов, как показано в примере.'
@@ -290,7 +302,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     },{ //No 14
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $n\\times n$ символов, как показано в примере.'
@@ -306,7 +319,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 8,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     },{ //No 15
         text: ['Написать программу, получающую на входе целое число $n$',
             'и выводящую на консоль квадрат из $2n\\times 2n$ символов, как показано в примере.'
@@ -329,7 +343,8 @@ module.exports = tasks.Tasks.fromObject({
             return pr.finish()
         }],
         stdin: 4,
-        stdinHint: 'Введите $n$:'
+        stdinHint: 'Введите $n$:',
+        tags: ['complexity-1', 'console-painting']
     }
     ]
 })
