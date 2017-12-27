@@ -200,6 +200,10 @@ Data.prototype.taskStatus = function(taskId)
     return this.statusData[taskId]
 }
 
+Data.prototype.hasUnblockedTasks = function() {
+    return _.some(this.statusData, function(d) { return !d.blocked })
+}
+
 Data.prototype.taskStatusFormatted = function(taskId)
 {
     return _.reduce(this.statusData[taskId], function(o, v, k) {
@@ -216,6 +220,14 @@ Data.prototype.taskStatusFormatted = function(taskId)
 Data.prototype.enableTask = function(taskId, enable) {
     this.statusData[taskId].blocked = !enable
     this.unsaved = true
+}
+
+Data.prototype.enableTasks = function(filter, enable) {
+    var self = this
+    _.each(allTasks.taskIds(filter), function(taskId) {
+        self.statusData[taskId].blocked = !enable
+    })
+    self.unsaved = true
 }
 
 Data.prototype.setTaskSolved = function(teamId, taskIndex, taskSolved) {

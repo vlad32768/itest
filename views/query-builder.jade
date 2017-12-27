@@ -1,239 +1,273 @@
-extends layout
+style.
+    #qb-info, #qb-query {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #qb-query {
+        padding: 5px;
+    }
+    .qb-logical, .qb-tag {
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+    }
 
-block content
-    link(rel='stylesheet', href='/stylesheets/jquery-ui.min.css')
-    link(rel='stylesheet' href='/stylesheets/messages.css')
-    link(rel='stylesheet' href='/stylesheets/jquery.splitter.css')
-    script(src='/javascripts/jquery-3.2.1.min.js')
-    script(src='/javascripts/jquery-ui.min.js')
-    script(src='/javascripts/messages.js')
-    style.
-        #qb-info, #qb-query {
-            display: flex;
-            flex-wrap: wrap;
+    #qb-menu, #qb-menu-advanced {
+        position: absolute;
+        width: 50%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        display: none;
+        cursor: default;
+    }
+    .qb-control-tag, .qb-control-logical {
+        padding: 3px 5px;
+        margin: 3px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .qb-control-tag {
+        background-color: #eee;
+    }
+    .qb-control-logical {
+        background-color: #fff;
+    }
+    .qb-logical, .qb-tag {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        padding: 3px;
+        margin: 3px 6px;
+        border-radius: 3px;
+    }
+    .qb-logical {
+        flex-wrap: wrap;
+    }
+    .qb-tag {
+        flex-wrap: nowrap;
+    }
+    .qb-label {
+        line-height: 4ex;
+        padding: 0 3px;
+    }
+    .qb-control {
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background-color: #eee;
+        width: 2.5ex;
+        height: 3ex;
+        padding-left: 1ex;
+        cursor: pointer;
+        margin: 0 5px;
+    }
+    .qb-add-control::before {
+        font-size: 130%;
+        line-height: 2.5ex;
+        color: #0c0;
+        content: '+';
+    }
+    .qb-del-control::before {
+        font-size: 130%;
+        line-height: 2.5ex;
+        color: #c00;
+        content: '\2012';
+    }
+script.
+    var queryBuilder = {
+            callbacks: [],
+            onChange: function(cb) { this.callbacks.push(cb) }
         }
-        #qb-query {
-            padding: 5px;
-        }
-        .qb-logical, .qb-tag {
-            box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
-        }
-
-        #qb-menu, #qb-menu-advanced {
-            position: absolute;
-            width: 50%;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            display: none;
-            cursor: default;
-        }
-        .qb-control-tag, .qb-control-logical {
-            padding: 3px 5px;
-            margin: 3px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            display: inline-block;
-            cursor: pointer;
-        }
-        .qb-control-tag {
-            background-color: #eee;
-        }
-        .qb-control-logical {
-            background-color: #fff;
-        }
-        .qb-logical, .qb-tag {
-            display: flex;
-            align-items: center;
-            flex-wrap: nowrap;
-            padding: 3px;
-            margin: 3px 6px;
-            border-radius: 3px;
-        }
-        .qb-logical {
-            flex-wrap: wrap;
-        }
-        .qb-tag {
-            flex-wrap: nowrap;
-        }
-        .qb-label {
-            line-height: 4ex;
-            padding: 0 3px;
-        }
-        .qb-control {
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            background-color: #eee;
-            width: 2.5ex;
-            height: 3ex;
-            padding-left: 1ex;
-            cursor: pointer;
-            margin: 0 5px;
-        }
-        .qb-add-control::before {
-            font-size: 130%;
-            line-height: 2.5ex;
-            color: #0c0;
-            content: '+';
-        }
-        .qb-del-control::before {
-            font-size: 130%;
-            line-height: 2.5ex;
-            color: #c00;
-            content: '\2012';
-        }
-    script.
-        $(document).ready(function() {
-            $.get('/su/tags')
-                .done(function(data) {
-                    var menu = $('#qb-menu')
-                    var menuAdvanced = $('#qb-menu-advanced')
-                    var tags = JSON.parse(data)
-                    tags.forEach(function(tag) {
-                        menu.append($('<div>').addClass('qb-control-tag').text(tag))
+    $(document).ready(function() {
+        $.get('/su/tags')
+            .done(function(data) {
+                var menu = $('#qb-menu')
+                var menuAdvanced = $('#qb-menu-advanced')
+                var tags = JSON.parse(data)
+                tags.forEach(function(tag) {
+                    menu.append($('<div>').addClass('qb-control-tag').text(tag))
+                })
+                var query = $('#qb-query')
+                function detachMenu(menu) {
+                    $('body').append(menu.detach())
+                }
+                function setMenuOnHover(element, menu) {
+                    function enterAddQueryItem() {
+                        $(this).append(menu.stop().detach())
+                        menu.fadeIn('fast')
+                    }
+                    function leaveAddQueryItem() {
+                        menu.fadeOut('fast', detachMenu.bind(this, menu))
+                    }
+                    element.mouseenter(enterAddQueryItem).mouseleave(leaveAddQueryItem)
+                    return element
+                }
+                function newAddControl(multiple) {
+                    return setMenuOnHover(
+                        $('<div>').addClass('qb-control qb-add-control' + (multiple? ' qb-multiple': '')),
+                        menu)
+                }
+                function currentQuery() {
+                    var selector = '.qb-logical, .qb-tag'
+                    function parseItem(item) {
+                        if (item.length === 0)
+                            return undefined
+                        var type = item.children('.qb-label').text()
+                        if (type === 'AND'   ||   type === 'OR') {
+                            var nested = []
+                            item.children(selector).each(function() {
+                                nested.push(parseItem($(this)))
+                            })
+                            var result = {}
+                            result[type] = nested
+                            return result
+                        }
+                        else if (type === 'NOT')
+                            return {
+                                NOT: parseItem(item.children(selector))
+                            }
+                        else
+                            return type
+                    }
+                    return parseItem(query.children(selector))
+                }
+                function invokeCallbacks() {
+                    var q = currentQuery()
+                    queryBuilder.callbacks.forEach(function(cb) {
+                        cb(q)
                     })
-                    var query = $('#qb-query')
-                    function detachMenu(menu) {
-                        $('body').append(menu.detach())
-                    }
-                    function setMenuOnHover(element, menu) {
-                        function enterAddQueryItem() {
-                            $(this).append(menu.stop().detach())
-                            menu.fadeIn('fast')
-                        }
-                        function leaveAddQueryItem() {
-                            menu.fadeOut('fast', detachMenu.bind(this, menu))
-                        }
-                        element.mouseenter(enterAddQueryItem).mouseleave(leaveAddQueryItem)
-                        return element
-                    }
-                    function newAddControl(multiple) {
-                        return setMenuOnHover(
-                            $('<div>').addClass('qb-control qb-add-control' + (multiple? ' qb-multiple': '')),
-                            menu)
-                    }
-                    query.append(newAddControl())
-                    function removeQueryItem() {
-                        var btn = $(this)
-                        var item = btn.parent()
-                        var next = item.next()
-                        var prev = item.prev()
-                        var last = next.hasClass('qb-add-control') && (prev.length === 0   ||   prev.hasClass('qb-label'))
-                        item.remove()
-                        if (last)
-                            next.show()
-                    }
-                    function newQueryItem(contentGenerator) {
-                        var control = $(this)
-                        var item = contentGenerator()
-                            .prepend($('<div>')
-                                .addClass('qb-control qb-del-control')
-                                .click(removeQueryItem))
-                            .insertBefore(control)
-                        if (!control.hasClass('qb-multiple'))
-                            control.hide()
-                        return item
-                    }
-                    function closeMenuThen(menu, then) {
-                        menu.fadeOut('fast', function() {
-                            var target = menu.parent()[0]
-                            detachMenu(menu)
-                            then.call(target)
-                        })
-                    }
-                    function closeMenuThenNewQueryItem(contentGenerator) {
-                        closeMenuThen(menu, newQueryItem.bind(menu.parent(), contentGenerator))
-                    }
-                    function newLogicalGenerator(text) {
+                }
+                query.append(newAddControl())
+                function removeQueryItem() {
+                    var btn = $(this)
+                    var item = btn.parent()
+                    var next = item.next()
+                    var prev = item.prev()
+                    var last = next.hasClass('qb-add-control') && (prev.length === 0   ||   prev.hasClass('qb-label'))
+                    item.remove()
+                    if (last)
+                        next.show()
+                    invokeCallbacks()
+                }
+                function newQueryItem(contentGenerator, invokeCb) {
+                    var control = $(this)
+                    var item = contentGenerator()
+                        .prepend($('<div>')
+                            .addClass('qb-control qb-del-control')
+                            .click(removeQueryItem))
+                        .insertBefore(control)
+                    if (!control.hasClass('qb-multiple'))
+                        control.hide()
+                    if (invokeCb)
+                        invokeCallbacks()
+                    return item
+                }
+                function closeMenuThen(menu, then) {
+                    menu.fadeOut('fast', function() {
+                        var target = menu.parent()[0]
+                        detachMenu(menu)
+                        then.call(target)
+                    })
+                }
+                function closeMenuThenNewQueryItem(contentGenerator, invokeCb) {
+                    closeMenuThen(menu, newQueryItem.bind(menu.parent(), contentGenerator, invokeCb))
+                }
+                function newLogicalGenerator(text) {
+                    return $('<div>')
+                        .addClass('qb-logical')
+                        .append(setMenuOnHover($('<div>')
+                            .addClass('qb-label').text(text), menuAdvanced))
+                        .append(newAddControl(text !== 'NOT'))
+                }
+                function newLogical() {
+                    var text = $(this).text()
+                    closeMenuThenNewQueryItem(newLogicalGenerator.bind(this, text), true)
+                }
+                function newTag() {
+                    var text = $(this).text()
+                    closeMenuThenNewQueryItem(function() {
                         return $('<div>')
-                            .addClass('qb-logical')
+                            .addClass('qb-tag')
                             .append(setMenuOnHover($('<div>')
                                 .addClass('qb-label').text(text), menuAdvanced))
-                            .append(newAddControl(text !== 'NOT'))
-                    }
-                    function newLogical() {
-                        var text = $(this).text()
-                        closeMenuThenNewQueryItem(newLogicalGenerator.bind(this, text))
-                    }
-                    function newTag() {
-                        var text = $(this).text()
-                        closeMenuThenNewQueryItem(function() {
-                            return $('<div>')
-                                .addClass('qb-tag')
-                                .append(setMenuOnHover($('<div>')
-                                    .addClass('qb-label').text(text), menuAdvanced))
-                        })
-                    }
+                    }, true)
+                }
 
-                    function removeWrappingItem() {
-                        var item = $(this)
-                        var multiple = item.parent().children('.qb-multiple').length == 1
-                        var content = item.children('.qb-logical, .qb-tag')
-                        if (!multiple && content.length > 1)
-                            return msg.error('Failed to unwrap: multiple items from wrapper contents are not allowed for wrapper parent')
-                        content.detach().insertBefore(item)
-                        if (content.length === 0)
-                            item.next().show()
-                        item.remove()
-                    }
+                function removeWrappingItem() {
+                    var item = $(this)
+                    var multiple = item.parent().children('.qb-multiple').length == 1
+                    var content = item.children('.qb-logical, .qb-tag')
+                    if (!multiple && content.length > 1)
+                        return msg.error('Failed to unwrap: multiple items from wrapper contents are not allowed for wrapper parent')
+                    content.detach().insertBefore(item)
+                    if (content.length === 0)
+                        item.next().show()
+                    item.remove()
+                }
 
-                    function wrapQueryItem(op) {
-                        var item = $(this)
-                        var wrappingItem = newQueryItem.call(item, newLogicalGenerator.bind(this, op))
-                        item.show().detach().insertAfter(wrappingItem.children('.qb-label'))
-                        var next = item.next()
-                        if (!next.hasClass('qb-multiple'))
-                            next.hide()
-                    }
+                function wrapQueryItem(op) {
+                    var item = $(this)
+                    var wrappingItem = newQueryItem.call(item, newLogicalGenerator.bind(this, op))
+                    item.show().detach().insertAfter(wrappingItem.children('.qb-label'))
+                    var next = item.next()
+                    if (!next.hasClass('qb-multiple'))
+                        next.hide()
+                }
 
-                    function invertQueryItem() {
-                        var item = $(this)
-                        if (item.hasClass('qb-logical') && item.children('.qb-label').text() === 'NOT')
-                            // Remove this NOT
-                            removeWrappingItem.call(item[0])
+                function invertQueryItem() {
+                    var item = $(this)
+                    if (item.hasClass('qb-logical') && item.children('.qb-label').text() === 'NOT')
+                        // Remove this NOT
+                        removeWrappingItem.call(item[0])
+                    else {
+                        var parentItem = item.parent()
+                        if (parentItem.hasClass('qb-logical') && parentItem.children('.qb-label').text() === 'NOT') {
+                            // Remove parent NOT
+                            removeWrappingItem.call(item.parent()[0])
+                        }
                         else {
-                            var parentItem = item.parent()
-                            if (parentItem.hasClass('qb-logical') && parentItem.children('.qb-label').text() === 'NOT') {
-                                // Remove parent NOT
-                                removeWrappingItem.call(item.parent()[0])
-                            }
-                            else {
-                                // Add parent NOT
-                                wrapQueryItem.call(item[0], 'NOT')
-                            }
+                            // Add parent NOT
+                            wrapQueryItem.call(item[0], 'NOT')
                         }
                     }
+                }
 
-                    function advancedMenuCommand() {
-                        var command = $(this).text()
-                        closeMenuThen(menuAdvanced, function() {
-                            var itemThis = $(this).parent()[0]
-                            switch(command) {
-                                case 'Invert':
-                                    return invertQueryItem.call(itemThis)
-                                case 'Remove wrapper':
-                                    return removeWrappingItem.call(itemThis)
-                                case 'Wrap with AND':
-                                    return wrapQueryItem.call(itemThis, 'AND')
-                                case 'Wrap with OR':
-                                    return wrapQueryItem.call(itemThis, 'OR')
-                                default:
-                                    return msg.warning('Don\'t know how to handle advanced menu command ' + command)
-                            }
-                        })
-                    }
-                    menu.children('.qb-control-logical').click(newLogical)
-                    menu.children('.qb-control-tag').click(newTag)
-                    menuAdvanced.children('.qb-control-logical').click(advancedMenuCommand)
-                })
-                .fail(msg.ajaxError)
-        })
+                function advancedMenuCommand() {
+                    var command = $(this).text()
+                    closeMenuThen(menuAdvanced, function() {
+                        var itemThis = $(this).parent()[0]
+                        switch(command) {
+                            case 'Invert':
+                                invertQueryItem.call(itemThis)
+                                break
+                            case 'Remove wrapper':
+                                removeWrappingItem.call(itemThis)
+                                break
+                            case 'Wrap with AND':
+                                wrapQueryItem.call(itemThis, 'AND')
+                                break
+                            case 'Wrap with OR':
+                                wrapQueryItem.call(itemThis, 'OR')
+                                break
+                            default:
+                                return msg.warning('Don\'t know how to handle advanced menu command ' + command)
+                        }
+                        invokeCallbacks()
+                    })
+                }
+                menu.children('.qb-control-logical').click(newLogical)
+                menu.children('.qb-control-tag').click(newTag)
+                menuAdvanced.children('.qb-control-logical').click(advancedMenuCommand)
+                queryBuilder.currentQuery = currentQuery
+            })
+            .fail(msg.ajaxError)
+    })
+mixin qb-html
     #qb
-        h1 Query builder
         #qb-query
         #qb-info
         #qb-menu

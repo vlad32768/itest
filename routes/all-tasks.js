@@ -17,6 +17,7 @@ var taskTags = []
         taskSetDescriptions[id] = taskSet.data.description
         for (var i=0, n=dirTasks.length; i<n; ++i) {
             var task = dirTasks[i]
+            task.addTag(id)
             _.each(task.tags(), function(tag) {
                 taskTagsObject[tag] = true
             })
@@ -43,8 +44,49 @@ function allTaskIds() {
     return _.keys(tasks)
 }
 
-function taskIds(taskSet) {
-    return _.filter(allTaskIds(), taskSetFilter(taskSet))
+// function taskIds(taskSet) {
+//     return _.filter(allTaskIds(), taskSetFilter(taskSet))
+// }
+
+function tagFilter(filter) {
+    if (!filter) return function() { return true }
+    return function(taskId) {
+        var tags = tasks[taskId].tagsObject()
+        function check(item) {
+            switch (typeof item) {
+                case 'string':   return item in tags
+                case 'undefined':   return true
+                case 'object':
+                    var ops = {
+                        AND: function(arg) {
+                            return _.every(arg, function(subItem) {
+                                return check(subItem)
+                            })
+                        },
+                        OR: function(arg) {
+                            return _.some(arg, function(subItem) {
+                                return check(subItem)
+                            })
+                        },
+                        NOT: function(arg) {
+                            return !check(arg)
+                        }
+                    }
+                    for (var op in ops) {
+                        var arg = item[op]
+                        if (arg)
+                            return ops[op](arg)
+                    }
+                    return true
+                default:   return true
+            }
+        }
+        return check(filter)
+    }
+}
+
+function taskIds(filter) {
+    return _.filter(allTaskIds(), tagFilter(filter))
 }
 
 function taskSets() {

@@ -189,9 +189,9 @@ router
             return false
         })
     })
-    .get('/mask-tasks', function(req, res) {
+    .get('/mask-tasks-old', function(req, res) {
         var taskSets = allTasks.taskSets()
-        res.render('mask-tasks', { allTasks: allTasks, taskSets: taskSets, sd: sd, taskStats: sd.data.taskStatsObj() })
+        res.render('mask-tasks-old', { allTasks: allTasks, taskSets: taskSets, sd: sd, taskStats: sd.data.taskStatsObj() })
     })
     .get('/mask-task-set', function(req, res) {
         var taskSet = req.query.taskSet
@@ -205,12 +205,35 @@ router
         sd.data.enableTask(taskId, enable)
         res.sendStatus(200)
     })
-    .get('/query-builder', function(req, res) {
-        res.render('query-builder')
+    .get('/mask-filtered-tasks', function(req, res) {
+        var filter = req.query.filter? JSON.parse(req.query.filter): undefined
+        var enable = toBool(req.query.enable)
+        sd.data.enableTasks(filter, enable)
+        res.sendStatus(200)
+    })
+    .get('/mask-tasks', function(req, res) {
+        res.render('mask-tasks', { allTasks: allTasks, sd: sd, taskStats: sd.data.taskStatsObj() } )
     })
     .get('/tags', function(req, res) {
         res.send(JSON.stringify(allTasks.taskTags()))
     })
+    .get('/task-ids', function(req, res) {
+        var filter = req.query.filter? JSON.parse(req.query.filter): undefined
+        var taskIds = allTasks.taskIds(filter)
+        var taskChecked = _.map(taskIds, function(taskId) {
+            return !sd.data.taskStatus(taskId).blocked
+        })
+        res.send({
+            taskIds: JSON.stringify(taskIds),
+            taskChecked: JSON.stringify(taskChecked)
+        })
+    })
+    .get('/task-statistics', function(req, res) {
+        res.send(sd.data.taskStatsObj())
+    })
     .use(su_task)
+    .use(function(req, res) {
+        res.sendStatus(404)
+    })
 
 module.exports = router

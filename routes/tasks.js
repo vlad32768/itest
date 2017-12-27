@@ -10,6 +10,7 @@ var sceneClasses = {
 
 function Task(data) {
     this.data = data
+    this.data.tagsObject = _.reduce(this.data.tags || [], function(o, tag) { o[tag] = true; return o }, {})
 }
 
 Task.fromObject = function(o) {
@@ -36,6 +37,14 @@ Task.prototype.stdinHint = function() {
 }
 Task.prototype.tags = function() {
     return this.data.tags
+}
+Task.prototype.addTag = function(tag) {
+    this.data.tags.push(tag)
+    this.data.tagsObject[tag] = true
+    return this
+}
+Task.prototype.tagsObject = function() {
+    return this.data.tagsObject
 }
 Task.prototype.options = function() {
     return this.data.options

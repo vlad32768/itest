@@ -8,53 +8,8 @@ block content
     script(src='/javascripts/jquery-ui.min.js')
     script(src='/javascripts/messages.js')
     script(src='/javascripts/jquery.splitter-0.14.0.js')
-    script.
-        $(document).ready(function() {
-            var reload = location.reload.bind(location)
-            $('.taskSet').click(function() {
-                $.get('/su/mask-task-set', { taskSet: $(this).next().text(), enable: this.checked } )
-                    .fail(msg.ajaxError)
-                    .done(reload)
-            })
-            $('.taskCheck').click(function() {
-                $.get('/su/mask-task', { task: $(this).next().text(), enable: this.checked } )
-                    .fail(msg.ajaxError)
-                    .done(reload)
-            })
-            var timeoutId
-            function loadPreview(a) {
-                timeoutId = undefined
-                $('a.preview').parent().removeClass('current-preview')
-                $(a).parent().addClass('current-preview')
-                $('#link-preview').attr('src', a.href)
-            }
-            $('a.preview')
-                .mouseenter(function() {
-                    timeoutId = setTimeout(loadPreview.bind(null, this), 500)
-                    })
-                .mouseleave(function() {
-                    if (timeoutId !== undefined)
-                        clearTimeout(timeoutId)
-                })
-            $('#main').split({
-                orientation: 'horizontal',
-                limit: 20,
-                position: '50%', // if there is no percentage it interpret it as pixels
-            })
-        })
+    include query-builder.jade
     style.
-        .taskContainer, .tagContainer {
-            padding-left: 2em;
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .task, .taskTag {
-            padding-right: 2em;
-            display: flex;
-        }
-        .info {
-            display: none;
-        }
         #main {
             position: fixed;
             top: 0;
@@ -66,32 +21,33 @@ block content
             position: fixed;
             overflow: auto;
         }
-        #alltasks div {
+        #alltasks > div {
             padding-left: 3em;
         }
-        /*
-        #alltasks {
-            position: fixed;
-            top: 0;
-            left: 3em;
-            right: 0;
-            height: 55%;
-            overflow: auto;
+        .checkAllFiltered {
+            margin-bottom: 1ex;
         }
-        #link-preview {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 45%;
+        .task, .taskTag {
+            padding-right: 2em;
+            display: flex;
         }
-        */
+        #taskIds {
+            padding-left: 2em;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .info {
+            display: none;
+        }
         #link-preview {
             width: 100%;
             height: 100%;
             border: none;
             transform: scale(1.0);
             transform-origin: 0 0;
+        }
+        #task-template {
+            display: none;
         }
         .task {
             border: 1px solid #fff;
@@ -101,30 +57,107 @@ block content
             background-color: #eee;
             border: 1px solid #ddd;
         }
+    script.
+        ;(function() {
+            function reloadStatistics() {
+                $.get('/su/task-statistics')
+                    .done(function(data) {
+                        var p = $('#task-stats')
+                        p.text('новых: ' + data.unchosen + ', нерешённых: ' + data.abandoned + ', решённых: ' + data.solved + ', решают сейчас:' + data.inprogress)
+                        // p#task-stats 
+                    })
+                    .fail(msg.ajaxError)
+            }
+            queryBuilder.onChange(function(query) {
+                msg.info(JSON.stringify(query))
+                $.get('/su/task-ids', { filter: JSON.stringify(query) })
+                    .done(function(data) {
+                        var taskIds = $('#taskIds')
+                        taskIds.html('')
+                        var taskChecked = JSON.parse(data.taskChecked)
+                        var nChecked = 0
+                        JSON.parse(data.taskIds).forEach(function(taskId, i) {
+                            var task = $('#task-template').children().clone(true)
+                            task.children('.taskCheck')[0].checked = taskChecked[i]
+                            task.children('.info').text(taskId)
+                            task.children('a.preview').attr('href', '/su/task?task='+taskId).text(taskId.replace(/^test-/, ''))
+                            taskIds.append(task)
+                            nChecked += taskChecked[i]? 1: 0
+                        })
+                        var checkAll = $('#check-all')[0]
+                        checkAll.checked = nChecked > 0
+                        checkAll.indeterminate = nChecked > 0   &&   nChecked < taskChecked.length
+                        reloadStatistics()
+                    })
+                    .fail(msg.ajaxError)
+            })
+            $(document).ready(function() {
+                var timeoutId
+                function loadPreview(a) {
+                    timeoutId = undefined
+                    $('a.preview').parent().removeClass('current-preview')
+                    $(a).parent().addClass('current-preview')
+                    $('#link-preview').attr('src', a.href)
+                }
+                $('a.preview')
+                    .mouseenter(function() {
+                        timeoutId = setTimeout(loadPreview.bind(null, this), 500)
+                        })
+                    .mouseleave(function() {
+                        if (timeoutId !== undefined)
+                            clearTimeout(timeoutId)
+                    })
+                $('.taskCheck').click(function() {
+                    $.get('/su/mask-task', { task: $(this).next().text(), enable: this.checked } )
+                        .done(function() {
+                            msg.info('OK')
+                            reloadStatistics()
+                        })
+                        .fail(msg.ajaxError)
+                })
+                $('#check-all').click(function() {
+                    var enable = this.checked
+                    $.get('/su/mask-filtered-tasks', { filter: JSON.stringify(queryBuilder.currentQuery()), enable: enable })
+                        .done(function() {
+                            $('.taskCheck').each(function() { this.checked = enable })
+                            msg.info('OK')
+                            reloadStatistics()
+                        })
+                        .fail(msg.ajaxError)
+                })
+                $('#main').split({
+                    orientation: 'horizontal',
+                    limit: 20,
+                    position: '50%', // if there is no percentage it interpret it as pixels
+                })
+
+                // set CheckAll indeterminate status
+                ;(function() {
+                    var tc = $('.taskCheck')
+                    var nChecked = 0
+                    tc.each(function() { nChecked += this.checked? 1: 0 })
+                    $('#check-all')[0].indeterminate = nChecked > 0   &&   nChecked < tc.length
+                })()
+            })
+        })()
     #main
         #alltasks
             #hdr
                 h1 Доступные задания
-                p новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress}
-            //- #tags
-            //-     h1 Теги
-            //-     div.tagQuery
-            //-     .tagContainer
-            //-         each tag in allTasks.taskTags()
-            //-             .taskTag= tag
-            #tasks
-                //- h2 Задачи
-                each taskSet, taskSetId in taskSets
-                    div
-                        div.taskSetContainer
-                            input.taskSet(type='checkbox' checked=sd.data.taskSetStatus(taskSetId)==='enabled')
-                            span= taskSetId
-                            span= ': ' + allTasks.taskSetDescription(taskSetId)
-                        .taskContainer
-                            each taskId in taskSet
-                                .task
-                                    input.taskCheck(type='checkbox' checked=!sd.data.taskStatus(taskId).blocked)
-                                    span.info= taskId
-                                    - var taskStatusFormatted = sd.data.taskStatusFormatted(taskId)
-                                    a.preview(href='/su/task?task='+taskId target='_blank')= taskId.replace(taskSetId+':', '') + (taskStatusFormatted? ': ' + taskStatusFormatted: '')
+                p#task-stats новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress}
+            +qb-html
+            .checkAllFiltered
+                input#check-all(type='checkbox' name='check-all' checked=sd.data.hasUnblockedTasks())
+                label(for='check-all') Выбрать все отфильтрованные
+            #taskIds
+                each taskId in allTasks.allTaskIds()
+                    .task
+                        input.taskCheck(type='checkbox' checked=!sd.data.taskStatus(taskId).blocked)
+                        span.info= taskId
+                        a.preview(href='/su/task?task='+taskId target='_blank')= taskId.replace(/^test-/, '')
         iframe#link-preview
+    #task-template
+        .task
+            input.taskCheck(type='checkbox')
+            span.info
+            a.preview(target='_blank')
