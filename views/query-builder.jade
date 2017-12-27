@@ -13,17 +13,18 @@ block content
             flex-wrap: wrap;
         }
         #qb-query {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #eef;
             padding: 5px;
         }
+        .qb-logical, .qb-tag {
+            box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+        }
+
         #qb-menu, #qb-menu-advanced {
             position: absolute;
             width: 50%;
             border: 1px solid #ccc;
             border-radius: 5px;
-            background-color: #efe;
+            background-color: #fff;
             padding: 5px;
             display: flex;
             align-items: center;
@@ -50,21 +51,18 @@ block content
             align-items: center;
             flex-wrap: nowrap;
             padding: 3px;
-            margin: 3px;
+            margin: 3px 6px;
+            border-radius: 3px;
+        }
+        .qb-logical {
+            flex-wrap: wrap;
+        }
+        .qb-tag {
+            flex-wrap: nowrap;
         }
         .qb-label {
             line-height: 4ex;
             padding: 0 3px;
-        }
-        .qb-logical {
-            border: 1px solid #fcc;
-            border-radius: 3px;
-            background-color: #fee;
-        }
-        .qb-tag {
-            border: 1px solid #ffc;
-            border-radius: 3px;
-            background-color: #ffe;
         }
         .qb-control {
             border: 1px solid #ccc;
@@ -74,6 +72,7 @@ block content
             height: 3ex;
             padding-left: 1ex;
             cursor: pointer;
+            margin: 0 5px;
         }
         .qb-add-control::before {
             font-size: 130%;
