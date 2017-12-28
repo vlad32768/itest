@@ -153,6 +153,9 @@ block content
             $('#allowAllTasksAtOnce').click(function() {
                 $.post('/su/tasks-allow-all-tasks-at-once', { value: $(this).prop('checked') }).fail(msg.ajaxError)
             })
+            $('#growingTaskComplexity').click(function() {
+                $.post('/su/tasks-growing-complexity', { value: $(this).prop('checked') }).fail(msg.ajaxError)
+            })
         })
     #hdr
         h1 Страница экзаменатора
@@ -190,6 +193,9 @@ block content
                         li
                             input#allowAllTasksAtOnce(type='checkbox' checked=studentData.allowAllTasksAtOnce)
                             label(for='allowAllTasksAtOnce') Разрешить брать несколько задач одновременно
+                        li
+                            input#growingTaskComplexity(type='checkbox' checked=studentData.growingTaskComplexity)
+                            label(for='growingTaskComplexity') Увеличивающаяся сложность задач
                         li
                             input#denyLogin(type='checkbox' checked=studentData.denyLogin)
                             label(for='denyLogin') Запретить идентификацию вновь прибывших

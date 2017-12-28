@@ -9,7 +9,7 @@ router
     })
     .post('/login', function(req, res, next) {
         var b = req.session.loginData = req.body
-        b = _.pick(b, ['group', 'firstname', 'lastname'])
+        b = _.pick(b, ['group', 'firstname', 'lastname', 'startComplexityIndex'])
         if (sd.data.denyLogin) {
             req.flash('loginMessage', 'Идентификация в данный момент запрещена')
             return res.redirect( '/login' )
@@ -52,7 +52,10 @@ router
             req.flash('loginMessage', 'Номер группы должен иметь формат 12345/6')
             return res.redirect('/login')
         }
-        var team = new sd.Team({group: b.group, members: members})
+        var teamData = { group: b.group, members: members }
+        if ('startComplexityIndex' in b)
+            teamData.startComplexityIndex = +b.startComplexityIndex
+        var team = new sd.Team(teamData)
         if (!sd.data.canAddTeam(team)) {
             team = sd.data.team(team.id())  // Pick existing team
             if (team && team.allowExtraLogin)

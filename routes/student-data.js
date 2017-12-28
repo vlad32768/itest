@@ -2,7 +2,7 @@ var _ = require('lodash')
 var allTasks = require('./all-tasks.js')
 
 function Team(options) {
-    _.merge(this, _.pick(options || {}, ['group', 'members']))
+    _.merge(this, _.pick(options || {}, ['group', 'members', 'startComplexityIndex']))
     this.tasks = []
     this.startTime = Date.now()
 }
@@ -36,6 +36,8 @@ Team.prototype.summary = function() {
     this.members.forEach(function(member) {
         items.push(member.firstname + ' ' + member.lastname)
     })
+    if (typeof this.startComplexityIndex === 'number')
+        items.push('бонусов ' + this.startComplexityIndex)
     return items.join(', ')
 }
 
@@ -54,6 +56,7 @@ function Data() {
     this.maxTeamSize = 2
     this.maxTasksPerTeam = 1
     this.allowAllTasksAtOnce = false
+    this.growingTaskComplexity = false
     this.statusData = _.reduce(allTasks.allTaskIds(), function(o, taskId) {
         o[taskId] = { chosen: 0, blocked: false, solved: 0, abandoned: 0 }
         return o
@@ -88,7 +91,7 @@ Data.fromJson = function(d) {
         result.addTeam(team, version)
     }
     _.assign(result.statusData, d.statusData)
-    _.merge(result, _.pick(d, 'maxTeamSize', 'maxTasksPerTeam', 'allowAllTasksAtOnce'))
+    _.merge(result, _.pick(d, 'maxTeamSize', 'maxTasksPerTeam', 'allowAllTasksAtOnce', 'growingTaskComplexity'))
     result.unsaved = false
     result.denyLogin = true
     return result
@@ -108,15 +111,32 @@ Data.prototype.canAddTeam = function(team) {
         return !self.list.hasOwnProperty(key)
     })
 }
-Data.prototype.taskStats = function() {
-    return _.reduce(this.statusData, function(o, st) {
-        if (!st.blocked)
+Data.prototype.taskStats = function(team, index) {
+    var isBlocked
+    if (arguments.length === 2   &&   typeof team.startComplexityIndex === 'number')
+        isBlocked = function(st, taskId) {
+            if (st.blocked)
+                return true
+            var task = allTasks.tasks()[taskId]
+            var tagsObject = task.tagsObject()
+            var complexity = index + team.startComplexityIndex
+            if (complexity < 1)
+                return !('complexity-1' in tagsObject   ||   'complexity-2' in tagsObject)
+            else if (complexity > 1)
+                return !('complexity-4' in tagsObject   ||   'complexity-5' in tagsObject)
+            else
+                return !('complexity-3' in tagsObject)
+        }
+    else
+        isBlocked = function(st, taskId) { return st.blocked }
+    return _.reduce(this.statusData, function(o, st, taskId) {
+        if (!isBlocked(st, taskId))
             ++o[st.chosen? ( st.solved? 2: st.abandoned? 1: 3 ): 0]
         return o
     }, [0, 0, 0, 0])
 }
 Data.prototype.taskStatsObj = function() {
-    var stats = this.taskStats()
+    var stats = this.taskStats.apply(this, arguments)
     return {
         unchosen: stats[0],
         abandoned: stats[1],
@@ -127,7 +147,7 @@ Data.prototype.taskStatsObj = function() {
 
 Data.prototype.allocTask = function(team) {
     // Generate task for the team
-    var stats = this.taskStats()
+    var stats = this.taskStats(team, team.tasks.length)
     var filters = [
         function(st) { return !st.blocked && !st.chosen },
         function(st) { return !st.blocked && st.chosen && st.abandoned },

@@ -182,6 +182,11 @@ router
             sd.data.allowAllTasksAtOnce = toBool(value)
         })
     })
+    .post('/tasks-growing-complexity', function(req, res) {
+        postScalarValue(req, res, function(value) {
+            sd.data.growingTaskComplexity = toBool(value)
+        })
+    })
     .post('/tasks-start-with-test', function(req, res) {
         postScalarValue(req, res, function(value) {
             sd.data.startWithTest = toBool(value)

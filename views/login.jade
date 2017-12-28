@@ -93,6 +93,13 @@ block content
         input(type='text' name='group' value=loginData.group autofocus)
         #students
         input.hidden#add-student(type='button' value='Добавить студента')
+        if studentData.growingTaskComplexity
+            input#startComplexityIndex1(type='radio' name='startComplexityIndex' value='0' checked)
+            label(for='startComplexityIndex1') Начать с совсем простой задачи (3 задачи на пятёрку)
+            input#startComplexityIndex2(type='radio' name='startComplexityIndex' value='1')
+            label(for='startComplexityIndex2') Начать с очень простой задачи (2 задачи на пятёрку)
+            input#startComplexityIndex3(type='radio' name='startComplexityIndex' value='2')
+            label(for='startComplexityIndex3') Начать с простой задачи (1 задача на пятёрку)
         input(type='submit' value='Войти')
     .hidden#studentLoginDataTemplate
         p Студент&nbsp;
