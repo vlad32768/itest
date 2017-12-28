@@ -44,10 +44,6 @@ function allTaskIds() {
     return _.keys(tasks)
 }
 
-// function taskIds(taskSet) {
-//     return _.filter(allTaskIds(), taskSetFilter(taskSet))
-// }
-
 function tagFilter(filter) {
     if (!filter) return function() { return true }
     return function(taskId) {

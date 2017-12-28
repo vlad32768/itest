@@ -58,7 +58,10 @@ Tasks.fromObject = function(o) {
     o.items.forEach(function(item) {
         var task = Task.fromObject(item)
         _.extend(task.data.options, data.options)
-        task.data.tags = task.data.tags.concat(data.tags)
+        if (data.tags)
+            _.each(data.tags, function(tag) {
+                task.addTag(tag)
+            })
         data.items.push(task)
     })
     return new Tasks(data)

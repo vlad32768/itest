@@ -111,54 +111,84 @@ Data.prototype.canAddTeam = function(team) {
         return !self.list.hasOwnProperty(key)
     })
 }
-Data.prototype.taskStats = function(team, index) {
+Data.prototype.tasksForTeam = function(team, index) {
     var isBlocked
-    if (arguments.length === 2   &&   typeof team.startComplexityIndex === 'number')
+    if (typeof team.startComplexityIndex === 'number') {
+        var complexityIndex = index + team.startComplexityIndex
+        var isBlockedByComplexity = complexityIndex < 1?
+                function(tagsObject) { return !('complexity-1' in tagsObject   ||   'complexity-2' in tagsObject) }:
+            complexityIndex > 1?
+                function(tagsObject) { return !('complexity-4' in tagsObject   ||   'complexity-5' in tagsObject) }:
+                function(tagsObject) { return !('complexity-3' in tagsObject) }
         isBlocked = function(st, taskId) {
-            if (st.blocked)
-                return true
-            var task = allTasks.tasks()[taskId]
-            var tagsObject = task.tagsObject()
-            var complexity = index + team.startComplexityIndex
-            if (complexity < 1)
-                return !('complexity-1' in tagsObject   ||   'complexity-2' in tagsObject)
-            else if (complexity > 1)
-                return !('complexity-4' in tagsObject   ||   'complexity-5' in tagsObject)
-            else
-                return !('complexity-3' in tagsObject)
+            return st.blocked?   true:   isBlockedByComplexity(allTasks.tasks()[taskId].tagsObject())
         }
+    }
     else
         isBlocked = function(st, taskId) { return st.blocked }
-    return _.reduce(this.statusData, function(o, st, taskId) {
-        if (!isBlocked(st, taskId))
-            ++o[st.chosen? ( st.solved? 2: st.abandoned? 1: 3 ): 0]
-        return o
-    }, [0, 0, 0, 0])
+    var availableTaskIds = []
+    var stats = [0, 0, 0, 0]
+    var filter = function(st, taskId) {
+        return !_.some(team.tasks, function(teamTask) { return teamTask.id === taskId }) && !isBlocked(st, taskId)
+    }
+    _.each(this.statusData, function(st, taskId) {
+        if (filter(st, taskId)) {
+            ++stats[st.chosen? ( st.solved? 2: st.abandoned? 1: 3 ): 0]
+            availableTaskIds.push(taskId)
+        }
+    })
+    return { stats: stats, filter: filter }
 }
+
+Data.prototype.taskStats = function(team, index) {
+    return _.reduce(this.statusData, function(o, st, taskId) {
+        if (!st.blocked) {
+            ++o[st.chosen? ( st.solved? 2: st.abandoned? 1: 3 ): 0]
+            var tagsObject = allTasks.tasks()[taskId].tagsObject()
+            if ('complexity-1' in tagsObject   ||   'complexity-2' in tagsObject)
+                ++o[4]
+            else if ('complexity-3' in tagsObject)
+                ++o[5]
+            else if ('complexity-4' in tagsObject   ||   'complexity-5' in tagsObject)
+                ++o[6]
+        }
+        return o
+    }, [0, 0, 0, 0,   0, 0, 0])
+}
+
 Data.prototype.taskStatsObj = function() {
     var stats = this.taskStats.apply(this, arguments)
     return {
         unchosen: stats[0],
         abandoned: stats[1],
         solved: stats[2],
-        inprogress: stats[3]
+        inprogress: stats[3],
+        availableLo: stats[4],
+        availableMed: stats[5],
+        availableHi: stats[6],
     }
 }
 
 Data.prototype.allocTask = function(team) {
     // Generate task for the team
-    var stats = this.taskStats(team, team.tasks.length)
+    var t4t = this.tasksForTeam(team, team.tasks.length)
     var filters = [
         function(st) { return !st.blocked && !st.chosen },
         function(st) { return !st.blocked && st.chosen && st.abandoned },
         function(st) { return !st.blocked && st.chosen && st.solved },
         function(st) { return !st.blocked && st.chosen && !st.abandoned && !st.solved }
     ]
-    var filterIndex = _.findIndex(stats, function(x) { return x > 0})
+    var filterIndex = _.findIndex(t4t.stats, function(x) { return x > 0})
     if (filterIndex === -1)
         throw new Error('Для Вас не хватило задания :\'(<br/>Приходите в другой раз!')
-    var taskIndex = Math.floor(Math.random() * stats[filterIndex])
-    var taskId = _(this.statusData).pickBy(filters[filterIndex]).keys().nth(taskIndex)
+    var filter = filters[filterIndex]
+    var taskIds = _(this.statusData).pickBy(function(st, taskId) {
+        return filter(st) && t4t.filter(st, taskId)
+    }).keys().value()
+    if (taskIds.length === 0)
+        throw new Error('Для Вас ВНЕЗАПНО не хватило задания :\'(<br/>Расскажите об этом преподавателю!')
+    var taskIndex = Math.floor(Math.random() * taskIds.length)
+    var taskId = taskIds[taskIndex]
     team.tasks.push({id: taskId})
     this.statusData[taskId].chosen++
 }

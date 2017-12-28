@@ -180,6 +180,8 @@ block content
         if team.tasks[teamTaskIndex].solved
             p.win Задача решена!
     h1 Вариант #{taskId}
+        if !allowUpload
+            | &nbsp; (теги: #{task.tags().join(', ')})
     .render-tex!= task.text()
     if task.stdin() !== undefined
         #stdin-block

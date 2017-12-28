@@ -63,13 +63,14 @@ block content
                 $.get('/su/task-statistics')
                     .done(function(data) {
                         var p = $('#task-stats')
-                        p.text('новых: ' + data.unchosen + ', нерешённых: ' + data.abandoned + ', решённых: ' + data.solved + ', решают сейчас:' + data.inprogress)
-                        // p#task-stats 
+                        p.text(
+                            'новых: ' + data.unchosen + ', нерешённых: ' + data.abandoned + ', решённых: ' + data.solved + ', решают сейчас:' + data.inprogress +
+                            ', доступно: ' + data.availableLo + ' на тройку, ' + data.availableMed + ' на четвёрку, ' + data.availableHi + ' на пятёрку')
                     })
                     .fail(msg.ajaxError)
             }
             queryBuilder.onChange(function(query) {
-                msg.info(JSON.stringify(query))
+                // msg.info(JSON.stringify(query))
                 $.get('/su/task-ids', { filter: JSON.stringify(query) })
                     .done(function(data) {
                         var taskIds = $('#taskIds')
@@ -110,7 +111,7 @@ block content
                 $('.taskCheck').click(function() {
                     $.get('/su/mask-task', { task: $(this).next().text(), enable: this.checked } )
                         .done(function() {
-                            msg.info('OK')
+                            // msg.info('OK')
                             reloadStatistics()
                         })
                         .fail(msg.ajaxError)
@@ -120,7 +121,7 @@ block content
                     $.get('/su/mask-filtered-tasks', { filter: JSON.stringify(queryBuilder.currentQuery()), enable: enable })
                         .done(function() {
                             $('.taskCheck').each(function() { this.checked = enable })
-                            msg.info('OK')
+                            // msg.info('OK')
                             reloadStatistics()
                         })
                         .fail(msg.ajaxError)
@@ -145,6 +146,7 @@ block content
             #hdr
                 h1 Доступные задания
                 p#task-stats новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress}
+                    | доступно: #{taskStats.availableLo} на тройку, #{taskStats.availableMed} на четвёрку, #{taskStats.availableHi} на пятёрку)
             +qb-html
             .checkAllFiltered
                 input#check-all(type='checkbox' name='check-all' checked=sd.data.hasUnblockedTasks())

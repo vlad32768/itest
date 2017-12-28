@@ -176,7 +176,8 @@ block content
                                 | Начать с&nbsp;
                                 a(href='/su/mask-test-questions', target='_blank') теста
                         li: a(href='/su/mask-tasks', target='_blank') Доступные задачи
-                            | (новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress})
+                            | (новых: #{taskStats.unchosen}, нерешённых: #{taskStats.abandoned}, решённых: #{taskStats.solved}, решают сейчас: #{taskStats.inprogress},
+                            | доступно: #{taskStats.availableLo} на тройку, #{taskStats.availableMed} на четвёрку, #{taskStats.availableHi} на пятёрку)
                         li: a(href='/su/mask-tasks-old', target='_blank') Доступные задачи (старая страница)
                         li Максимальное число студентов в команде:
                             input#teamSize1(type='radio' name='maxTeamSize' value='1' checked=studentData.maxTeamSize===1)
@@ -221,6 +222,7 @@ block content
         table.state
             thead: tr
                 th Группы
+                th Бонусы
                 th Время
                 th Студенты
                 th Задачи
@@ -230,6 +232,7 @@ block content
                     tr.team
                         td= team.group
                             span.teamId= team.id()
+                        td= typeof team.startComplexityIndex === 'number'? team.startComplexityIndex: '-'
                         td= util.formatTimeSpan(Date.now() - team.startTime)
                         td: table: tbody
                             each member, memberIndex in team.members
@@ -251,33 +254,6 @@ block content
                         td
                             input.relogin(title='Разрешить повторный вход' type='checkbox' checked=team.allowExtraLogin)
                             input.remove(title='Удалить команду' type='button' value='X')
-        //-
-            table
-                tr
-                    th Команда
-                    th Вариант
-                    th Результат
-                    th :)
-                    th :(
-                    th Оценка
-                    th ...
-                    th ->
-                each team, index in studentData.teams()
-                    tr
-                        td(style='rowspan: #{team.tasks.length};')= team.summary()
-                            span.teamId= team.id()
-                        each teamTask, teamTaskIndex in team.tasks
-                            td: a(href='/su/task?task=#{teamTask.id}' target='_blank')= teamTask.id
-                            td
-                                if teamTask.result
-                                    a.team-result(href='/su/team-result?id=#{team.id()}&taskIndex=#{teamTaskIndex}' target='_blank') есть
-                                else
-                                    | нет
-                            td: input.taskSolved(type='checkbox' checked=teamTask.solved)
-                            td: input.taskAbandoned(type='checkbox' checked=teamTask.abandoned)
-                        td(style='rowspan: #{team.tasks.length};'): input.mark(type='text' value=team.mark||'')
-                        td(style='rowspan: #{team.tasks.length};'): input.remove(type='button' value='удалить')
-                        td(style='rowspan: #{team.tasks.length};'): input.relogin(type='checkbox' checked=team.allowExtraLogin)
     #confirm-remove(title="Действитьельно удалить?")
     #confirm-clear(title="Очистить данные?")
         p Текущее состояние не сохранено!
