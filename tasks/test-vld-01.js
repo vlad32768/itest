@@ -49,7 +49,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '7   1 2 2 2 5 6 6',
-        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$',
+        tags: ['arrays']
     },
     { //2
         text: [
@@ -64,7 +65,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(count).finish()
         }],
         stdin: '5  10  3 7 4 5 5 3 9 5 7 9 ',
-        stdinHint: 'Введите $n, s, a_1, \\ldots, a_s$'
+        stdinHint: 'Введите $n, s, a_1, \\ldots, a_s$',
+        tags: ['arrays']
     },
     {   //3
         text: [
@@ -90,7 +92,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(s).finish()
         }],
         stdin: '1',
-        stdinHint: 'Введите $x$'
+        stdinHint: 'Введите $x$',
+        tags: ['math']
     },
     {   //4
         text: [
@@ -108,7 +111,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(str).finish()
         }],
         stdin: '1 2 3 2 4 6.1',
-        stdinHint: 'Введите $a_0, \\ldots, a_5$'
+        stdinHint: 'Введите $a_0, \\ldots, a_5$',
+        tags: ['math','planimetry']
     },
     {   //5
         text: [
@@ -126,7 +130,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '-0.24951 0.74612 0.61729 0.5621 0.55952 1.17089 0.81161 -0.1866 0.5536 ',
-        stdinHint: 'Введите $a_0, \\ldots, a_8$'
+        stdinHint: 'Введите $a_0, \\ldots, a_8$',
+        tags: ['math','planimetry']
     },
     {   //6
         text: [
@@ -158,7 +163,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(max_key,m.get(max_key)).finish()
         }],
         stdin: '15  1 3 5 5 5 5 6 6 7 7 7 8 9 9 9',
-        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-2'] //comp-1?
     },
     {   //7
         text: [
@@ -176,7 +182,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10    2 4 3 5 4 6 5 7 6 8',
-        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-1']
     },
     {   //8
         text: [
@@ -221,7 +228,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.println(m_c).finish()
         }],
         stdin: '20    2 4 3 5 5 5 5 4 3 2 2 2 3 4 5 6 7 7 6 5',
-        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-4']
     },
     {   //9
         text: [
@@ -264,7 +272,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.print(acc_s_max,acc_e_max).finish()
         }],
         stdin: '20    2 4 3 5  5 5 5 4 3 2 2   2 3 4 5 6 7   7 6 5',
-        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-4']
     },
     {   //10
         text: [
@@ -282,7 +291,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '4   1 5 3 7',
-        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-1']
     },
     {   //11
         text: [
@@ -315,7 +325,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '-0.99823459867075659  0.28726115158486704 0 0',
-        stdinHint: 'Введите $c$, $x_0$'//TODO:latex Real Im ?
+        stdinHint: 'Введите $c$, $x_0$',//TODO:latex Real Im ?
+        tags: ['math','complexity-3'] //comp-2?
     },
     {   //12
         text: [
@@ -333,7 +344,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(i).finish()
         }],
         stdin: '2   7  3 5 7 9 11 14 16',
-        stdinHint: 'Введите $h, n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $h, n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-1']
     },
     {   //13
         text: [
@@ -377,7 +389,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '2   7     3 5    8 9 11 12   15',
-        stdinHint: 'Введите $h, n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $h, n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-2'] //comp-1?
     },
     {   //14
         text: [
@@ -395,7 +408,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(c).finish()
         }],
         stdin: '7  3 5 5 5 7 7 8',
-        stdinHint: 'Введите $n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-1']
     },
     {   //15
         text: [
@@ -414,7 +428,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(i).finish()
         }],
         stdin: '2 4   7  3 5 7 3 4 1 3 ',
-        stdinHint: 'Введите $h, H, n, a_1, \\ldots, a_n$'
+        stdinHint: 'Введите $h, H, n, a_1, \\ldots, a_n$',
+        tags: ['arrays','complexity-1']
     },
     {   //16
         text: [
@@ -441,7 +456,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '28',
-        stdinHint: 'Введите $n$'
+        stdinHint: 'Введите $n$',
+        tags: ['math','complexity-2']
     },
     { //17
         text: [
@@ -478,7 +494,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5  5  2 5 8 15 20 ',
-        stdinHint: 'Введите $n, size, a_1, \\ldots, v_{size-1}$'
+        stdinHint: 'Введите $n, size, a_1, \\ldots, v_{size-1}$',
+        tags: ['arrays','complexity-3']
     },
     { //18
         text: [
@@ -513,7 +530,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5  5  2 5 8 15 20 ',
-        stdinHint: 'Введите $n, size, v_1, \\ldots, v_{size-1}$'
+        stdinHint: 'Введите $n, size, v_1, \\ldots, v_{size-1}$',
+        tags: ['arrays','complexity-3']
     },
     { //19
         text: [
@@ -540,7 +558,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 2 5 8 1 4 15 20 1 25',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_n$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_n$',
+        tags: ['arrays','complexity-2']
     },
     { //20
         text: [
@@ -564,7 +583,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 2 5 8 1 4 15 20 1 25',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-3']
     },
     { //21
         text: [
@@ -594,7 +614,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '7  10  5 2 5 8 1 4 15 20 1 25',
-        stdinHint: 'Введите $d, n, v_1, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $d, n, v_1, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     { //22
         text: [
@@ -619,7 +640,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5   2 4 6 8 10',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     { //23
         text: [
@@ -659,7 +681,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5   2 4 6 8 10',
-        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_1, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     { //24
         text: [
@@ -679,7 +702,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 1 10 5 20 9 3 20 1 25',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     { //25
         text: [
@@ -697,7 +721,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10  5 2 5 8 2 4 15 20 1 25',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     { //26
         text: [
@@ -725,7 +750,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '7',
-        stdinHint: 'Введите $n$'
+        stdinHint: 'Введите $n$',
+        tags: ['math','complexity-2'] //comp-1?
     },
     { //27
         text: [
@@ -763,7 +789,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10 1 2 2 2 3 4 4 4 4 5',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-3']
     },
     { //28
         text: [
@@ -788,7 +815,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '132435',
-        stdinHint: 'Введите $n$'
+        stdinHint: 'Введите $n$',
+        tags: ['arrays','math','complexity-2']
     },
     { //29
         text: [
@@ -806,7 +834,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(f,d).finish()
         }],
         stdin: '3   5   4 2 3 1 2',
-        stdinHint: 'Введите $x, n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $x, n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','math','complexity-3']
     },
     { //30
         text: [
@@ -841,7 +870,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10   2 3 2 3 2 1 2 3 2 2',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-3']
     },
     { //31  = 23
         text: [
@@ -885,7 +915,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5   2 4 6 8 10',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     { //32
         text: [
@@ -903,7 +934,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: ' 3 8   10   1 3  2 4  3 5  4 6  5 7  6 8  7 9  8 10  9 11  10 12',
-        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_{2n-1}$'
+        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_{2n-1}$',
+        tags: ['arrays','complexity-2']
     },
     { //33
         text: [
@@ -932,7 +964,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: ' 3 8   10   1 3  2 4  3 5  4 6  5 7  6 8  7 9  8 10  9 11  10 12',
-        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_{2n-1}$'
+        stdinHint: 'Введите $a, b, n, v_0, \\ldots, v_{2n-1}$',
+        tags: ['arrays','complexity-2']
     },
     {   //34
         text: [
@@ -955,7 +988,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '28 36',
-        stdinHint: 'Введите $M, N$'
+        stdinHint: 'Введите $M, N$',
+        tags: ['arrays','math','complexity-2']
     },
     {   //35 //27?
         text: [
@@ -1001,7 +1035,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10   3 3 -1 -1 -1 3 -1 3 3 3',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-3']
     },
     {   //36
         text: [
@@ -1027,7 +1062,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '4  28 196 32 56',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     {   //37
         text: [
@@ -1053,7 +1089,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.println(p).finish()
         }],
         stdin: '5  0 0  0 2  4 5  8 2  8 0',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{2n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{2n-1}$',
+        tags: ['arrays','math','complexity-3']
     },
     {   //38
         text: [
@@ -1079,7 +1116,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.println(idx).finish()
         }],
         stdin: '7   1 2 3 5 4 6 7',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     {   //39
         text: [
@@ -1098,7 +1136,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10   1 2 3 10 5 6 7 8 9 0',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-1']
     },
     {   //40
         text: [
@@ -1127,7 +1166,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '4  5   1 3  2 4  3 5  4 6  5 7',
-        stdinHint: 'Введите $a, n, v_0, \\ldots, v_{2n-1}$'
+        stdinHint: 'Введите $a, n, v_0, \\ldots, v_{2n-1}$',
+        tags: ['arrays','complexity-2']
     },
     {   //41
         text: [
@@ -1156,7 +1196,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.println(idx).finish()
         }],
         stdin: ' 3 4    5     1 1  2 2  3 3  4 4  5 5',
-        stdinHint: 'Введите $ x_A, y_A, n, v_0, \\ldots, v_{2n-1}$'
+        stdinHint: 'Введите $ x_A, y_A, n, v_0, \\ldots, v_{2n-1}$',
+        tags: ['arrays','math','planimetry','complexity-2']
     },
     {   //42
         text: [
@@ -1178,7 +1219,8 @@ module.exports = tasks.Tasks.fromObject({
             return lp().println(s).finish()
         }],
         stdin: ' 7   0 0.2617993877991494 0.5235987755982988 0.7853981633974483 1.0471975511965976 1.308996938995747 1.5707963267948963  0 0.25881904510252074 0.49999999999999994 0.7071067811865475 0.8660254037844386 0.9659258262890682 1',
-        stdinHint: 'Введите $n, x_1, \\ldots, x_{n}, y_1, \\ldots, y_{n}$'
+        stdinHint: 'Введите $n, x_1, \\ldots, x_{n}, y_1, \\ldots, y_{n}$',
+        tags: ['arrays','math','complexity-2']
     },
     {   //43
         text: [
@@ -1198,7 +1240,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '5   1 3 2 -3 4',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     },
     {   //44
         text: [
@@ -1228,7 +1271,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '10   9 3 2 1 0 0 0 0 0 0   5 4 3 9 9 0 0 0 0 0',
-        stdinHint: 'Введите $n, u_0, \\ldots, u_{n-1}  v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, u_0, \\ldots, u_{n-1}  v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','math','complexity-3']
     },
     {   //45
         text: [
@@ -1260,7 +1304,8 @@ module.exports = tasks.Tasks.fromObject({
             return printer.finish()
         }],
         stdin: '7    1 2 3 3 4 6 7',
-        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$'
+        stdinHint: 'Введите $n, v_0, \\ldots, v_{n-1}$',
+        tags: ['arrays','complexity-2']
     }
     ]
 })
